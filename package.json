@@ -1,0 +1,30 @@
+{
+  "name": "claude-certified-architect-mock-exam",
+  "version": "1.0.0",
+  "description": "A single-page, offline-friendly mock exam for the Claude Certified Architect — Foundations (CCAF) credential, built from what I learned preparing for and passing the real exam.",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server -p 3000 -o",
+    "test": "echo \"No tests specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://x-access-token:ghs_OgTbX4ARxxfrzT6oGgxhyQUZ6A3o433bUh1f@github.com/zintaen/claude-certified-architect-mock-exam.git"
+  },
+  "keywords": [
+    "claude",
+    "anthropic",
+    "certification",
+    "mock-exam",
+    "ccaf"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zintaen/claude-certified-architect-mock-exam/issues"
+  },
+  "homepage": "https://github.com/zintaen/claude-certified-architect-mock-exam#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
