@@ -477,33 +477,36 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
 .theme-toggle:hover { transform:scale(1.1); }
 .theme-toggle:active { transform:scale(0.95); }
 
-/* Dark mode palette */
+/* Dark mode palette — CyberSkill Design System tonal-elevation model
+   Surfaces rise in L (H≈44 warm hue); text = warm-neutral oklch(0.96 0.03 83.7);
+   Pure white NEVER used on dark surfaces. */
 :root.dark-mode {
-  --bg:#1A1A2E;
-  --bg-2:#16213E;
-  --ink:#E8E0D8;
-  --ink-soft:#C4B8AB;
-  --muted:#9A8B7A;
-  --line:#2E3A50;
-  --accent:#F4BA17;
-  --accent-dark:#E2AC13;
-  --accent-soft:#3A3520;
-  --good:#7AAD3E;
-  --bad:#E06050;
-  --warn:#C89040;
-  --info:#4A9DAA;
-  --card:#0F3460;
-  --brand-900:#E8E0D8;
-  --brand-700:#C4B8AB;
-  --gold-400:#F6C437;
-  --cream:#1A1A2E;
-  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.4);
-  --shadow-lg: 0 2px 4px rgba(0,0,0,.3), 0 18px 40px rgba(0,0,0,.5);
+  --bg:oklch(0.14 0.02 44);             /* Page L0: #1C0E04 */
+  --bg-2:oklch(0.22 0.02 44);           /* Surface L2: hovered/nav */
+  --ink:oklch(0.96 0.03 83.7);          /* warm-neutral text — NOT white */
+  --ink-soft:oklch(0.88 0.016 44);      /* neutral-200 → soft text on dark */
+  --muted:#BFAE94;                      /* from DS cross-theme text.muted */
+  --line:oklch(0.40 0.02 44);           /* border-default dark */
+  --accent:#F4C32E;                     /* ochre-400 for dark CTA */
+  --accent-dark:#E2AC13;                /* ochre-600 hover */
+  --accent-soft:oklch(0.22 0.06 84);    /* ochre tint on dark */
+  --good:#5BB069;                       /* DS semantic success dark */
+  --bad:#E5694A;                        /* DS semantic danger dark */
+  --warn:#F4BA17;                       /* DS semantic warning dark */
+  --info:#5C9DDB;                       /* DS semantic info dark */
+  --card:oklch(0.18 0.02 44);           /* Surface L1: card */
+  --brand-900:oklch(0.96 0.03 83.7);    /* warm-neutral replaces umber on dark */
+  --brand-700:oklch(0.88 0.016 44);     /* neutral-200 */
+  --gold-400:#F4C32E;                   /* ochre-400 */
+  --cream:oklch(0.14 0.02 44);          /* page bg */
+  /* DS: shadows de-emphasized; highlight stroke + faint drop */
+  --shadow: inset 0 1px 0 oklch(1 0 0 / 0.05), 0 4px 8px oklch(0 0 0 / 0.4);
+  --shadow-lg: inset 0 1px 0 oklch(1 0 0 / 0.05), 0 16px 32px oklch(0 0 0 / 0.5);
 }
 :root.dark-mode body { background:var(--bg); color:var(--ink); }
-:root.dark-mode .topbar { background:rgba(26,26,46,.92); border-bottom-color:var(--line); }
+:root.dark-mode .topbar { background:oklch(0.14 0.02 44 / 0.92); border-bottom-color:var(--line); }
 :root.dark-mode .exam-wrap, :root.dark-mode .q-card { background:var(--card); border-color:var(--line); }
-:root.dark-mode .hero { background:linear-gradient(170deg,#16213E 0%,#1A1A2E 100%); }
+:root.dark-mode .hero { background:linear-gradient(170deg, oklch(0.18 0.02 44) 0%, oklch(0.14 0.02 44) 100%); }
 :root.dark-mode .watermark { opacity:0.03; }
 :root.dark-mode .result-v2 { background:var(--card); border-color:var(--line); }
 :root.dark-mode .btn.ghost { border-color:var(--line); color:var(--ink); }
@@ -514,6 +517,11 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
 :root.dark-mode .auth-box { background:var(--bg-2); border-color:var(--line); }
 :root.dark-mode .palette .p-btn { background:var(--bg-2); border-color:var(--line); color:var(--ink); }
 :root.dark-mode ::selection { background:var(--accent); color:var(--bg); }
+:root.dark-mode .stat { background:var(--card); border-color:var(--line); }
+:root.dark-mode .start-grid { color:var(--ink); }
+:root.dark-mode section { border-color:var(--line); }
+:root.dark-mode .nav a { color:var(--ink-soft); }
+:root.dark-mode .nav a:hover { color:var(--ink); }
 
 /* Domain breakdown bars */
 .domain-breakdown { margin-top:24px; padding:20px; background:var(--bg-2); border-radius:12px; border:1px solid var(--line); }
@@ -3711,8 +3719,8 @@ window.__ENC_QUESTIONS = [
     const toggle = document.getElementById('theme-toggle');
     const saved = localStorage.getItem('ccaf-dark-mode');
     
-    // Check saved preference or system preference
-    if (saved === 'true' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    // Light theme by default — only apply dark if user explicitly chose it
+    if (saved === 'true') {
       document.documentElement.classList.add('dark-mode');
       if (toggle) toggle.textContent = '🌙';
     }

@@ -27,8 +27,11 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
+  // Only handle http/https requests (skip chrome-extension://, etc.)
+  if (!url.protocol.startsWith('http')) return;
+
   // Don't cache Supabase API calls or analytics
-  if (url.hostname.includes('supabase') || url.hostname.includes('vercel')) {
+  if (url.hostname.includes('supabase') || url.hostname.includes('vercel') || url.hostname.includes('jsdelivr')) {
     return; // let the browser handle these normally
   }
 
