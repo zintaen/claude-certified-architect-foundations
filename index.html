@@ -3535,6 +3535,7 @@ window.__ENC_QUESTIONS = [
   window.verifyUser = async function() {
     const email = document.getElementById("auth-email") ? document.getElementById("auth-email").value.trim() : "";
     const pin = document.getElementById("auth-pin") ? document.getElementById("auth-pin").value.trim() : "";
+    const nickname = document.getElementById("auth-nickname") ? document.getElementById("auth-nickname").value.trim() : "";
     
     if (!email && !pin) return true; // guest mode
     if ((email && !pin) || (!email && pin) || !/^\d{6}$/.test(pin)) {
@@ -3554,7 +3555,8 @@ window.__ENC_QUESTIONS = [
       const p_pin_hash = await hashPIN(pin);
       const { data, error } = await supabase.rpc('verify_mock_user', {
         p_email: email,
-        p_pin_hash: p_pin_hash
+        p_pin_hash: p_pin_hash,
+        p_nickname: nickname || null
       });
 
       if (error) {
