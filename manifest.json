@@ -1,0 +1,17 @@
+{
+  "name": "CCAF Mock Exam",
+  "short_name": "CCAF Exam",
+  "description": "Claude Certified Architect — Foundations mock exam with 60 scenario-based questions.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FAF6F0",
+  "theme_color": "#C8A97E",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%23C8A97E'/><text x='96' y='120' font-size='100' text-anchor='middle' fill='%23FAF6F0' font-family='system-ui'>📝</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

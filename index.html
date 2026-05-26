@@ -8,6 +8,7 @@
 <meta name="description" content="Free CCAF mock exam by CyberSkill. 60 questions, 120-minute proctor-style timer, 1000-point scoring, review explanations. Turn your will into real." />
 <meta name="theme-color" content="#45210E" />
 <link rel="icon" type="image/svg+xml" href="assets/cyberskill-logo.svg" />
+<link rel="manifest" href="manifest.json" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@500;700&display=swap" />
@@ -456,16 +457,105 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
 .auth-box h4 { margin:0 0 8px; font-size:1.05rem; }
 .auth-box p { font-size:0.85rem; margin:0 0 12px; color:var(--ink-soft); }
 .auth-form { display: flex; gap: 8px; flex-wrap: wrap; }
-.auth-input { flex: 1; min-width: 140px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); font: inherit; }
+.auth-input { flex: 1; min-width: 120px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); font: inherit; background:var(--card); color:var(--ink); }
 .global-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px; }
 @media(max-width:800px) { .global-stats-grid { grid-template-columns: repeat(2, 1fr); } }
 @media(max-width:500px) { .global-stats-grid { grid-template-columns: 1fr; } }
 .hard-q-item { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px dashed var(--line); font-size:0.85rem;}
 .hard-q-item:last-child { border-bottom: none; }
+
+/* Dark mode toggle */
+.theme-toggle {
+  position:fixed; bottom:20px; right:20px; z-index:9999;
+  width:44px; height:44px; border-radius:50%;
+  border:1px solid var(--line); background:var(--card);
+  color:var(--ink); font-size:1.2rem; cursor:pointer;
+  box-shadow: var(--shadow);
+  display:flex; align-items:center; justify-content:center;
+  transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
+}
+.theme-toggle:hover { transform:scale(1.1); }
+.theme-toggle:active { transform:scale(0.95); }
+
+/* Dark mode palette */
+:root.dark-mode {
+  --bg:#1A1A2E;
+  --bg-2:#16213E;
+  --ink:#E8E0D8;
+  --ink-soft:#C4B8AB;
+  --muted:#9A8B7A;
+  --line:#2E3A50;
+  --accent:#F4BA17;
+  --accent-dark:#E2AC13;
+  --accent-soft:#3A3520;
+  --good:#7AAD3E;
+  --bad:#E06050;
+  --warn:#C89040;
+  --info:#4A9DAA;
+  --card:#0F3460;
+  --brand-900:#E8E0D8;
+  --brand-700:#C4B8AB;
+  --gold-400:#F6C437;
+  --cream:#1A1A2E;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.4);
+  --shadow-lg: 0 2px 4px rgba(0,0,0,.3), 0 18px 40px rgba(0,0,0,.5);
+}
+:root.dark-mode body { background:var(--bg); color:var(--ink); }
+:root.dark-mode .topbar { background:rgba(26,26,46,.92); border-bottom-color:var(--line); }
+:root.dark-mode .exam-wrap, :root.dark-mode .q-card { background:var(--card); border-color:var(--line); }
+:root.dark-mode .hero { background:linear-gradient(170deg,#16213E 0%,#1A1A2E 100%); }
+:root.dark-mode .watermark { opacity:0.03; }
+:root.dark-mode .result-v2 { background:var(--card); border-color:var(--line); }
+:root.dark-mode .btn.ghost { border-color:var(--line); color:var(--ink); }
+:root.dark-mode .btn.ghost:hover { background:var(--bg-2); }
+:root.dark-mode .pill { background:var(--bg-2); border-color:var(--line); color:var(--ink-soft); }
+:root.dark-mode .kbd { background:var(--bg-2); border-color:var(--line); color:var(--ink); }
+:root.dark-mode code.mark { background:var(--accent-soft); color:var(--accent); }
+:root.dark-mode .auth-box { background:var(--bg-2); border-color:var(--line); }
+:root.dark-mode .palette .p-btn { background:var(--bg-2); border-color:var(--line); color:var(--ink); }
+:root.dark-mode ::selection { background:var(--accent); color:var(--bg); }
+
+/* Domain breakdown bars */
+.domain-breakdown { margin-top:24px; padding:20px; background:var(--bg-2); border-radius:12px; border:1px solid var(--line); }
+.domain-breakdown h4 { margin:0 0 16px; font-size:1rem; }
+.domain-bar { margin-bottom:12px; }
+.domain-bar:last-child { margin-bottom:0; }
+.domain-bar-label { display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px; }
+.domain-bar-label span:first-child { font-weight:600; }
+.domain-bar-track { height:24px; background:var(--line); border-radius:12px; overflow:hidden; position:relative; }
+.domain-bar-fill { height:100%; border-radius:12px; transition: width 1s var(--ease-out); display:flex; align-items:center; justify-content:flex-end; padding-right:8px; font-size:0.75rem; font-weight:700; color:#fff; min-width:0; }
+.domain-bar-fill.high { background:linear-gradient(90deg,#86A64E,#567A2E); }
+.domain-bar-fill.mid { background:linear-gradient(90deg,#E2AC13,#C8930A); }
+.domain-bar-fill.low { background:linear-gradient(90deg,#D06040,#A23B22); }
+
+/* Leaderboard */
+.leaderboard { margin-top:24px; }
+.leaderboard h4 { margin:0 0 12px; font-size:1rem; }
+.lb-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+.lb-table th { text-align:left; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); border-bottom:2px solid var(--line); padding:6px 8px; }
+.lb-table td { padding:8px; border-bottom:1px solid var(--line); }
+.lb-table tr:last-child td { border-bottom:none; }
+.lb-rank { font-weight:700; color:var(--accent); width:36px; text-align:center; }
+.lb-rank.gold { color:#F4BA17; }
+.lb-rank.silver { color:#A0A0A0; }
+.lb-rank.bronze { color:#CD7F32; }
+.lb-score { font-weight:700; font-family:'Red Hat Text',sans-serif; }
+
+/* Dashboard */
+.dashboard-box { background:var(--bg-2); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:16px; }
+.dashboard-box h4 { margin:0 0 4px; font-size:1.1rem; }
+.dashboard-box .sub { font-size:0.85rem; color:var(--muted); margin:0 0 16px; }
+.history-list { display:grid; gap:8px; }
+.history-item { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:var(--card); border:1px solid var(--line); border-radius:8px; font-size:0.85rem; }
+.history-score { font-weight:700; font-size:1rem; }
+.history-score.pass { color:var(--good); }
+.history-score.fail { color:var(--bad); }
+.history-meta { color:var(--muted); font-size:0.8rem; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="no-select">
+<button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">☀️</button>
 <div class="watermark" aria-hidden="true"></div>
 <div id="wm-text" aria-hidden="true"></div>
 
@@ -669,6 +759,13 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
       <div class="stat"><div class="k" id="stat-pass-rate">-</div><div class="l">Pass Rate</div></div>
       <div class="stat"><div class="k" id="stat-hardest" style="font-size:1rem;margin-top:6px;">Loading...</div><div class="l">Hardest Questions</div></div>
     </div>
+    <div class="leaderboard" id="leaderboard-container">
+      <h4>🏆 Top Scorers</h4>
+      <table class="lb-table">
+        <thead><tr><th>#</th><th>Player</th><th>Score</th></tr></thead>
+        <tbody id="leaderboard-body"><tr><td colspan="3" style="text-align:center;color:var(--muted)">Loading...</td></tr></tbody>
+      </table>
+    </div>
   </div>
 </section>
 
@@ -708,10 +805,13 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
                 <h4>Optional: Save Your Progress</h4>
                 <p>Provide your email and a 6-digit PIN to save your score and receive future mock tests. Leave blank to take as guest.</p>
                 <div class="auth-form">
+                  <input type="text" id="auth-nickname" class="auth-input" placeholder="Nickname (for leaderboard)" maxlength="20" />
                   <input type="email" id="auth-email" class="auth-input" placeholder="Email address" />
                   <input type="password" id="auth-pin" class="auth-input" placeholder="6-digit PIN" maxlength="6" pattern="\d{6}" />
                 </div>
               </div>
+
+              <div id="dashboard-container" class="hidden"></div>
 
               <div class="cta-row" style="margin-top:8px">
                 <button class="btn accent" id="btn-start">Start timed exam (60 Qs · 120 min)</button>
@@ -820,6 +920,7 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
             </div>
 
             <div class="result-v2-footer">
+              <div id="domain-breakdown"></div>
               <div class="review-gate" id="review-gate">
                 <div class="review-gate-icon" id="review-gate-icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -3176,6 +3277,44 @@ window.__ENC_QUESTIONS = [
       window.submitToSupabase(score1000, wrongIdxs, usedSec);
     }
 
+    // Domain breakdown
+    const domainNames = {
+      'research_pipeline': 'Research Pipeline',
+      'code_exploration': 'Code Exploration',
+      'customer_support': 'Customer Support',
+      'extraction_pipeline': 'Extraction Pipeline'
+    };
+    const domainStats = {};
+    state.items.forEach(it => {
+      const g = it.group || 'misc';
+      if (!domainStats[g]) domainStats[g] = { total: 0, correct: 0 };
+      domainStats[g].total++;
+      const chosen = it.options.find(o => o.letter === it.chosenLetter);
+      if (chosen && chosen.correct) domainStats[g].correct++;
+    });
+    const dbEl = document.getElementById('domain-breakdown');
+    if (dbEl) {
+      let html = '<div class="domain-breakdown"><h4>📊 Performance by Domain</h4>';
+      Object.entries(domainStats).forEach(([key, val]) => {
+        const dpct = val.total ? Math.round(100 * val.correct / val.total) : 0;
+        const level = dpct >= 70 ? 'high' : dpct >= 50 ? 'mid' : 'low';
+        const label = domainNames[key] || key;
+        html += `<div class="domain-bar">
+          <div class="domain-bar-label"><span>${label}</span><span>${val.correct}/${val.total} (${dpct}%)</span></div>
+          <div class="domain-bar-track"><div class="domain-bar-fill ${level}" style="width:0%">${dpct}%</div></div>
+        </div>`;
+      });
+      html += '</div>';
+      dbEl.innerHTML = html;
+      // animate bars
+      requestAnimationFrame(() => {
+        dbEl.querySelectorAll('.domain-bar-fill').forEach(bar => {
+          const pctVal = bar.textContent;
+          bar.style.width = pctVal;
+        });
+      });
+    }
+
     // Review gate UI
     const gate      = $("#review-gate");
     const gateIcon  = $("#review-gate-icon");
@@ -3392,12 +3531,13 @@ window.__ENC_QUESTIONS = [
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
+  // ---- Verify user (called before exam starts) ----
   window.verifyUser = async function() {
     const email = document.getElementById("auth-email") ? document.getElementById("auth-email").value.trim() : "";
     const pin = document.getElementById("auth-pin") ? document.getElementById("auth-pin").value.trim() : "";
     
     if (!email && !pin) return true; // guest mode
-    if ((email && !pin) || (!email && pin) || !/^\\d{6}$/.test(pin)) {
+    if ((email && !pin) || (!email && pin) || !/^\d{6}$/.test(pin)) {
       alert("Please provide both a valid email and a 6-digit PIN, or leave both blank.");
       return false;
     }
@@ -3426,6 +3566,10 @@ window.__ENC_QUESTIONS = [
         alert("Authentication failed: " + data.error);
         return false;
       }
+
+      // If verified, try to load their history for the dashboard
+      loadDashboard(email, p_pin_hash);
+
       return true;
     } catch(e) {
       console.error(e);
@@ -3437,11 +3581,14 @@ window.__ENC_QUESTIONS = [
     }
   }
 
+  // ---- Submit result ----
   window.submitToSupabase = async function(score, wrongAnswers, timeTaken) {
     const email = document.getElementById("auth-email") ? document.getElementById("auth-email").value.trim() : "";
     const pin = document.getElementById("auth-pin") ? document.getElementById("auth-pin").value.trim() : "";
+    const nickname = document.getElementById("auth-nickname") ? document.getElementById("auth-nickname").value.trim() : "";
     let p_email = null;
     let p_pin_hash = null;
+    let p_nickname = nickname || null;
 
     if (email && pin) {
       p_email = email;
@@ -3454,7 +3601,8 @@ window.__ENC_QUESTIONS = [
         p_pin_hash: p_pin_hash,
         p_score: score,
         p_wrong_answers: wrongAnswers,
-        p_time_taken: timeTaken
+        p_time_taken: timeTaken,
+        p_nickname: p_nickname
       });
       if (error) console.error("Error submitting result:", error);
       else if (data && !data.success) {
@@ -3468,6 +3616,7 @@ window.__ENC_QUESTIONS = [
     }
   };
 
+  // ---- Fetch global stats + leaderboard ----
   async function fetchGlobalStats() {
     try {
       const { data, error } = await supabase.rpc('get_global_stats');
@@ -3493,14 +3642,123 @@ window.__ENC_QUESTIONS = [
         } else {
           hardestEl.textContent = 'Not enough data';
         }
+
+        // Leaderboard
+        const lbBody = document.getElementById('leaderboard-body');
+        if (lbBody && data.leaderboard && data.leaderboard.length > 0) {
+          lbBody.innerHTML = '';
+          data.leaderboard.forEach((entry, i) => {
+            const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+            const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td class="lb-rank ${rankClass}">${medal}</td>
+              <td>${entry.nickname || 'Anonymous'}</td>
+              <td class="lb-score">${entry.score}</td>
+            `;
+            lbBody.appendChild(tr);
+          });
+        } else if (lbBody) {
+          lbBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--muted)">No scores yet. Be the first!</td></tr>';
+        }
       }
     } catch(e) {
       console.error("Fetch stats exception:", e);
     }
   }
 
-  // Fetch stats on load
-  document.addEventListener("DOMContentLoaded", fetchGlobalStats);
+  // ---- Personal Dashboard ----
+  async function loadDashboard(email, pinHash) {
+    try {
+      const { data, error } = await supabase.rpc('get_user_history', {
+        p_email: email,
+        p_pin_hash: pinHash
+      });
+      if (error || !data || !data.success) return;
+
+      const results = data.results || [];
+      if (results.length === 0) return;
+
+      const container = document.getElementById('dashboard-container');
+      if (!container) return;
+
+      container.classList.remove('hidden');
+      let html = '<div class="dashboard-box"><h4>👋 Welcome Back!</h4>';
+      html += `<p class="sub">You've taken ${results.length} exam${results.length === 1 ? '' : 's'} so far. Here's your history:</p>`;
+      html += '<div class="history-list">';
+      results.slice(0, 5).forEach(r => {
+        const d = new Date(r.taken_at);
+        const dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+        const timeStr = r.time_taken ? `${Math.floor(r.time_taken / 60)}m ${r.time_taken % 60}s` : '-';
+        const passClass = r.score >= 700 ? 'pass' : 'fail';
+        html += `<div class="history-item">
+          <div><div class="history-score ${passClass}">${r.score} / 1000</div><div class="history-meta">${dateStr} · ${timeStr}</div></div>
+          <div class="history-score ${passClass}">${r.score >= 700 ? '✓ Pass' : '✗ Fail'}</div>
+        </div>`;
+      });
+      html += '</div></div>';
+      container.innerHTML = html;
+    } catch(e) {
+      console.error("Dashboard error:", e);
+    }
+  }
+
+  // ---- Dark Mode ----
+  function initDarkMode() {
+    const toggle = document.getElementById('theme-toggle');
+    const saved = localStorage.getItem('ccaf-dark-mode');
+    
+    // Check saved preference or system preference
+    if (saved === 'true' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark-mode');
+      if (toggle) toggle.textContent = '🌙';
+    }
+
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark-mode');
+        toggle.textContent = isDark ? '🌙' : '☀️';
+        localStorage.setItem('ccaf-dark-mode', isDark);
+        // Add a subtle spin animation
+        toggle.style.transform = 'scale(1.1) rotate(360deg)';
+        setTimeout(() => toggle.style.transform = '', 300);
+      });
+    }
+  }
+
+  // ---- Service Worker ----
+  function registerSW() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        console.log('SW registered:', reg.scope);
+      }).catch(err => {
+        console.warn('SW registration failed:', err);
+      });
+    }
+  }
+
+  // ---- Auto-load dashboard on email/pin blur ----
+  function initAuthListeners() {
+    const pinEl = document.getElementById('auth-pin');
+    if (pinEl) {
+      pinEl.addEventListener('blur', async () => {
+        const email = document.getElementById('auth-email')?.value.trim();
+        const pin = pinEl.value.trim();
+        if (email && /^\d{6}$/.test(pin)) {
+          const pinHash = await hashPIN(pin);
+          loadDashboard(email, pinHash);
+        }
+      });
+    }
+  }
+
+  // Init everything on DOM ready
+  document.addEventListener("DOMContentLoaded", () => {
+    fetchGlobalStats();
+    initDarkMode();
+    registerSW();
+    initAuthListeners();
+  });
 </script>
 </body>
 </html>
