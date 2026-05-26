@@ -3275,10 +3275,14 @@ window.__ENC_QUESTIONS = [
     if (qcEl) qcEl.textContent = QUESTIONS.length;
 
     const start = $("#btn-start");
-    if (start) start.addEventListener("click", () => startExam(readOpts()));
+    if (start) start.addEventListener("click", async () => {
+      if (window.verifyUser && !(await window.verifyUser())) return;
+      startExam(readOpts());
+    });
 
     const practice = $("#btn-practice");
-    if (practice) practice.addEventListener("click", () => {
+    if (practice) practice.addEventListener("click", async () => {
+      if (window.verifyUser && !(await window.verifyUser())) return;
       const o = readOpts(); o.untimed = true; startExam(o);
     });
 
@@ -3386,6 +3390,51 @@ window.__ENC_QUESTIONS = [
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  window.verifyUser = async function() {
+    const email = document.getElementById("auth-email") ? document.getElementById("auth-email").value.trim() : "";
+    const pin = document.getElementById("auth-pin") ? document.getElementById("auth-pin").value.trim() : "";
+    
+    if (!email && !pin) return true; // guest mode
+    if ((email && !pin) || (!email && pin) || !/^\\d{6}$/.test(pin)) {
+      alert("Please provide both a valid email and a 6-digit PIN, or leave both blank.");
+      return false;
+    }
+
+    const startBtn = document.getElementById("btn-start");
+    const practiceBtn = document.getElementById("btn-practice");
+    const ogStart = startBtn ? startBtn.innerHTML : "";
+    const ogPractice = practiceBtn ? practiceBtn.innerHTML : "";
+
+    if (startBtn) startBtn.innerHTML = "Verifying...";
+    if (practiceBtn) practiceBtn.innerHTML = "Verifying...";
+
+    try {
+      const p_pin_hash = await hashPIN(pin);
+      const { data, error } = await supabase.rpc('verify_mock_user', {
+        p_email: email,
+        p_pin_hash: p_pin_hash
+      });
+
+      if (error) {
+        console.error("Verification error:", error);
+        alert("Error connecting to server. Please try again.");
+        return false;
+      }
+      if (data && !data.success) {
+        alert("Authentication failed: " + data.error);
+        return false;
+      }
+      return true;
+    } catch(e) {
+      console.error(e);
+      alert("Something went wrong during verification.");
+      return false;
+    } finally {
+      if (startBtn) startBtn.innerHTML = ogStart;
+      if (practiceBtn) practiceBtn.innerHTML = ogPractice;
+    }
   }
 
   window.submitToSupabase = async function(score, wrongAnswers, timeTaken) {
