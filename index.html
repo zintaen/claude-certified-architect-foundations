@@ -3519,9 +3519,10 @@ window.__ENC_QUESTIONS = [
   inject();
 </script>
 <script>
+(function(){
   const SUPABASE_URL = "https://idtmcfqcgvecrivvtsxv.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkdG1jZnFjZ3ZlY3JpdnZ0c3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NjYwNjAsImV4cCI6MjA5NTM0MjA2MH0.SBB3j0xIjJt4hp9PzD0tX4VOd2vY5gIu6BddspVVFn4";
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   async function hashPIN(pin) {
     if (!pin) return null;
@@ -3553,7 +3554,7 @@ window.__ENC_QUESTIONS = [
 
     try {
       const p_pin_hash = await hashPIN(pin);
-      const { data, error } = await supabase.rpc('verify_mock_user', {
+      const { data, error } = await sbClient.rpc('verify_mock_user', {
         p_email: email,
         p_pin_hash: p_pin_hash,
         p_nickname: nickname || null
@@ -3598,7 +3599,7 @@ window.__ENC_QUESTIONS = [
     }
 
     try {
-      const { data, error } = await supabase.rpc('submit_exam_result', {
+      const { data, error } = await sbClient.rpc('submit_exam_result', {
         p_email: p_email,
         p_pin_hash: p_pin_hash,
         p_score: score,
@@ -3621,7 +3622,7 @@ window.__ENC_QUESTIONS = [
   // ---- Fetch global stats + leaderboard ----
   async function fetchGlobalStats() {
     try {
-      const { data, error } = await supabase.rpc('get_global_stats');
+      const { data, error } = await sbClient.rpc('get_global_stats');
       if (error) {
         console.error("Error fetching global stats:", error);
         return;
@@ -3672,7 +3673,7 @@ window.__ENC_QUESTIONS = [
   // ---- Personal Dashboard ----
   async function loadDashboard(email, pinHash) {
     try {
-      const { data, error } = await supabase.rpc('get_user_history', {
+      const { data, error } = await sbClient.rpc('get_user_history', {
         p_email: email,
         p_pin_hash: pinHash
       });
@@ -3761,6 +3762,7 @@ window.__ENC_QUESTIONS = [
     registerSW();
     initAuthListeners();
   });
+})();
 </script>
 </body>
 </html>
