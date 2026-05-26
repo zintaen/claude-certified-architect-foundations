@@ -450,7 +450,20 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
 
 /* Scrollbar polish (WebKit) */
 ::selection{background:var(--accent);color:var(--ink)}
+
+/* Auth Form & Stats */
+.auth-box { background:var(--bg-2); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px; }
+.auth-box h4 { margin:0 0 8px; font-size:1.05rem; }
+.auth-box p { font-size:0.85rem; margin:0 0 12px; color:var(--ink-soft); }
+.auth-form { display: flex; gap: 8px; flex-wrap: wrap; }
+.auth-input { flex: 1; min-width: 140px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); font: inherit; }
+.global-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px; }
+@media(max-width:800px) { .global-stats-grid { grid-template-columns: repeat(2, 1fr); } }
+@media(max-width:500px) { .global-stats-grid { grid-template-columns: 1fr; } }
+.hard-q-item { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px dashed var(--line); font-size:0.85rem;}
+.hard-q-item:last-child { border-bottom: none; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="no-select">
 <div class="watermark" aria-hidden="true"></div>
@@ -641,6 +654,24 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
   </div>
 </section>
 
+<!-- GLOBAL STATS -->
+<section id="global-stats" style="background:var(--bg); border-top:1px solid var(--line);">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="pill">Community Insights</span>
+        <h2>Global Statistics</h2>
+      </div>
+    </div>
+    <div class="global-stats-grid" id="stats-container">
+      <div class="stat"><div class="k" id="stat-total-exams">-</div><div class="l">Total Exams</div></div>
+      <div class="stat"><div class="k" id="stat-avg-score">-</div><div class="l">Avg Score</div></div>
+      <div class="stat"><div class="k" id="stat-pass-rate">-</div><div class="l">Pass Rate</div></div>
+      <div class="stat"><div class="k" id="stat-hardest" style="font-size:1rem;margin-top:6px;">Loading...</div><div class="l">Hardest Questions</div></div>
+    </div>
+  </div>
+</section>
+
 <!-- EXAM -->
 <section id="exam">
   <div class="container">
@@ -672,6 +703,15 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
 
               <input id="opt-count"   type="hidden" value="60" />
               <input id="opt-minutes" type="hidden" value="120" />
+
+              <div class="auth-box">
+                <h4>Optional: Save Your Progress</h4>
+                <p>Provide your email and a 6-digit PIN to save your score and receive future mock tests. Leave blank to take as guest.</p>
+                <div class="auth-form">
+                  <input type="email" id="auth-email" class="auth-input" placeholder="Email address" />
+                  <input type="password" id="auth-pin" class="auth-input" placeholder="6-digit PIN" maxlength="6" pattern="\d{6}" />
+                </div>
+              </div>
 
               <div class="cta-row" style="margin-top:8px">
                 <button class="btn accent" id="btn-start">Start timed exam (60 Qs · 120 min)</button>
@@ -3123,6 +3163,19 @@ window.__ENC_QUESTIONS = [
       sum.textContent = `You answered ${correct} of ${total} correctly (${pct}%). On the 1,000-point scale that's ${score1000}. This mock uses 700 as a working pass benchmark; Anthropic doesn't publish the official cut score.${timeNote}${focusNote}`;
     }
 
+    // Submit to Supabase
+    if (window.submitToSupabase) {
+      // gather incorrect indexes
+      const wrongIdxs = [];
+      state.items.forEach((it, idx) => {
+        const chosen = it.options.find(o => o.letter === it.chosenLetter);
+        if (!chosen || !chosen.correct) {
+          wrongIdxs.push(idx + 1); // 1-based index
+        }
+      });
+      window.submitToSupabase(score1000, wrongIdxs, usedSec);
+    }
+
     // Review gate UI
     const gate      = $("#review-gate");
     const gateIcon  = $("#review-gate-icon");
@@ -3321,6 +3374,84 @@ window.__ENC_QUESTIONS = [
 <script type="module">
   import { inject } from 'https://cdn.jsdelivr.net/npm/@vercel/analytics@1/dist/index.js';
   inject();
+</script>
+<script>
+  const SUPABASE_URL = "https://idtmcfqcgvecrivvtsxv.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkdG1jZnFjZ3ZlY3JpdnZ0c3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NjYwNjAsImV4cCI6MjA5NTM0MjA2MH0.SBB3j0xIjJt4hp9PzD0tX4VOd2vY5gIu6BddspVVFn4";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function hashPIN(pin) {
+    if (!pin) return null;
+    const msgBuffer = new TextEncoder().encode(pin);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  window.submitToSupabase = async function(score, wrongAnswers, timeTaken) {
+    const email = document.getElementById("auth-email") ? document.getElementById("auth-email").value.trim() : "";
+    const pin = document.getElementById("auth-pin") ? document.getElementById("auth-pin").value.trim() : "";
+    let p_email = null;
+    let p_pin_hash = null;
+
+    if (email && pin) {
+      p_email = email;
+      p_pin_hash = await hashPIN(pin);
+    }
+
+    try {
+      const { data, error } = await supabase.rpc('submit_exam_result', {
+        p_email: p_email,
+        p_pin_hash: p_pin_hash,
+        p_score: score,
+        p_wrong_answers: wrongAnswers,
+        p_time_taken: timeTaken
+      });
+      if (error) console.error("Error submitting result:", error);
+      else if (data && !data.success) {
+        alert("Failed to save score: " + data.error);
+      }
+      
+      // refresh global stats after a short delay
+      setTimeout(fetchGlobalStats, 2000);
+    } catch(e) {
+      console.error("Supabase exception:", e);
+    }
+  };
+
+  async function fetchGlobalStats() {
+    try {
+      const { data, error } = await supabase.rpc('get_global_stats');
+      if (error) {
+        console.error("Error fetching global stats:", error);
+        return;
+      }
+      
+      if (data) {
+        document.getElementById('stat-total-exams').textContent = data.total_exams || 0;
+        document.getElementById('stat-avg-score').textContent = data.avg_score || 0;
+        document.getElementById('stat-pass-rate').textContent = (data.pass_rate || 0) + '%';
+        
+        const hardestEl = document.getElementById('stat-hardest');
+        if (data.hardest_questions && data.hardest_questions.length > 0) {
+          hardestEl.innerHTML = '';
+          data.hardest_questions.forEach(q => {
+            const div = document.createElement('div');
+            div.className = 'hard-q-item';
+            div.innerHTML = `<span>Question ${q.index}</span> <span>${q.misses} misses</span>`;
+            hardestEl.appendChild(div);
+          });
+        } else {
+          hardestEl.textContent = 'Not enough data';
+        }
+      }
+    } catch(e) {
+      console.error("Fetch stats exception:", e);
+    }
+  }
+
+  // Fetch stats on load
+  document.addEventListener("DOMContentLoaded", fetchGlobalStats);
 </script>
 </body>
 </html>
