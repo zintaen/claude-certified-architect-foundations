@@ -3462,11 +3462,11 @@ window.__ENC_QUESTIONS = [
           wrongIdxs.push(idx + 1); // 1-based index
         }
       });
-      // Guard: Only submit if they answered at least one question
-      if (totalAnswered > 0) {
+      // Guard: Only submit if they answered at least one question AND it's a full 60-question timed exam
+      if (totalAnswered > 0 && !state.untimed && state.items.length === 60) {
         window.submitToSupabase(score1000, wrongIdxs, usedSec);
       } else {
-        console.warn("Exam abandoned without answering any questions. Skipped saving to Supabase to prevent data pollution.");
+        console.warn("Exam was practice/partial or abandoned. Skipped saving to Supabase to prevent data pollution.");
       }
     }
 
@@ -4143,20 +4143,32 @@ window.__ENC_QUESTIONS = [
           if (pool.length === 0) pool = qs; // fallback
         }
         
-        // We override the local QUESTIONS array just for this session, but we shouldn't modify the global one permanently.
-        // Wait, buildSession uses getQuestions(). Let's modify buildSession to optionally take a filtered pool, or we just override window.QUESTIONS temporarily.
-        // Actually, we can just do a custom buildSession logic or just filter QUESTIONS and restore it later.
+        // We override the local QUESTIONS array just for this session
         const originalQs = window.QUESTIONS;
         window.setQuestions(pool);
         
-        document.getElementById("opt-count").value = 10;
-        document.getElementById("opt-minutes").value = 0; // untimed
+        const o = {
+          count: 10,
+          minutes: 0,
+          shuffleOptions: true,
+          review: true,
+          untimed: true,
+        };
+
+        const execute = () => {
+          startExam(o);
+          // Restore after a brief delay so buildSession uses the filtered pool
+          setTimeout(() => window.setQuestions(originalQs), 100);
+        };
         
-        const startBtn = document.getElementById("btn-practice");
-        if (startBtn) startBtn.click();
-        
-        // Restore after a brief delay so buildSession uses the filtered pool
-        setTimeout(() => window.setQuestions(originalQs), 1000);
+        if (window.verifyUser) {
+          window.verifyUser().then(valid => {
+            if (valid) execute();
+            else window.setQuestions(originalQs);
+          });
+        } else {
+          execute();
+        }
       });
     }
 
