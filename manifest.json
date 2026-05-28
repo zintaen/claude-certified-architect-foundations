@@ -1,17 +1,25 @@
 {
-  "name": "CCAF Mock Exam",
+  "name": "CyberSkill · CCAF Mock Exam",
   "short_name": "CCAF Exam",
   "description": "Claude Certified Architect — Foundations mock exam with 60 scenario-based questions.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#FAF6F0",
-  "theme_color": "#C8A97E",
+  "background_color": "#FBF7EF",
+  "theme_color": "#45210E",
   "orientation": "any",
+  "id": "/ccaf-mock-exam",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%23C8A97E'/><text x='96' y='120' font-size='100' text-anchor='middle' fill='%23FAF6F0' font-family='system-ui'>📝</text></svg>",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%2345210E'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='%23F4BA17' font-family='system-ui'%3E📝%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%2345210E'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='%23F4BA17' font-family='system-ui'%3E📝%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ]
 }

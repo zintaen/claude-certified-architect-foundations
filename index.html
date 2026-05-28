@@ -16,6 +16,8 @@
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
+<script>/* Prevent FOUC: apply dark mode synchronously before first paint */
+if(localStorage.getItem('ccaf-dark-mode')==='true')document.documentElement.classList.add('dark-mode');</script>
 <style>
 :root{
   /* CyberSkill palette: warm parchment + brown-900 ink + gold-500 accent */
@@ -48,7 +50,7 @@
   --logo-url:url("assets/cyberskill-logo.svg");
 }
 *{box-sizing:border-box}
-html,html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:"Red Hat Text","Red Hat Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;font-weight:500;line-height:1.55;font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden;word-wrap:break-word;overflow-wrap:break-word;font-style:normal}
 img,svg{max-width:100%;height:auto}
 pre,code{word-wrap:break-word;overflow-wrap:anywhere}
@@ -85,7 +87,7 @@ p{margin:.4em 0 .9em;color:var(--ink-soft)}
 
 /* Hero */
 .hero{padding:60px 0 40px;position:relative;overflow:hidden}
-.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(1000px 400px at 85% -10%,rgba(244,186,23,.22),transparent 60%),radial-gradient(700px 260px at 10% 20%,rgba(69,33,14,.06),transparent 60%);pointer-events:none}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(1000px 400px at 85% -10%,rgba(244,186,23,.10),transparent 60%),radial-gradient(700px 260px at 10% 20%,rgba(69,33,14,.03),transparent 60%);pointer-events:none}
 .hero-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:36px;align-items:center}
 @media (max-width:900px){.hero-grid{grid-template-columns:1fr}}
 .hero h1 span{background:linear-gradient(120deg,var(--accent-dark) 0%,var(--accent) 60%,var(--gold-400) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
@@ -209,6 +211,9 @@ code.mark{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-
 .palette-grid button.current.answered{color:#2E4416}
 .palette-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:.76rem;color:var(--muted);font-weight:700}
 .palette-legend .swatch{display:inline-block;width:10px;height:10px;border-radius:3px;border:1px solid var(--line);vertical-align:middle;margin-right:4px}
+.swatch.ans{background:#E4EDD0;border-color:#B9C998}
+.swatch.flag{background:#FDF1D3;border-color:#EBC966}
+.swatch.un{background:#fff}
 
 /* Progress */
 .progress{height:8px;background:var(--bg-2);border-radius:999px;overflow:hidden;border:1px solid var(--line);margin-top:6px}
@@ -315,9 +320,9 @@ footer .brand-footer .brand-name{font-size:1rem}
 body.tab-hidden .exam-wrap,body.tab-hidden #intro{filter:blur(14px) brightness(.4);pointer-events:none}
 body.tab-hidden::after{content:"Content hidden — return focus to resume.";position:fixed;inset:0;display:grid;place-items:center;color:var(--cream);font-weight:700;letter-spacing:.04em;background:rgba(69,33,14,.72);z-index:99}
 
-/* watermark (subtle) */
-.watermark{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.045;background-image:repeating-linear-gradient(-30deg,transparent 0,transparent 180px,rgba(69,33,14,.35) 180px,rgba(69,33,14,.35) 182px)}
-#wm-text{position:fixed;inset:0;pointer-events:none;z-index:2;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(6,1fr);opacity:.055;transform:rotate(-22deg);font-weight:700;color:var(--brand-900);font-size:14px;place-items:center}
+/* watermark (very subtle — prioritise readability over anti-cheat) */
+.watermark{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.018;background-image:repeating-linear-gradient(-30deg,transparent 0,transparent 180px,rgba(69,33,14,.25) 180px,rgba(69,33,14,.25) 182px)}
+#wm-text{position:fixed;inset:0;pointer-events:none;z-index:2;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(6,1fr);opacity:.022;transform:rotate(-22deg);font-weight:700;color:var(--brand-900);font-size:14px;place-items:center}
 @media print{body{display:none}}
 
 /* ========= RESPONSIVE — tablet & phone ========= */
@@ -507,21 +512,110 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
 :root.dark-mode .topbar { background:oklch(0.14 0.02 44 / 0.92); border-bottom-color:var(--line); }
 :root.dark-mode .exam-wrap, :root.dark-mode .q-card { background:var(--card); border-color:var(--line); }
 :root.dark-mode .hero { background:linear-gradient(170deg, oklch(0.18 0.02 44) 0%, oklch(0.14 0.02 44) 100%); }
-:root.dark-mode .watermark { opacity:0.03; }
-:root.dark-mode .result-v2 { background:var(--card); border-color:var(--line); }
+:root.dark-mode .watermark { opacity:0.012; }
+:root.dark-mode #wm-text { opacity:0.016; }
 :root.dark-mode .btn.ghost { border-color:var(--line); color:var(--ink); }
 :root.dark-mode .btn.ghost:hover { background:var(--bg-2); }
 :root.dark-mode .pill { background:var(--bg-2); border-color:var(--line); color:var(--ink-soft); }
 :root.dark-mode .kbd { background:var(--bg-2); border-color:var(--line); color:var(--ink); }
-:root.dark-mode code.mark { background:var(--accent-soft); color:var(--accent); }
+:root.dark-mode code.mark { background:var(--accent-soft); color:var(--accent); border-color:oklch(0.40 0.08 84); }
 :root.dark-mode .auth-box { background:var(--bg-2); border-color:var(--line); }
-:root.dark-mode .palette .p-btn { background:var(--bg-2); border-color:var(--line); color:var(--ink); }
+:root.dark-mode .palette-grid button { background:var(--bg-2); border-color:var(--line); color:var(--ink); }
 :root.dark-mode ::selection { background:var(--accent); color:var(--bg); }
 :root.dark-mode .stat { background:var(--card); border-color:var(--line); }
 :root.dark-mode .start-grid { color:var(--ink); }
 :root.dark-mode section { border-color:var(--line); }
 :root.dark-mode .nav a { color:var(--ink-soft); }
 :root.dark-mode .nav a:hover { color:var(--ink); }
+
+/* Dark mode: chips, tags, inputs */
+:root.dark-mode .chip { background:var(--bg-2); border-color:var(--line); color:var(--ink-soft); }
+:root.dark-mode .option-row input[type=number] { background:var(--card); border-color:var(--line); color:var(--ink); }
+:root.dark-mode .rules { border-color:var(--line); }
+:root.dark-mode .alert { background:var(--accent-soft); border-color:oklch(0.40 0.08 84); color:var(--accent); }
+
+/* Dark mode: question options */
+:root.dark-mode .opt .letter { background:var(--bg-2); border-color:var(--line); }
+:root.dark-mode .opt.correct { border-color:var(--good); background:oklch(0.20 0.04 148); }
+:root.dark-mode .opt.correct .letter { background:var(--good); border-color:var(--good); }
+:root.dark-mode .opt.incorrect { border-color:var(--bad); background:oklch(0.20 0.05 25); }
+:root.dark-mode .opt.incorrect .letter { background:var(--bad); border-color:var(--bad); }
+:root.dark-mode .q-text code.mark { background:oklch(0.22 0.06 84); border-color:oklch(0.40 0.08 84); color:var(--accent); }
+
+/* Dark mode: palette grid */
+:root.dark-mode .palette { background:var(--card); border-color:var(--line); }
+:root.dark-mode .palette-grid button { background:var(--bg-2); border-color:var(--line); color:var(--ink); }
+:root.dark-mode .palette-grid button.answered { background:oklch(0.20 0.04 148); border-color:var(--good); color:var(--good); }
+:root.dark-mode .palette-grid button.flagged { background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
+:root.dark-mode .palette-grid button.current.answered { color:var(--good); }
+:root.dark-mode .swatch.ans { background:oklch(0.20 0.04 148); border-color:var(--good); }
+:root.dark-mode .swatch.flag { background:var(--accent-soft); border-color:var(--accent); }
+:root.dark-mode .swatch.un { background:var(--bg-2); }
+:root.dark-mode .domain-bar-fill.high { background:linear-gradient(90deg,oklch(0.18 0.03 148),oklch(0.16 0.02 148)); }
+:root.dark-mode .domain-bar-fill.mid { background:linear-gradient(90deg,oklch(0.22 0.06 84),oklch(0.20 0.05 84)); }
+:root.dark-mode .domain-bar-fill.low { background:linear-gradient(90deg,oklch(0.18 0.03 25),oklch(0.16 0.02 25)); }
+
+/* Dark mode: feature icons & option-row */
+:root.dark-mode .feature .ico { background:var(--accent-soft); border-color:var(--line); }
+:root.dark-mode .option-row { background:var(--bg-2); border-color:var(--line); }
+:root.dark-mode .hero::before { background:radial-gradient(1000px 400px at 85% -10%,rgba(244,186,23,.05),transparent 60%),radial-gradient(700px 260px at 10% 20%,rgba(69,33,14,.02),transparent 60%); }
+
+/* Dark mode: timer warning/danger */
+:root.dark-mode .timer { background:var(--card); border-color:var(--line); color:var(--accent); }
+:root.dark-mode .timer.warn { background:oklch(0.22 0.06 84); border-color:var(--warn); color:var(--warn); }
+:root.dark-mode .timer.danger { background:oklch(0.20 0.05 25); border-color:var(--bad); color:var(--bad); }
+
+/* Dark mode: donate banner */
+:root.dark-mode .donate { background:linear-gradient(135deg,var(--accent-soft) 0%, oklch(0.22 0.06 84) 100%); border-color:oklch(0.40 0.08 84); }
+:root.dark-mode .donate .coin { background:var(--card); }
+
+/* Dark mode: result page */
+:root.dark-mode .result-v2 { background:var(--card); border-color:var(--line); box-shadow:0 20px 60px -30px rgba(69,33,14,.35), inset 0 1px 0 rgba(255,255,255,.05); }
+:root.dark-mode .result-v2::before, :root.dark-mode .result-v2::after { opacity:0.3; }
+:root.dark-mode .result-v2.is-pass { background:linear-gradient(135deg, oklch(0.18 0.03 148) 0%, oklch(0.16 0.02 148) 100%); }
+:root.dark-mode .result-v2.is-pass::before { background:radial-gradient(circle at 30% 30%,rgba(91,176,105,.18),transparent 60%); }
+:root.dark-mode .result-v2.is-fail { background:linear-gradient(135deg, oklch(0.18 0.03 25) 0%, oklch(0.16 0.02 25) 100%); }
+:root.dark-mode .result-v2.is-fail::before { background:radial-gradient(circle at 30% 30%,rgba(229,105,74,.18),transparent 60%); }
+:root.dark-mode .result-hero { background:linear-gradient(135deg, var(--card), var(--bg-2)); }
+:root.dark-mode .result-v2 .stat { background:var(--bg-2); border-color:var(--line); box-shadow:none; }
+:root.dark-mode .result-v2-footer { border-top-color:var(--line); }
+:root.dark-mode .review-gate { background:var(--bg-2); border-color:var(--line); }
+:root.dark-mode .review-gate.locked { background:oklch(0.22 0.06 84); border-color:var(--warn); }
+:root.dark-mode .review-gate.unlocked { background:oklch(0.20 0.04 148); border-color:var(--good); }
+
+/* Dark mode: review items */
+:root.dark-mode .r-opt { background:var(--bg); }
+:root.dark-mode .r-opt.is-correct { border-color:var(--good); background:oklch(0.20 0.04 148); }
+:root.dark-mode .r-opt.is-wrong { border-color:var(--bad); background:oklch(0.20 0.05 25); }
+:root.dark-mode .r-line .letter { background:var(--bg-2); border-color:var(--line); }
+:root.dark-mode .is-correct .r-line .letter { background:var(--good); border-color:var(--good); }
+:root.dark-mode .is-wrong .r-line .letter { background:var(--bad); border-color:var(--bad); }
+:root.dark-mode .r-opt .why { background:var(--bg-2); border-left-color:var(--line); }
+:root.dark-mode .is-correct .why { border-left-color:var(--good); }
+:root.dark-mode .is-wrong .why { border-left-color:var(--bad); }
+:root.dark-mode .tag.right { background:oklch(0.20 0.04 148); color:var(--good); }
+:root.dark-mode .tag.wrong { background:oklch(0.20 0.05 25); color:var(--bad); }
+:root.dark-mode .tag.skip { background:var(--accent-soft); color:var(--accent); }
+:root.dark-mode .r-line .tag.good { background:oklch(0.20 0.04 148); color:var(--good); border-color:var(--good); }
+:root.dark-mode .r-line .tag.bad { background:oklch(0.20 0.05 25); color:var(--bad); border-color:var(--bad); }
+:root.dark-mode .is-correct code.mark { background:oklch(0.20 0.04 148); color:var(--good); border-color:var(--good); }
+:root.dark-mode .is-wrong code.mark, :root.dark-mode .r-opt.is-wrong code.mark { background:oklch(0.20 0.05 25); color:var(--bad); border-color:var(--bad); }
+:root.dark-mode .pass-tag.pass { background:oklch(0.20 0.04 148); border-color:var(--good); color:var(--good); }
+:root.dark-mode .pass-tag.fail { background:oklch(0.20 0.05 25); border-color:var(--bad); color:var(--bad); }
+
+/* Dark mode: footer */
+:root.dark-mode footer { background:var(--bg-2); border-top-color:var(--line); }
+:root.dark-mode footer a { color:var(--accent); }
+:root.dark-mode footer a:hover { color:var(--ink); }
+:root.dark-mode .review-item { background:var(--card); border-color:var(--line); }
+
+/* Review status pills */
+.pill-skip { background:#F3E9D5; border-color:#E3CB87; color:#6B4A15; }
+.pill-correct { background:#E6F3EA; border-color:#AECFB6; color:#245B34; }
+.pill-wrong { background:#F5DDD9; border-color:#E0A69E; color:#7A2A21; }
+:root.dark-mode .pill-skip { background:var(--accent-soft); border-color:oklch(0.40 0.08 84); color:var(--accent); }
+:root.dark-mode .pill-correct { background:oklch(0.20 0.04 148); border-color:var(--good); color:var(--good); }
+:root.dark-mode .pill-wrong { background:oklch(0.20 0.05 25); border-color:var(--bad); color:var(--bad); }
 
 /* Domain breakdown bars */
 .domain-breakdown { margin-top:24px; padding:20px; background:var(--bg-2); border-radius:12px; border:1px solid var(--line); }
@@ -562,7 +656,7 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="no-select">
+<body>
 <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">☀️</button>
 <div class="watermark" aria-hidden="true"></div>
 <div id="wm-text" aria-hidden="true"></div>
@@ -797,6 +891,49 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
         <div id="timer" class="timer" aria-live="polite">02:00:00</div>
       </div>
 
+      <!-- ==============================
+       ADMIN EDITOR VIEW
+       ============================== -->
+  <section id="view-admin" class="hidden">
+    <div class="container" style="max-width:900px; padding:40px 20px;">
+      <div class="section-head">
+        <h2>Admin Question Editor</h2>
+        <button class="btn ghost small" onclick="showView('view-start')">← Back to Start</button>
+      </div>
+      <div id="admin-editor-root"></div>
+    </div>
+  </section>
+
+  <!-- ==============================
+       FLASHCARD VIEW
+       ============================== -->
+  <section id="view-flashcard" class="hidden">
+    <div class="container" style="max-width:700px; padding:40px 20px;">
+      <div class="section-head" style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="margin:0">Flashcard Mode</h2>
+        <button class="btn ghost small" onclick="finishFlashcards()">End Session</button>
+      </div>
+      <div class="progress" style="margin-bottom:20px"><span id="fc-progress" style="width:0%"></span></div>
+      
+      <div id="fc-card" class="q-card" style="min-height:300px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px;">
+        <!-- content injected here -->
+      </div>
+      
+      <div id="fc-actions" style="margin-top:20px; display:flex; justify-content:center; gap:12px;">
+        <button class="btn primary" id="fc-btn-reveal">Reveal Answer</button>
+      </div>
+      <div id="fc-rate" class="hidden" style="margin-top:20px; display:flex; justify-content:center; gap:12px;">
+        <button class="btn ghost" style="color:var(--good); border-color:var(--good)" id="fc-btn-easy">Easy</button>
+        <button class="btn ghost" style="color:var(--ink); border-color:var(--line)" id="fc-btn-good">Good</button>
+        <button class="btn ghost" style="color:var(--bad); border-color:var(--bad)" id="fc-btn-hard">Hard</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================
+       FOOTER
+       ============================== -->
+
       <div class="exam-body">
 
         <!-- START SCREEN -->
@@ -821,9 +958,18 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
 
               <div id="dashboard-container" class="hidden"></div>
 
-              <div class="cta-row" style="margin-top:8px">
-                <button class="btn accent" id="btn-start">Start timed exam (60 Qs · 120 min)</button>
+              <div style="margin: 16px 0; padding:10px; border-radius:8px; background:var(--bg); border:1px solid var(--warn);">
+                <label style="display:flex; align-items:center; gap:8px; font-weight:bold; color:var(--warn); cursor:pointer;">
+                  <input type="checkbox" id="opt-proctor" style="transform:scale(1.2)" />
+                  🔒 Enable Ultra-Strict Proctor Mode (Requires Fullscreen, Fails on Tab Switch)
+                </label>
+              </div>
+
+              <div class="cta-row" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn accent" id="btn-start">Start timed exam (60 Qs)</button>
                 <button class="btn ghost small" id="btn-practice">Untimed practice mode</button>
+                <button class="btn ghost small" id="btn-targeted">Targeted Practice (Weakest Domain)</button>
+                <button class="btn ghost small" id="btn-flashcard">Flashcard Mode (Spaced Repetition)</button>
               </div>
             </div>
 
@@ -873,9 +1019,9 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
               <h4>Question palette</h4>
               <div class="palette-grid" id="palette"></div>
               <div class="palette-legend">
-                <span><span class="swatch" style="background:#E4EDD0;border-color:#B9C998"></span>answered</span>
-                <span><span class="swatch" style="background:#FDF1D3;border-color:#EBC966"></span>flagged</span>
-                <span><span class="swatch" style="background:#fff"></span>unanswered</span>
+                <span><span class="swatch swatch-ans"></span>answered</span>
+                <span><span class="swatch swatch-flag"></span>flagged</span>
+                <span><span class="swatch swatch-un"></span>unanswered</span>
               </div>
               <div style="margin-top:14px">
                 <button class="btn accent small" style="width:100%" id="btn-submit-2">Finish & score</button>
@@ -1014,11 +1160,23 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
   }, true);
 
   // ===== blur on tab switch / window-blur during exam =====
+  var __lastFocusLossTime = 0;
+  function countFocusLoss(){
+    var now = Date.now();
+    if (now - __lastFocusLossTime < 200) return; // deduplicate blur+visibilitychange
+    __lastFocusLossTime = now;
+    window.__focusLoss = (window.__focusLoss||0) + 1;
+    
+    if (window.__isProctorMode && window.__focusLoss > 3) {
+      alert("Proctor Mode Violation: Too many tab switches. Your exam is terminated.");
+      if (window.finishExamForProctor) window.finishExamForProctor();
+    }
+  }
   document.addEventListener('visibilitychange', function(){
     if (!ON_EXAM) return;
     if (document.hidden) {
       document.body.classList.add('tab-hidden');
-      window.__focusLoss = (window.__focusLoss||0) + 1;
+      countFocusLoss();
     } else {
       document.body.classList.remove('tab-hidden');
     }
@@ -1026,7 +1184,7 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
   window.addEventListener('blur', function(){
     if (!ON_EXAM) return;
     document.body.classList.add('tab-hidden');
-    window.__focusLoss = (window.__focusLoss||0) + 1;
+    countFocusLoss();
   });
   window.addEventListener('focus', function(){
     document.body.classList.remove('tab-hidden');
@@ -2902,18 +3060,14 @@ window.__ENC_QUESTIONS = [
 (function(){
   'use strict';
 
-  // ---- decode embedded question bank ----
-  let QUESTIONS = [];
-  try {
-    const b64 = (window.__ENC_QUESTIONS || "").replace(/\s+/g, "");
-    const json = atob(b64);
-    // fromCharCode across large strings can choke: use TextDecoder on the byte map
-    const bytes = new Uint8Array(json.length);
-    for (let i=0;i<json.length;i++) bytes[i] = json.charCodeAt(i) & 0xff;
-    QUESTIONS = JSON.parse(new TextDecoder("utf-8").decode(bytes));
-  } catch (err) {
-    console.warn("Failed to load question bank", err);
-    QUESTIONS = [];
+  // ---- questions setup ----
+  window.QUESTIONS = [];
+  window.setQuestions = function(qs) {
+    window.QUESTIONS = qs;
+  };
+  
+  function getQuestions() {
+    return window.QUESTIONS;
   }
 
   // ---- small helpers ----
@@ -3014,7 +3168,7 @@ window.__ENC_QUESTIONS = [
 
   // ---- view switching ----
   function showView(id){
-    ["view-start","view-running","view-result","view-review"].forEach(v => {
+    ["view-start","view-running","view-result","view-review","view-admin","view-flashcard"].forEach(v => {
       const el = document.getElementById(v);
       if (!el) return;
       if (v === id) el.classList.remove("hidden");
@@ -3025,11 +3179,11 @@ window.__ENC_QUESTIONS = [
     if (sec) sec.scrollIntoView({behavior:"smooth", block:"start"});
   }
 
-  // ---- build a fresh session from form inputs ----
   function buildSession(opts){
-    const want = Math.max(1, Math.min(QUESTIONS.length, opts.count|0));
+    const qs = getQuestions();
+    const want = Math.max(1, Math.min(qs.length, opts.count|0));
     // Group-aware ordering: scenario clusters stay contiguous.
-    const pool = pickProportional(QUESTIONS, want);
+    const pool = pickProportional(qs, want);
     state.items = pool.map(q => {
       // Options are always shuffled per user's request.
       return {
@@ -3148,7 +3302,22 @@ window.__ENC_QUESTIONS = [
 
   // ---- start ----
   function startExam(opts){
+    const proctorBox = document.getElementById("opt-proctor");
+    window.__isProctorMode = proctorBox && proctorBox.checked;
+    
+    if (window.__isProctorMode) {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.warn("Fullscreen request failed", err);
+        });
+      }
+    }
+    
+    window.finishExamForProctor = () => finishExam(true);
+
     buildSession(opts);
+    const sidEl = document.getElementById("session-id");
+    if (sidEl) sidEl.textContent = state.sessionId;
     showView("view-running");
     renderQuestion();
     renderPalette();
@@ -3157,6 +3326,14 @@ window.__ENC_QUESTIONS = [
     window.__setOnExam && window.__setOnExam(!state.untimed); // only harden during timed sessions
     startTimer();
   }
+
+  // Proctor mode fullscreen change listener
+  document.addEventListener('fullscreenchange', () => {
+    if (window.__isProctorMode && !document.fullscreenElement && window.__setOnExam && !state.finished) {
+      alert("Proctor Mode Violation: You exited fullscreen. Your exam is terminated.");
+      finishExam(true);
+    }
+  });
 
   // ---- finish & score ----
   function finishExam(force){
@@ -3276,13 +3453,20 @@ window.__ENC_QUESTIONS = [
     if (window.submitToSupabase) {
       // gather incorrect indexes
       const wrongIdxs = [];
+      let totalAnswered = 0;
       state.items.forEach((it, idx) => {
+        if (it.chosenLetter) totalAnswered++;
         const chosen = it.options.find(o => o.letter === it.chosenLetter);
         if (!chosen || !chosen.correct) {
           wrongIdxs.push(idx + 1); // 1-based index
         }
       });
-      window.submitToSupabase(score1000, wrongIdxs, usedSec);
+      // Guard: Only submit if they answered at least one question
+      if (totalAnswered > 0) {
+        window.submitToSupabase(score1000, wrongIdxs, usedSec);
+      } else {
+        console.warn("Exam abandoned without answering any questions. Skipped saving to Supabase to prevent data pollution.");
+      }
     }
 
     // Domain breakdown
@@ -3367,10 +3551,10 @@ window.__ENC_QUESTIONS = [
         <div><strong>Question ${i+1}</strong> <span class="pill mono">${esc(it.id)}</span></div>
         <div>${
           !chosen
-            ? '<span class="pill" style="background:#F3E9D5;border-color:#E3CB87;color:#6B4A15">Skipped</span>'
+            ? '<span class="pill pill-skip">Skipped</span>'
             : wasCorrect
-              ? '<span class="pill" style="background:#E6F3EA;border-color:#AECFB6;color:#245B34">Correct</span>'
-              : '<span class="pill" style="background:#F5DDD9;border-color:#E0A69E;color:#7A2A21">Incorrect</span>'
+              ? '<span class="pill pill-correct">Correct</span>'
+              : '<span class="pill pill-wrong">Incorrect</span>'
         }</div>
       `;
       card.appendChild(head);
@@ -3400,6 +3584,30 @@ window.__ENC_QUESTIONS = [
         card.appendChild(row);
       });
 
+      // Community Comments section
+      const commBox = document.createElement("div");
+      commBox.className = "comments-section";
+      commBox.style.marginTop = "20px";
+      commBox.style.padding = "15px";
+      commBox.style.background = "var(--bg-2)";
+      commBox.style.borderRadius = "8px";
+      commBox.style.border = "1px solid var(--line)";
+      
+      commBox.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h4 style="margin:0; font-size:1rem;">Community Comments</h4>
+          <button class="btn ghost small" onclick="loadComments('${it.id}', 'comments-${it.id}')">Load / Add Comments</button>
+        </div>
+        <div id="comments-${it.id}" class="comments-list hidden">
+          <div class="comments-content" style="margin-bottom:15px; font-size:0.9rem;"></div>
+          <div style="display:flex; gap:10px;">
+            <input type="text" id="comment-input-${it.id}" placeholder="Add a comment..." style="flex:1; padding:8px; border:1px solid var(--line); border-radius:4px; background:var(--bg); color:var(--ink);" />
+            <button class="btn primary small" onclick="postComment('${it.id}', 'comments-${it.id}')">Post</button>
+          </div>
+        </div>
+      `;
+      card.appendChild(commBox);
+
       host.appendChild(card);
     });
   }
@@ -3419,18 +3627,27 @@ window.__ENC_QUESTIONS = [
   function wire(){
     // static info
     const qcEl = document.getElementById("question-count-info");
-    if (qcEl) qcEl.textContent = QUESTIONS.length;
+    if (qcEl) qcEl.textContent = getQuestions().length;
 
     const start = $("#btn-start");
+    let starting = false;
     if (start) start.addEventListener("click", async () => {
-      if (window.verifyUser && !(await window.verifyUser())) return;
-      startExam(readOpts());
+      if (starting) return;
+      starting = true;
+      try {
+        if (window.verifyUser && !(await window.verifyUser())) return;
+        startExam(readOpts());
+      } finally { starting = false; }
     });
 
     const practice = $("#btn-practice");
     if (practice) practice.addEventListener("click", async () => {
-      if (window.verifyUser && !(await window.verifyUser())) return;
-      const o = readOpts(); o.untimed = true; startExam(o);
+      if (starting) return;
+      starting = true;
+      try {
+        if (window.verifyUser && !(await window.verifyUser())) return;
+        const o = readOpts(); o.untimed = true; startExam(o);
+      } finally { starting = false; }
     });
 
     const next = $("#btn-next");
@@ -3514,23 +3731,111 @@ window.__ENC_QUESTIONS = [
     });
   }
 
-  if (document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", wire);
-  } else {
-    wire();
-  }
+  window.wireExam = wire;
 })();
 
 </script>
-<script type="module">
-  import { inject } from 'https://cdn.jsdelivr.net/npm/@vercel/analytics@1/dist/index.js';
-  inject();
-</script>
+<!-- Vercel analytics loaded via defer script in head -->
 <script>
 (function(){
   const SUPABASE_URL = "https://idtmcfqcgvecrivvtsxv.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkdG1jZnFjZ3ZlY3JpdnZ0c3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NjYwNjAsImV4cCI6MjA5NTM0MjA2MH0.SBB3j0xIjJt4hp9PzD0tX4VOd2vY5gIu6BddspVVFn4";
-  const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let sbClient = null;
+  if (window.supabase) {
+    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    window.sbClient = sbClient;
+  } else {
+    console.warn('Supabase SDK not loaded — online features disabled.');
+  }
+
+  window.loadQuestions = async function() {
+    let localQuestions = window.QUESTIONS || [];
+    if (sbClient) {
+      try {
+        const { data, error } = await sbClient.from('questions').select('*').order('id', {ascending:true});
+        if (error) throw error;
+        if (data && data.length > 0) {
+          window.setQuestions(data);
+        } else {
+          window.setQuestions(localQuestions);
+          // Seed DB if empty and user is admin
+          if (new URLSearchParams(window.location.search).get("admin")) {
+            for (let q of localQuestions) {
+              await sbClient.from('questions').upsert(q);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Supabase questions error, using local", e);
+        window.setQuestions(localQuestions);
+      }
+    } else {
+      window.setQuestions(localQuestions);
+    }
+  };
+
+  window.loadComments = async function(questionId, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.classList.toggle("hidden");
+    if (container.classList.contains("hidden")) return;
+    
+    const contentEl = container.querySelector(".comments-content");
+    contentEl.innerHTML = "Loading...";
+    
+    if (!sbClient) {
+      contentEl.innerHTML = "Offline mode - comments disabled.";
+      return;
+    }
+    
+    try {
+      const { data, error } = await sbClient.from('question_comments').select('*').eq('question_id', questionId).order('created_at', {ascending: false});
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        contentEl.innerHTML = data.map(c => `
+          <div style="margin-bottom:10px; padding:10px; background:var(--bg); border:1px solid var(--line); border-radius:4px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.8rem; color:var(--ink-soft);">
+              <strong>${c.nickname || 'Anonymous'}</strong>
+              <span>${new Date(c.created_at).toLocaleDateString()}</span>
+            </div>
+            <div>${c.comment.replace(/[&<>"']/g, ch => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[ch]))}</div>
+          </div>
+        `).join("");
+      } else {
+        contentEl.innerHTML = "No comments yet. Be the first!";
+      }
+    } catch (e) {
+      contentEl.innerHTML = "Failed to load comments.";
+    }
+  };
+
+  window.postComment = async function(questionId, containerId) {
+    if (!sbClient) return alert("You are offline.");
+    const email = document.getElementById("auth-email") ? document.getElementById("auth-email").value.trim() : "";
+    const nickname = document.getElementById("auth-nickname") ? document.getElementById("auth-nickname").value.trim() : "";
+    if (!email || !nickname) return alert("Please set an email and nickname on the Start screen to comment.");
+    
+    const inputEl = document.getElementById(`comment-input-${questionId}`);
+    if (!inputEl || !inputEl.value.trim()) return;
+    
+    try {
+      const { error } = await sbClient.from('question_comments').insert({
+        question_id: questionId,
+        user_email: email,
+        nickname: nickname,
+        comment: inputEl.value.trim()
+      });
+      if (error) throw error;
+      
+      inputEl.value = "";
+      // Reload comments
+      document.getElementById(containerId).classList.add("hidden");
+      window.loadComments(questionId, containerId);
+    } catch (e) {
+      alert("Failed to post comment: " + e.message);
+    }
+  };
 
   async function hashPIN(pin) {
     if (!pin) return null;
@@ -3547,6 +3852,7 @@ window.__ENC_QUESTIONS = [
     const nickname = document.getElementById("auth-nickname") ? document.getElementById("auth-nickname").value.trim() : "";
     
     if (!email && !pin) return true; // guest mode
+    if (!sbClient) return true; // Supabase offline — allow anyway
     if ((email && !pin) || (!email && pin) || !/^\d{6}$/.test(pin)) {
       alert("Please provide both a valid email and a 6-digit PIN, or leave both blank.");
       return false;
@@ -3597,6 +3903,7 @@ window.__ENC_QUESTIONS = [
     const email = document.getElementById("auth-email") ? document.getElementById("auth-email").value.trim() : "";
     const pin = document.getElementById("auth-pin") ? document.getElementById("auth-pin").value.trim() : "";
     const nickname = document.getElementById("auth-nickname") ? document.getElementById("auth-nickname").value.trim() : "";
+    if (!sbClient) return; // Supabase offline
     let p_email = null;
     let p_pin_hash = null;
     let p_nickname = nickname || null;
@@ -3629,6 +3936,7 @@ window.__ENC_QUESTIONS = [
 
   // ---- Fetch global stats + leaderboard ----
   async function fetchGlobalStats() {
+    if (!sbClient) return; // Supabase offline
     try {
       const { data, error } = await sbClient.rpc('get_global_stats');
       if (error) {
@@ -3647,7 +3955,12 @@ window.__ENC_QUESTIONS = [
           data.hardest_questions.forEach(q => {
             const div = document.createElement('div');
             div.className = 'hard-q-item';
-            div.innerHTML = `<span>Question ${q.index}</span> <span>${q.misses} misses</span>`;
+            const span1 = document.createElement('span');
+            span1.textContent = 'Question ' + q.index;
+            const span2 = document.createElement('span');
+            span2.textContent = q.misses + ' misses';
+            div.appendChild(span1);
+            div.appendChild(span2);
             hardestEl.appendChild(div);
           });
         } else {
@@ -3660,13 +3973,19 @@ window.__ENC_QUESTIONS = [
           lbBody.innerHTML = '';
           data.leaderboard.forEach((entry, i) => {
             const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-            const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+            const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i + 1);
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td class="lb-rank ${rankClass}">${medal}</td>
-              <td>${entry.nickname || 'Anonymous'}</td>
-              <td class="lb-score">${entry.score}</td>
-            `;
+            const tdRank = document.createElement('td');
+            tdRank.className = 'lb-rank ' + rankClass;
+            tdRank.textContent = medal;
+            const tdName = document.createElement('td');
+            tdName.textContent = entry.nickname || 'Anonymous';
+            const tdScore = document.createElement('td');
+            tdScore.className = 'lb-score';
+            tdScore.textContent = entry.score;
+            tr.appendChild(tdRank);
+            tr.appendChild(tdName);
+            tr.appendChild(tdScore);
             lbBody.appendChild(tr);
           });
         } else if (lbBody) {
@@ -3680,6 +3999,7 @@ window.__ENC_QUESTIONS = [
 
   // ---- Personal Dashboard ----
   async function loadDashboard(email, pinHash) {
+    if (!sbClient) return; // Supabase offline
     try {
       const { data, error } = await sbClient.rpc('get_user_history', {
         p_email: email,
@@ -3763,12 +4083,172 @@ window.__ENC_QUESTIONS = [
     }
   }
 
+  function initAdminAndFlashcards() {
+    const qs = window.QUESTIONS || [];
+    
+    // ---- 1. Targeted Practice ----
+    const btnTargeted = document.getElementById("btn-targeted");
+    if (btnTargeted) {
+      btnTargeted.addEventListener("click", () => {
+        // Find weakest domain from the UI text if dashboard is loaded
+        const bars = document.querySelectorAll(".domain-bar-label");
+        let weakestGroup = null;
+        let lowestPct = 100;
+        bars.forEach(bar => {
+          const m = bar.innerText.match(/(.*)\s+(\d+)%/);
+          if (m) {
+            const pct = parseInt(m[2], 10);
+            if (pct < lowestPct) {
+              lowestPct = pct;
+              // Clean up domain name matching
+              weakestGroup = m[1].trim(); 
+            }
+          }
+        });
+        
+        let pool = qs;
+        if (weakestGroup) {
+          // Attempt to map UI label back to internal group ID
+          // The mapping in fetchGlobalStats is:
+          // domainLabels = { "extraction_pipeline": "Extraction Pipeline", ... }
+          // We will just do a substring match
+          pool = qs.filter(q => weakestGroup.toLowerCase().includes(q.group.toLowerCase().replace(/_/g, " ")) || q.group === weakestGroup);
+          if (pool.length === 0) pool = qs; // fallback
+        }
+        
+        // We override the local QUESTIONS array just for this session, but we shouldn't modify the global one permanently.
+        // Wait, buildSession uses getQuestions(). Let's modify buildSession to optionally take a filtered pool, or we just override window.QUESTIONS temporarily.
+        // Actually, we can just do a custom buildSession logic or just filter QUESTIONS and restore it later.
+        const originalQs = window.QUESTIONS;
+        window.setQuestions(pool);
+        
+        document.getElementById("opt-count").value = 10;
+        document.getElementById("opt-minutes").value = 0; // untimed
+        
+        const startBtn = document.getElementById("btn-practice");
+        if (startBtn) startBtn.click();
+        
+        // Restore after a brief delay so buildSession uses the filtered pool
+        setTimeout(() => window.setQuestions(originalQs), 1000);
+      });
+    }
+
+    // ---- 2. Flashcard Mode ----
+    let fcIndex = 0;
+    let fcPool = [];
+    const btnFlashcard = document.getElementById("btn-flashcard");
+    
+    window.finishFlashcards = function() {
+      // Custom view logic for finishing flashcards
+      const viewCard = document.getElementById("view-flashcard");
+      if (viewCard) viewCard.classList.add("hidden");
+      document.getElementById("view-start").classList.remove("hidden");
+    };
+
+    if (btnFlashcard) {
+      btnFlashcard.addEventListener("click", () => {
+        fcPool = [...qs].sort(() => Math.random() - 0.5);
+        fcIndex = 0;
+        if(fcPool.length === 0) return alert("No questions available");
+        
+        document.getElementById("view-start").classList.add("hidden");
+        document.getElementById("view-flashcard").classList.remove("hidden");
+        renderFlashcard();
+      });
+    }
+    
+    function renderFlashcard() {
+      const q = fcPool[fcIndex];
+      const card = document.getElementById("fc-card");
+      const prog = document.getElementById("fc-progress");
+      if(prog) prog.style.width = ((fcIndex / fcPool.length)*100) + "%";
+      
+      card.innerHTML = `<div style="font-size:1.1rem; line-height:1.6;">${String(q.text).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]))}</div>`;
+      
+      document.getElementById("fc-actions").classList.remove("hidden");
+      document.getElementById("fc-rate").classList.add("hidden");
+    }
+    
+    const btnReveal = document.getElementById("fc-btn-reveal");
+    if (btnReveal) {
+      btnReveal.addEventListener("click", () => {
+        const q = fcPool[fcIndex];
+        const card = document.getElementById("fc-card");
+        const correct = q.options.find(o => o.correct);
+        card.innerHTML += `
+          <div style="margin-top:30px; padding-top:20px; border-top:1px solid var(--line); color:var(--good); font-weight:bold;">
+            Answer: ${correct ? String(correct.text).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])) : "No correct option found"}
+          </div>
+          <div style="margin-top:15px; font-size:0.9rem; color:var(--ink-soft);">
+            ${q.options[0].explain ? String(q.options[0].explain).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])) : ""}
+          </div>
+        `;
+        document.getElementById("fc-actions").classList.add("hidden");
+        document.getElementById("fc-rate").classList.remove("hidden");
+      });
+    }
+    
+    const nextCard = () => {
+      fcIndex++;
+      if (fcIndex >= fcPool.length) {
+        alert("You've finished all flashcards!");
+        window.finishFlashcards();
+      } else {
+        renderFlashcard();
+      }
+    };
+    
+    ["fc-btn-easy", "fc-btn-good", "fc-btn-hard"].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) btn.addEventListener("click", nextCard);
+    });
+
+    // ---- 3. Admin Editor ----
+    if (new URLSearchParams(window.location.search).get("admin")) {
+      document.getElementById("view-start").classList.add("hidden");
+      document.getElementById("view-admin").classList.remove("hidden");
+      renderAdminEditor();
+    }
+    
+    function renderAdminEditor() {
+      const root = document.getElementById("admin-editor-root");
+      if (!root) return;
+      let html = `<div style="display:flex; flex-direction:column; gap:20px;">`;
+      qs.forEach(q => {
+        html += `
+          <div class="card" style="padding:15px; display:flex; flex-direction:column; gap:10px;">
+            <div style="font-weight:bold">${q.id} - ${q.group}</div>
+            <textarea id="admin-text-${q.id}" style="width:100%; height:80px; padding:8px;">${q.text}</textarea>
+            <button class="btn accent small" onclick="saveAdminQuestion('${q.id}')">Save Changes</button>
+          </div>
+        `;
+      });
+      html += `</div>`;
+      root.innerHTML = html;
+    }
+    
+    window.saveAdminQuestion = async function(id) {
+      if (!window.sbClient) return alert("Supabase not connected");
+      const txt = document.getElementById(`admin-text-${id}`).value;
+      const q = qs.find(x => x.id === id);
+      if (q) {
+        q.text = txt;
+        const {error} = await window.sbClient.from("questions").update({text: txt}).eq("id", id);
+        if (error) alert("Error saving: " + error.message);
+        else alert("Saved successfully!");
+      }
+    };
+  }
+
   // Init everything on DOM ready
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
+    await window.loadQuestions();
+    if (window.wireExam) window.wireExam();
     fetchGlobalStats();
     initDarkMode();
     registerSW();
     initAuthListeners();
+    initAdminAndFlashcards(); // We will define this next
   });
 })();
 </script>
