@@ -67,7 +67,7 @@ p{margin:.4em 0 .9em;color:var(--ink-soft)}
 .container{max-width:1100px;margin:0 auto;padding:0 24px}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
 .badge{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.16em;padding:5px 10px;border-radius:999px;background:var(--ink);color:var(--accent);border:1px solid var(--ink)}
-.pill{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--bg-2);color:var(--ink-soft);font-size:.78rem;font-weight:700;letter-spacing:.04em;border:1px solid var(--line)}
+.pill{display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:6px 14px;border-radius:999px;background:var(--bg-2);color:var(--ink-soft);font-size:.78rem;font-weight:700;letter-spacing:.04em;border:1px solid var(--line)}
 .chip{display:inline-block;padding:3px 10px;border-radius:8px;font-size:.82rem;font-weight:700;letter-spacing:.01em;background:#fff;border:1px solid var(--line);color:var(--ink-soft)}
 .eyebrow{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:var(--brand-700)}
 .slogan{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--gold-400)}
@@ -100,7 +100,7 @@ p{margin:.4em 0 .9em;color:var(--ink-soft)}
 .stat .l{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;font-weight:700}
 
 .cta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
-.btn{appearance:none;border:1px solid transparent;cursor:pointer;font-family:inherit;font-weight:700;font-size:.95rem;padding:12px 20px;border-radius:12px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;letter-spacing:.01em;transition:transform var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}
+.btn{appearance:none;border:1px solid transparent;cursor:pointer;font-family:inherit;font-weight:700;font-size:.95rem;padding:12px 20px;border-radius:12px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:8px;letter-spacing:.01em;transition:transform var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}
 .btn:active{transform:translateY(1px)}
 .btn.primary{background:var(--ink);color:var(--cream);box-shadow:0 2px 0 rgba(69,33,14,.18),var(--shadow)}
 .btn.primary:hover{background:var(--brand-700);color:var(--cream)}
@@ -304,16 +304,22 @@ code.mark{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-
 .is-correct .why{border-left-color:var(--good)}
 .is-wrong .why{border-left-color:var(--bad)}
 
-/* Footer */
-footer{padding:40px 0 60px;color:var(--muted);font-size:.9rem;text-align:center;border-top:1px solid var(--line);margin-top:40px;background:var(--bg-2)}
-footer a{color:var(--brand-700);font-weight:700}
-footer a:hover{color:var(--ink)}
-footer .small{display:block;margin-top:10px;font-size:.8rem;max-width:760px;margin-left:auto;margin-right:auto}
-footer .slogan{display:block;margin-bottom:12px}
-footer .brand-footer{display:inline-flex;align-items:center;gap:10px;margin-bottom:10px}
+/* Footer Enterprise */
+footer{padding:60px 0;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line);margin-top:40px;background:var(--bg-2)}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px;margin-bottom:40px}
+@media (max-width:800px){.footer-grid{grid-template-columns:1fr;text-align:center}}
+.footer-col h4{font-size:1rem;color:var(--ink);margin-bottom:16px;font-weight:700;}
+.footer-col p {color:var(--ink-soft);margin-top:0;}
+footer a{color:var(--brand-700);font-weight:700;text-decoration:none}
+footer a:hover{color:var(--ink);text-decoration:underline}
+.footer-links{display:flex;flex-direction:column;gap:10px}
+.footer-bottom{border-top:1px solid var(--line);padding-top:20px;text-align:center;font-size:.8rem;color:var(--muted)}
+footer .brand-footer{display:inline-flex;align-items:center;gap:10px;margin-bottom:0}
 footer .brand-footer .brand-mark{width:32px;height:32px;flex:0 0 32px}
-footer .brand-footer .brand-mark img{width:26px;height:26px}
-footer .brand-footer .brand-name{font-size:1rem}
+footer .brand-footer .brand-name{font-size:1.1rem;color:var(--ink);font-weight:700}
+.social-icon {display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:transparent;color:var(--ink);transition:all var(--dur-fast) var(--ease-out);}
+.social-icon:hover {color:var(--brand-700);transform:translateY(-1px);}
+.social-icon svg {width:20px;height:20px;fill:currentColor;}
 
 /* hidden */
 .hidden{display:none !important}
@@ -676,6 +682,12 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
       <a href="#path">Path</a>
       <a href="#reddit">Community</a>
       <a href="#exam">Practice Exam</a>
+      <a href="https://www.linkedin.com/in/zintaen/" target="_blank" rel="noopener" class="social-icon" aria-label="LinkedIn" title="LinkedIn">
+        <svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+      </a>
+      <a href="https://wa.me/84906878091" target="_blank" rel="noopener" class="social-icon" aria-label="WhatsApp" title="WhatsApp">
+        <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+      </a>
       <a href="#tip" class="pill" style="border-color:var(--accent-dark);color:var(--ink);background:var(--accent-soft)">Support us</a>
     </nav>
   </div>
@@ -816,7 +828,7 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
           The exam covers a lot of practical ground on prompt engineering for tool use, managing context windows efficiently, and handling Human-in-the-Loop workflows — so I wrote up my full playbook and bundled the resources I actually used into the chips below.
         </blockquote>
         <div class="links">
-          <a class="chip" href="https://www.reddit.com/r/ClaudeAI/comments/1ruf70b/just_passed_the_new_claude_certified_architect/" target="_blank" rel="noopener">Read my Reddit post ↗</a>
+          <a class="chip" href="https://www.reddit.com/r/ClaudeAI/comments/1to0xfc/comment/ooabw3z" target="_blank" rel="noopener">Read my Reddit post ↗</a>
           <a class="chip" href="https://anthropic.skilljar.com/claude-certified-architect-foundations-access-request" target="_blank" rel="noopener">Request exam access</a>
           <a class="chip" href="https://anthropic.skilljar.com/" target="_blank" rel="noopener">Training courses</a>
           <a class="chip" href="https://github.com/anthropics/anthropic-cookbook" target="_blank" rel="noopener">Anthropic Cookbook</a>
@@ -958,13 +970,6 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
 
               <div id="dashboard-container" class="hidden"></div>
 
-              <div style="margin: 16px 0; padding:10px; border-radius:8px; background:var(--bg); border:1px solid var(--warn);">
-                <label style="display:flex; align-items:center; gap:8px; font-weight:bold; color:var(--warn); cursor:pointer;">
-                  <input type="checkbox" id="opt-proctor" style="transform:scale(1.2)" />
-                  🔒 Enable Ultra-Strict Proctor Mode (Requires Fullscreen, Fails on Tab Switch)
-                </label>
-              </div>
-
               <div class="cta-row" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
                 <button class="btn accent" id="btn-start">Start timed exam (60 Qs)</button>
                 <button class="btn ghost small" id="btn-practice">Untimed practice mode</button>
@@ -996,7 +1001,7 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;margin-bottom:14px">
             <small class="mono" id="progress-text">0 / 0 answered</small>
             <div>
-              <button class="btn ghost small" id="btn-cancel-exam" style="color:var(--bad);">Exit exam</button>
+              <button class="btn ghost small" id="btn-cancel-exam" style="color:var(--bad);">Quit (abandon session)</button>
               <button class="btn ghost small" id="btn-submit">Submit exam</button>
             </div>
           </div>
@@ -1118,13 +1123,34 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
 
 <footer>
   <div class="container">
-    <div class="slogan">Turn your will into real</div>
-    <div class="brand-footer">
-      <span class="brand-mark sm" aria-hidden="true"></span>
-      <span class="brand-name">CyberSkill</span>
+    <div class="footer-grid">
+      <div class="footer-col" style="text-align:left;">
+        <div class="brand-footer">
+          <span class="brand-mark sm" aria-hidden="true"></span>
+          <span class="brand-name">CyberSkill</span>
+        </div>
+        <div class="slogan" style="margin-top:4px; margin-bottom:16px;">Turn your will into real</div>
+        <p style="font-size:0.85rem; max-width:300px; line-height:1.6;">Providing enterprise-grade practice materials and infrastructure for the Claude Partner Network community.</p>
+      </div>
+      <div class="footer-col" style="text-align:left;">
+        <h4>Creator</h4>
+        <div class="footer-links">
+          <a href="https://www.linkedin.com/in/zintaen/" target="_blank" rel="noopener">Stephen Cheng (LinkedIn)</a>
+          <a href="https://wa.me/84906878091" target="_blank" rel="noopener">WhatsApp (+84 90 687 8091)</a>
+          <a href="https://buymeacoffee.com/zintaen" target="_blank" rel="noopener">Buy me a coffee ☕</a>
+        </div>
+      </div>
+      <div class="footer-col" style="text-align:left;">
+        <h4>Legal & Disclaimer</h4>
+        <p style="font-size:0.8rem; line-height:1.5;">
+          CCAF, Claude, and the Claude Partner Network are Anthropic products/programs. 
+          This page is an unofficial, community-made study aid and is <strong>not affiliated with Anthropic</strong>.
+        </p>
+      </div>
     </div>
-    <div>Built for fellow Claude partners by <a href="https://buymeacoffee.com/zintaen" target="_blank" rel="noopener">@zintaen</a> · Not affiliated with Anthropic.</div>
-    <div class="small">CCAF, Claude, and the Claude Partner Network are Anthropic products/programs. This page is an unofficial, community-made study aid. Questions are paraphrased practice items authored by the maintainer; explanations reflect their best interpretation of public Anthropic documentation and may not match official answer keys.</div>
+    <div class="footer-bottom">
+      &copy; 2026 CyberSkill & Stephen Cheng. All rights reserved.
+    </div>
   </div>
 </footer>
 
@@ -3272,6 +3298,29 @@ window.__ENC_QUESTIONS = [
     const pct = total ? Math.round((done/total)*100) : 0;
     $("#progress-bar").style.width = pct + "%";
     $("#progress-text").textContent = `${done} / ${total} answered`;
+    
+    const submitBtn1 = document.getElementById("btn-submit");
+    const submitBtn2 = document.getElementById("btn-submit-2");
+    
+    let btnText = "Submit";
+    let disableSubmit = false;
+    
+    if (done < total) {
+      btnText = `Answer all ${total} Qs to Submit`;
+      disableSubmit = true;
+    } else {
+      btnText = state.untimed ? "Finish Practice (Not Saved)" : "Submit Exam (Will be Saved)";
+      disableSubmit = false;
+    }
+    
+    if (submitBtn1) {
+      submitBtn1.textContent = btnText;
+      submitBtn1.disabled = disableSubmit;
+    }
+    if (submitBtn2) {
+      submitBtn2.textContent = btnText;
+      submitBtn2.disabled = disableSubmit;
+    }
   }
 
   // ---- timer ----
@@ -3303,8 +3352,7 @@ window.__ENC_QUESTIONS = [
 
   // ---- start ----
   function startExam(opts){
-    const proctorBox = document.getElementById("opt-proctor");
-    window.__isProctorMode = proctorBox && proctorBox.checked;
+    window.__isProctorMode = !opts.untimed;
     
     if (window.__isProctorMode) {
       if (document.documentElement.requestFullscreen) {
@@ -3317,6 +3365,7 @@ window.__ENC_QUESTIONS = [
     window.finishExamForProctor = () => finishExam(true);
 
     buildSession(opts);
+
     const sidEl = document.getElementById("session-id");
     if (sidEl) sidEl.textContent = state.sessionId;
     showView("view-running");
@@ -3341,10 +3390,11 @@ window.__ENC_QUESTIONS = [
     if (state.finished) return;
     if (!force){
       const unanswered = state.items.filter(x => !x.chosenLetter).length;
-      const msg = unanswered > 0
-        ? `Submit now? You still have ${unanswered} unanswered question${unanswered===1?"":"s"}.`
-        : `Submit now? You'll see your score and review.`;
-      if (!window.confirm(msg)) return;
+      if (unanswered > 0) {
+        alert(`You must answer all ${state.items.length} questions before submitting.`);
+        return;
+      }
+      if (!window.confirm(`Submit now? You'll see your score and review.`)) return;
     }
     state.finished = true;
     stopTimer();
@@ -3485,6 +3535,10 @@ window.__ENC_QUESTIONS = [
       const chosen = it.options.find(o => o.letter === it.chosenLetter);
       if (chosen && chosen.correct) domainStats[g].correct++;
     });
+    
+    // Save to localStorage so dashboard and Targeted Practice can use it
+    localStorage.setItem('ccaf-last-domain-stats', JSON.stringify(domainStats));
+    
     const dbEl = document.getElementById('domain-breakdown');
     if (dbEl) {
       let html = '<div class="domain-breakdown"><h4>📊 Performance by Domain</h4>';
@@ -3930,6 +3984,12 @@ window.__ENC_QUESTIONS = [
     const email = document.getElementById("auth-email") ? document.getElementById("auth-email").value.trim() : "";
     const pin = document.getElementById("auth-pin") ? document.getElementById("auth-pin").value.trim() : "";
     const nickname = document.getElementById("auth-nickname") ? document.getElementById("auth-nickname").value.trim() : "";
+    
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      console.warn("Invalid email format. Skipping submission.");
+      return;
+    }
+
     if (!sbClient) return; // Supabase offline
     let p_email = null;
     let p_pin_hash = null;
@@ -4035,6 +4095,16 @@ window.__ENC_QUESTIONS = [
       if (error || !data || !data.success) return;
 
       const results = data.results || [];
+      
+      const authForm = document.querySelector('.auth-form');
+      const authMsg = document.querySelector('.auth-box p');
+      const authHeader = document.querySelector('.auth-box h4');
+      if (authForm && authMsg && authHeader && email) {
+        authForm.classList.add('hidden');
+        authHeader.textContent = '✅ Logged In';
+        authMsg.textContent = `Authenticated as ${email}. Your progress is being synced.`;
+      }
+
       if (results.length === 0) return;
 
       const container = document.getElementById('dashboard-container');
@@ -4043,6 +4113,31 @@ window.__ENC_QUESTIONS = [
       container.classList.remove('hidden');
       let html = '<div class="dashboard-box"><h4>👋 Welcome Back!</h4>';
       html += `<p class="sub">You've taken ${results.length} exam${results.length === 1 ? '' : 's'} so far. Here's your history:</p>`;
+      
+      const lastStatsStr = localStorage.getItem('ccaf-last-domain-stats');
+      if (lastStatsStr) {
+        try {
+          const domainStats = JSON.parse(lastStatsStr);
+          const domainNames = {
+            'research_pipeline': 'Research Pipeline',
+            'code_exploration': 'Code Exploration',
+            'customer_support': 'Customer Support',
+            'extraction_pipeline': 'Extraction Pipeline'
+          };
+          html += '<div class="domain-breakdown" style="margin: 15px 0 25px 0;"><h5>📊 Your Last Attempt by Domain</h5>';
+          Object.entries(domainStats).forEach(([key, val]) => {
+            const dpct = val.total ? Math.round(100 * val.correct / val.total) : 0;
+            const level = dpct >= 70 ? 'high' : dpct >= 50 ? 'mid' : 'low';
+            const label = domainNames[key] || key;
+            html += `<div class="domain-bar">
+              <div class="domain-bar-label"><span>${label}</span><span>${val.correct}/${val.total} (${dpct}%)</span></div>
+              <div class="domain-bar-track"><div class="domain-bar-fill ${level}" style="width:${dpct}%">${dpct}%</div></div>
+            </div>`;
+          });
+          html += '</div>';
+        } catch(e) {}
+      }
+
       html += '<div class="history-list">';
       results.slice(0, 5).forEach(r => {
         const d = new Date(r.taken_at);
@@ -4097,12 +4192,25 @@ window.__ENC_QUESTIONS = [
 
   // ---- Auto-load dashboard on email/pin blur ----
   function initAuthListeners() {
+    const emailEl = document.getElementById('auth-email');
     const pinEl = document.getElementById('auth-pin');
+    
+    // Auto-login from localStorage
+    const savedEmail = localStorage.getItem('ccaf-email');
+    const savedPin = localStorage.getItem('ccaf-pin');
+    if (savedEmail && savedPin && emailEl && pinEl) {
+      emailEl.value = savedEmail;
+      pinEl.value = savedPin;
+      hashPIN(savedPin).then(pinHash => loadDashboard(savedEmail, pinHash));
+    }
+    
     if (pinEl) {
       pinEl.addEventListener('blur', async () => {
-        const email = document.getElementById('auth-email')?.value.trim();
+        const email = emailEl?.value.trim();
         const pin = pinEl.value.trim();
         if (email && /^\d{6}$/.test(pin)) {
+          localStorage.setItem('ccaf-email', email);
+          localStorage.setItem('ccaf-pin', pin);
           const pinHash = await hashPIN(pin);
           loadDashboard(email, pinHash);
         }
@@ -4117,29 +4225,29 @@ window.__ENC_QUESTIONS = [
     const btnTargeted = document.getElementById("btn-targeted");
     if (btnTargeted) {
       btnTargeted.addEventListener("click", () => {
-        // Find weakest domain from the UI text if dashboard is loaded
-        const bars = document.querySelectorAll(".domain-bar-label");
+        const lastStatsStr = localStorage.getItem('ccaf-last-domain-stats');
+        if (!lastStatsStr) {
+          alert("Please complete at least one mock exam to unlock Targeted Practice.");
+          return;
+        }
+        
+        let domainStats = {};
+        try { domainStats = JSON.parse(lastStatsStr); } catch(e) {}
+        
         let weakestGroup = null;
         let lowestPct = 100;
-        bars.forEach(bar => {
-          const m = bar.innerText.match(/(.*)\s+(\d+)%/);
-          if (m) {
-            const pct = parseInt(m[2], 10);
-            if (pct < lowestPct) {
-              lowestPct = pct;
-              // Clean up domain name matching
-              weakestGroup = m[1].trim(); 
-            }
+        
+        Object.entries(domainStats).forEach(([key, val]) => {
+          const pct = val.total ? Math.round(100 * val.correct / val.total) : 0;
+          if (pct < lowestPct) {
+            lowestPct = pct;
+            weakestGroup = key;
           }
         });
         
         let pool = qs;
         if (weakestGroup) {
-          // Attempt to map UI label back to internal group ID
-          // The mapping in fetchGlobalStats is:
-          // domainLabels = { "extraction_pipeline": "Extraction Pipeline", ... }
-          // We will just do a substring match
-          pool = qs.filter(q => weakestGroup.toLowerCase().includes(q.group.toLowerCase().replace(/_/g, " ")) || q.group === weakestGroup);
+          pool = qs.filter(q => q.group === weakestGroup);
           if (pool.length === 0) pool = qs; // fallback
         }
         
@@ -4202,7 +4310,22 @@ window.__ENC_QUESTIONS = [
       const prog = document.getElementById("fc-progress");
       if(prog) prog.style.width = ((fcIndex / fcPool.length)*100) + "%";
       
-      card.innerHTML = `<div style="font-size:1.1rem; line-height:1.6;">${String(q.text).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]))}</div>`;
+      let html = `<div class="review-item" style="border:none; padding:0; box-shadow:none; margin:0; background:transparent;">`;
+      html += `<div class="review-q" style="margin-bottom:20px;">${richText(q.text)}</div>`;
+      q.options.forEach((op, i) => {
+        const letter = String.fromCharCode(65+i);
+        html += `
+          <div class="r-opt" id="fc-opt-${i}" style="transition: opacity 0.2s;">
+            <div class="r-line">
+              <span class="letter">${letter}</span>
+              <span class="r-text">${richText(op.text)}</span>
+            </div>
+            <div class="why hidden" id="fc-why-${i}">${richText(op.explain)}</div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      card.innerHTML = html;
       
       document.getElementById("fc-actions").classList.remove("hidden");
       document.getElementById("fc-rate").classList.add("hidden");
@@ -4212,16 +4335,18 @@ window.__ENC_QUESTIONS = [
     if (btnReveal) {
       btnReveal.addEventListener("click", () => {
         const q = fcPool[fcIndex];
-        const card = document.getElementById("fc-card");
-        const correct = q.options.find(o => o.correct);
-        card.innerHTML += `
-          <div style="margin-top:30px; padding-top:20px; border-top:1px solid var(--line); color:var(--good); font-weight:bold;">
-            Answer: ${correct ? String(correct.text).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])) : "No correct option found"}
-          </div>
-          <div style="margin-top:15px; font-size:0.9rem; color:var(--ink-soft);">
-            ${q.options[0].explain ? String(q.options[0].explain).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])) : ""}
-          </div>
-        `;
+        q.options.forEach((op, i) => {
+          const optDiv = document.getElementById(`fc-opt-${i}`);
+          const whyDiv = document.getElementById(`fc-why-${i}`);
+          if (optDiv && whyDiv) {
+            if (op.correct) {
+              optDiv.classList.add("is-correct");
+            } else {
+              optDiv.style.opacity = "0.5";
+            }
+            whyDiv.classList.remove("hidden");
+          }
+        });
         document.getElementById("fc-actions").classList.add("hidden");
         document.getElementById("fc-rate").classList.remove("hidden");
       });
@@ -4254,10 +4379,17 @@ window.__ENC_QUESTIONS = [
       if (!root) return;
       let html = `<div style="display:flex; flex-direction:column; gap:20px;">`;
       qs.forEach(q => {
+        let optsHtml = q.options.map((o, i) => `
+          <div style="margin-top:5px;">
+            <strong>Option ${o.letter} (Correct: ${o.correct}):</strong><br/>
+            <textarea id="admin-opt-${q.id}-${i}" style="width:100%; height:40px; padding:4px;">${o.text}</textarea>
+          </div>
+        `).join('');
         html += `
           <div class="card" style="padding:15px; display:flex; flex-direction:column; gap:10px;">
             <div style="font-weight:bold">${q.id} - ${q.group}</div>
             <textarea id="admin-text-${q.id}" style="width:100%; height:80px; padding:8px;">${q.text}</textarea>
+            ${optsHtml}
             <button class="btn accent small" onclick="saveAdminQuestion('${q.id}')">Save Changes</button>
           </div>
         `;
@@ -4272,7 +4404,10 @@ window.__ENC_QUESTIONS = [
       const q = qs.find(x => x.id === id);
       if (q) {
         q.text = txt;
-        const {error} = await window.sbClient.from("questions").update({text: txt}).eq("id", id);
+        q.options.forEach((o, i) => {
+          o.text = document.getElementById(`admin-opt-${id}-${i}`).value;
+        });
+        const {error} = await window.sbClient.from("questions").update({text: txt, options: q.options}).eq("id", id);
         if (error) alert("Error saving: " + error.message);
         else alert("Saved successfully!");
       }
