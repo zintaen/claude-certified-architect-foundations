@@ -67,8 +67,8 @@ p{margin:.4em 0 .9em;color:var(--ink-soft)}
 .container{max-width:1100px;margin:0 auto;padding:0 24px}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
 .badge{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.16em;padding:5px 10px;border-radius:999px;background:var(--ink);color:var(--accent);border:1px solid var(--ink)}
-.pill{display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:6px 14px;border-radius:999px;background:var(--bg-2);color:var(--ink-soft);font-size:.78rem;font-weight:700;letter-spacing:.04em;border:1px solid var(--line)}
-.chip{display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:4px 10px;border-radius:8px;font-size:.82rem;font-weight:700;letter-spacing:.01em;background:#fff;border:1px solid var(--line);color:var(--ink-soft)}
+.pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 14px;border-radius:999px;background:var(--bg-2);color:var(--ink-soft);font-size:.78rem;font-weight:700;letter-spacing:.04em;border:1px solid var(--line)}
+.chip{display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;border-radius:8px;font-size:.82rem;font-weight:700;letter-spacing:.01em;background:#fff;border:1px solid var(--line);color:var(--ink-soft)}
 .eyebrow{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:var(--brand-700)}
 .slogan{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--gold-400)}
 
@@ -100,7 +100,7 @@ p{margin:.4em 0 .9em;color:var(--ink-soft)}
 .stat .l{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;font-weight:700}
 
 .cta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
-.btn{appearance:none;border:1px solid transparent;cursor:pointer;font-family:inherit;font-weight:700;font-size:.95rem;padding:12px 20px;border-radius:12px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:8px;letter-spacing:.01em;transition:transform var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}
+.btn{appearance:none;border:1px solid transparent;cursor:pointer;font-family:inherit;font-weight:700;font-size:.95rem;padding:12px 20px;border-radius:12px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.01em;transition:transform var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}
 .btn:active{transform:translateY(1px)}
 .btn.primary{background:var(--ink);color:var(--cream);box-shadow:0 2px 0 rgba(69,33,14,.18),var(--shadow)}
 .btn.primary:hover{background:var(--brand-700);color:var(--cream)}
@@ -227,7 +227,7 @@ code.mark{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-
 .score-ring .s-bg{stroke:var(--bg-2)}
 .score-ring .s-fg{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.22,.9,.32,1)}
 .score-ring .center{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
-.score-ring .val{font-family:"Red Hat Text",system-ui,sans-serif;font-size:3rem;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-.02em}
+.score-ring .val{font-family:"Red Hat Text",system-ui,sans-serif;font-size:3rem;font-weight:700;color:var(--ink);letter-spacing:-.02em}
 .score-ring .label{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-700);margin-top:4px;font-weight:700}
 .score-ring .pct{margin-top:8px;padding:3px 10px;border-radius:999px;background:var(--bg-2);border:1px solid var(--line);color:var(--muted);font-size:.78rem;letter-spacing:.04em;font-weight:700}
 .result-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
@@ -248,7 +248,7 @@ code.mark{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-
 .result-sum{margin:0;color:var(--ink-soft);max-width:62ch;font-size:.97rem;line-height:1.55}
 .result-v2 .result-kpis{margin-top:20px}
 .result-v2 .stat{background:rgba(255,255,255,.9);border:1px solid rgba(69,33,14,.1);backdrop-filter:saturate(1.1) blur(2px);padding:14px 14px;border-radius:14px;text-align:left;box-shadow:0 2px 0 rgba(69,33,14,.05)}
-.result-v2 .stat .k{font-family:"Red Hat Text",system-ui,sans-serif;font-size:1.65rem;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-.01em}
+.result-v2 .stat .k{font-family:"Red Hat Text",system-ui,sans-serif;font-size:1.65rem;font-weight:700;color:var(--ink);letter-spacing:-.01em}
 .result-v2 .stat .l{margin-top:4px;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-700);font-weight:700}
 .result-v2-footer{position:relative;padding:18px 32px 28px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-top:1px dashed rgba(69,33,14,.22);margin-top:8px}
 .review-gate{display:flex;gap:12px;align-items:center;padding:12px 16px;background:rgba(255,255,255,.85);border:1px solid rgba(69,33,14,.14);border-radius:12px;min-width:0;flex:1 1 auto;max-width:620px}
@@ -317,7 +317,7 @@ footer a:hover{color:var(--ink);text-decoration:underline}
 footer .brand-footer{display:inline-flex;align-items:center;gap:10px;margin-bottom:0}
 footer .brand-footer .brand-mark{width:32px;height:32px;flex:0 0 32px}
 footer .brand-footer .brand-name{font-size:1.1rem;color:var(--ink);font-weight:700}
-.social-icon {display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:0;width:32px;height:32px;border-radius:8px;background:transparent;color:var(--ink);transition:all var(--dur-fast) var(--ease-out);}
+.social-icon {display:inline-flex;align-items:center;justify-content:center;padding:0;width:32px;height:32px;border-radius:8px;background:transparent;color:var(--ink);transition:all var(--dur-fast) var(--ease-out);}
 .social-icon:hover {color:var(--brand-700);transform:translateY(-1px);}
 .social-icon svg {width:20px;height:20px;fill:currentColor;}
 
@@ -469,11 +469,31 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
 .auth-box p { font-size:0.85rem; margin:0 0 12px; color:var(--ink-soft); }
 .auth-form { display: flex; gap: 8px; flex-wrap: wrap; }
 .auth-input { flex: 1; min-width: 120px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); font: inherit; background:var(--card); color:var(--ink); }
-.global-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px; }
-@media(max-width:800px) { .global-stats-grid { grid-template-columns: repeat(2, 1fr); } }
-@media(max-width:500px) { .global-stats-grid { grid-template-columns: 1fr; } }
-.hard-q-item { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px dashed var(--line); font-size:0.85rem;}
-.hard-q-item:last-child { border-bottom: none; }
+.global-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 24px; }
+@media(max-width:900px) { .global-stats-grid { grid-template-columns: repeat(2, 1fr); } }
+@media(max-width:550px) { .global-stats-grid { grid-template-columns: 1fr; } }
+.global-stats-grid .stat { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; transition: transform var(--dur-fast), box-shadow var(--dur-fast), border-color var(--dur-fast); }
+.global-stats-grid .stat:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.05); border-color: var(--brand-700); }
+.global-stats-grid .stat::before { content:""; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg, var(--accent), var(--gold-400)); opacity:0; transition:opacity var(--dur-fast); }
+.global-stats-grid .stat:hover::before { opacity: 1; }
+.global-stats-grid .stat .k { font-family: "Red Hat Text", system-ui, sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--ink); margin-bottom: 8px; letter-spacing: -0.02em; }
+.global-stats-grid .stat .l { font-size: 0.75rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.15em; font-weight: 700; }
+.hard-q-item { display:flex; justify-content:space-between; padding:8px 12px; background:var(--bg-2); border-radius:8px; margin-bottom:6px; font-size:0.85rem; font-weight:600; color:var(--ink); border:1px solid var(--line); transition: border-color var(--dur-fast); }
+.hard-q-item:hover { border-color: var(--bad); }
+.hard-q-item span:last-child { color: var(--bad); }
+
+.leaderboard { margin-top: 32px; background: var(--card); padding: 24px 32px; border-radius: 20px; border: 1px solid var(--line); box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+@media(max-width:550px) { .leaderboard { padding: 20px 16px; } }
+.leaderboard h4 { margin-top:0; font-size: 1.3rem; margin-bottom: 20px; display:flex; align-items:center; gap:8px; color:var(--ink); font-family:"Red Hat Text", system-ui, sans-serif; }
+.lb-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 8px; }
+.lb-table th { text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); padding: 0 16px 8px; border-bottom: 1px dashed var(--line); }
+.lb-table td { padding: 14px 16px; background: var(--bg-2); font-size: 0.95rem; font-weight: 600; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--ink); }
+.lb-table tr td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; border-left: 1px solid var(--line); }
+.lb-table tr td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-right: 1px solid var(--line); text-align: right; }
+.lb-table tr:hover td { background: var(--card); }
+.lb-rank { width: 48px; text-align: center !important; font-size: 1.25rem; }
+.lb-rank.gold { text-shadow: 0 2px 4px rgba(212,175,55,0.4); }
+.lb-score { color: var(--ink); font-family: "Red Hat Text", system-ui, sans-serif; font-size: 1.1rem; }
 
 /* Dark mode toggle */
 .theme-toggle {
