@@ -996,6 +996,7 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;margin-bottom:14px">
             <small class="mono" id="progress-text">0 / 0 answered</small>
             <div>
+              <button class="btn ghost small" id="btn-cancel-exam" style="color:var(--bad);">Exit exam</button>
               <button class="btn ghost small" id="btn-submit">Submit exam</button>
             </div>
           </div>
@@ -3676,6 +3677,17 @@ window.__ENC_QUESTIONS = [
     if (submit1) submit1.addEventListener("click", () => finishExam(false));
     if (submit2) submit2.addEventListener("click", () => finishExam(false));
 
+    const cancelExam = $("#btn-cancel-exam");
+    if (cancelExam) cancelExam.addEventListener("click", () => {
+      if (window.confirm("Are you sure you want to exit? Your progress will be lost.")) {
+        if (state.timerHandle){ clearInterval(state.timerHandle); state.timerHandle = null; }
+        if (window.__isProctorMode && document.fullscreenElement) {
+          document.exitFullscreen().catch(()=>{});
+        }
+        showView("view-start");
+      }
+    });
+
     const review = $("#btn-review");
     if (review) review.addEventListener("click", () => {
       if (!state.reviewEnabled){
@@ -3749,7 +3761,18 @@ window.__ENC_QUESTIONS = [
   }
 
   window.loadQuestions = async function() {
-    let localQuestions = window.QUESTIONS || [];
+    let localQuestions = [];
+    if (window.__ENC_QUESTIONS) {
+      try {
+        const b64 = window.__ENC_QUESTIONS;
+        const decoded = decodeURIComponent(escape(atob(b64)));
+        localQuestions = JSON.parse(decoded);
+        window.QUESTIONS = localQuestions; // Set it globally too
+      } catch(e) {
+        console.error("Failed to decode local questions", e);
+      }
+    }
+
     if (sbClient) {
       try {
         const { data, error } = await sbClient.from('questions').select('*').order('id', {ascending:true});
@@ -3852,6 +3875,10 @@ window.__ENC_QUESTIONS = [
     const nickname = document.getElementById("auth-nickname") ? document.getElementById("auth-nickname").value.trim() : "";
     
     if (!email && !pin) return true; // guest mode
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("Please provide a valid email format.");
+      return false;
+    }
     if (!sbClient) return true; // Supabase offline — allow anyway
     if ((email && !pin) || (!email && pin) || !/^\d{6}$/.test(pin)) {
       alert("Please provide both a valid email and a 6-digit PIN, or leave both blank.");
