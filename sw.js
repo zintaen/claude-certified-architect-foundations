@@ -3,7 +3,10 @@ const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './assets/cyberskill-logo.svg'
+  './assets/cyberskill-logo.svg',
+  './assets/styles.css',
+  './assets/questions.js',
+  './assets/app.js'
 ];
 
 // Domains to never cache (API calls, CDN, analytics)
