@@ -1,1 +1,17 @@
 .DS_Store
+Thumbs.db
+.env
+.env.*
+node_modules/
+.vercel/
+dist/
+build/
+*.log
+npm-debug.log*
+.idea/
+.vscode/
+*.swp
+*.swo
+*.bak
+*.tmp
+coverage/

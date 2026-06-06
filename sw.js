@@ -1,9 +1,17 @@
-const CACHE_NAME = 'ccaf-exam-v4';
+const CACHE_NAME = 'ccaf-exam-v5';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './assets/cyberskill-logo.svg'
 ];
+
+// Domains to never cache (API calls, CDN, analytics)
+const EXCLUDED_HOSTS = new Set([
+  'idtmcfqcgvecrivvtsxv.supabase.co',
+  'va.vercel-scripts.com',
+  'cdn.jsdelivr.net'
+]);
 
 // Install: cache core assets
 self.addEventListener('install', event => {
@@ -23,23 +31,24 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch: network-first for API calls, cache-first for app shell
+// Fetch: stale-while-revalidate for app shell, network-only for excluded hosts
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Only handle http/https requests (skip chrome-extension://, etc.)
+  // Only handle http/https (skip chrome-extension://, etc.)
   if (!url.protocol.startsWith('http')) return;
 
-  // Don't cache Supabase API calls or analytics
-  if (url.hostname.includes('supabase') || url.hostname.includes('vercel') || url.hostname.includes('jsdelivr')) {
-    return; // let the browser handle these normally
-  }
+  // Don't cache API calls, analytics, or CDN
+  if (EXCLUDED_HOSTS.has(url.hostname)) return;
+
+  // Only cache GET requests
+  if (event.request.method !== 'GET') return;
 
   event.respondWith(
     caches.match(event.request).then(cached => {
-      const networkFetch = fetch(event.request).then(response => {
-        // Update cache with fresh response
-        if (response.ok) {
+      const networkFetch = fetch(event.request.clone()).then(response => {
+        // Only cache successful same-origin responses
+        if (response.ok && url.origin === self.location.origin) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }

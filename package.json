@@ -1,0 +1,24 @@
+{
+  "name": "claude-certified-architect-mock-exam",
+  "version": "1.0.0",
+  "description": "[![Live Demo](https://img.shields.io/badge/Live-ccaf.cyberskill.dev-45210E?style=flat-square&logo=vercel)](https://ccaf.cyberskill.dev) [![License](https://img.shields.io/badge/License-Personal%20Educational%20Use-F4BA17?style=flat-square)](./LICENSE)",
+  "main": "sw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zintaen/claude-certified-architect-mock-exam.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/zintaen/claude-certified-architect-mock-exam/issues"
+  },
+  "homepage": "https://github.com/zintaen/claude-certified-architect-mock-exam#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}

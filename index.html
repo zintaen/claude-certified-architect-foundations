@@ -11,11 +11,14 @@
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="CyberSkill · CCAF Practice Mock Exam" />
 <meta name="twitter:description" content="Free 60-question mock exam for Claude Certified Architect — Foundations. Timed, scored, with full explanations." />
+<meta property="og:image" content="https://ccaf.cyberskill.dev/assets/cyberskill-logo.svg" />
+<meta name="twitter:image" content="https://ccaf.cyberskill.dev/assets/cyberskill-logo.svg" />
 <link rel="canonical" href="https://ccaf.cyberskill.dev/" />
 <title>CyberSkill · CCAF Practice — Claude Certified Architect Foundations mock exam</title>
 <meta name="description" content="Free CCAF mock exam by CyberSkill. 60 questions, 120-minute proctor-style timer, 1000-point scoring, review explanations. Turn your will into real." />
 <meta name="theme-color" content="#45210E" />
 <link rel="icon" type="image/svg+xml" href="assets/cyberskill-logo.svg" />
+<link rel="apple-touch-icon" href="assets/cyberskill-logo.svg" />
 <link rel="manifest" href="manifest.json" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -61,10 +64,9 @@ if(localStorage.getItem('ccaf-dark-mode')==='true')document.documentElement.clas
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-behavior:smooth}
 body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:"Red Hat Text","Red Hat Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;font-weight:500;line-height:1.55;font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden;word-wrap:break-word;overflow-wrap:break-word;font-style:normal}
-img,svg{max-width:100%;height:auto}
+img,svg{max-width:100%;height:auto;display:block}
 pre,code{word-wrap:break-word;overflow-wrap:anywhere}
 body.no-select,body.no-select *{user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none}
-img{max-width:100%;display:block}
 em,i{font-style:normal;color:var(--brand-700);font-weight:700}
 a{color:var(--brand-700);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px;text-decoration-color:var(--accent);transition:color var(--dur-fast) var(--ease-out),text-decoration-color var(--dur-fast) var(--ease-out)}
 a:hover{color:var(--ink);text-decoration-color:var(--accent-dark)}
@@ -109,7 +111,7 @@ p{margin:.4em 0 .9em;color:var(--ink-soft)}
 .stat .l{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;font-weight:700}
 
 .cta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
-.btn{appearance:none;border:1px solid transparent;cursor:pointer;font-family:inherit;font-weight:700;font-size:.95rem;padding:12px 20px;border-radius:12px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.01em;transition:transform var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:6px;font-weight:600;font-size:0.95rem;cursor:pointer;transition:all .2s;text-align:center;border:1px solid transparent;background:transparent;color:var(--ink)}
 .btn:active{transform:translateY(1px)}
 .btn.primary{background:var(--ink);color:var(--cream);box-shadow:0 2px 0 rgba(69,33,14,.18),var(--shadow)}
 .btn.primary:hover{background:var(--brand-700);color:var(--cream)}
@@ -219,8 +221,11 @@ code.mark{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-
 .palette-grid button.current{outline:2px solid var(--accent-dark);outline-offset:1px}
 .palette-grid button.current.answered{color:#2E4416}
 .palette-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:.76rem;color:var(--muted);font-weight:700}
-.palette-legend .swatch{display:inline-block;width:10px;height:10px;border-radius:3px;border:1px solid var(--line);vertical-align:middle;margin-right:4px}
-.swatch.ans{background:#E4EDD0;border-color:#B9C998}
+.swatch-item{display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--ink-soft)}
+.swatch{width:12px;height:12px;border-radius:3px;border:1px solid var(--line);background:var(--bg)}
+.swatch.ans{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.swatch.flag{border-color:#E87726;background:var(--bg)}
+.swatch.un{background:var(--bg);border-color:var(--line)}
 .swatch.flag{background:#FDF1D3;border-color:#EBC966}
 .swatch.un{background:#fff}
 
@@ -724,7 +729,7 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
   "author": { "@type": "Person", "name": "Stephen Cheng", "url": "https://www.linkedin.com/in/zintaen/" }
 }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" integrity="sha384-o+Hkm/usHFhCEWo1Ae1cLsOLiQQNrD2UfI424QDAaiZR7URnC8v35ey7s2sbGZHB" crossorigin="anonymous"></script>
 </head>
 <body>
 <a class="skip-link" href="#exam">Skip to exam</a>
@@ -846,7 +851,7 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
       </div>
       <div class="card feature">
         <div class="ico" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
+          <circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
         </div>
         <h3>Partner-only pricing</h3>
         <p>A fixed $99 discount is offered to approved Claude Partner Network companies. This practice exam is free — because your first attempt shouldn't be blind.</p>
@@ -962,16 +967,6 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
       </div>
     </div>
 
-    <div class="exam-wrap">
-      <div class="exam-head">
-        <div class="title">
-          <span class="brand-mark sm" aria-hidden="true"></span>
-          <span>CCAF Practice — Session</span>
-          <span id="session-id" class="chip mono" title="Session ID">—</span>
-        </div>
-        <div id="timer" class="timer" role="timer" aria-live="off" aria-atomic="true">02:00:00</div>
-      </div>
-
       <!-- ==============================
        ADMIN EDITOR VIEW
        ============================== -->
@@ -1011,9 +1006,18 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
     </div>
   </section>
 
-  <!-- ==============================
-       FOOTER
+      <!-- ==============================
+       EXAM WRAP BEGIN
        ============================== -->
+      <div class="exam-wrap">
+      <div class="exam-head">
+        <div class="title">
+          <span class="brand-mark sm" aria-hidden="true"></span>
+          <span>CCAF Practice — Session</span>
+          <span id="session-id" class="chip mono" title="Session ID">—</span>
+        </div>
+        <div id="timer" class="timer" role="timer" aria-live="off" aria-atomic="true">02:00:00</div>
+      </div>
 
       <div class="exam-body">
 
@@ -1093,11 +1097,11 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
             <aside class="palette" aria-label="Question palette">
               <h4>Question palette</h4>
               <div class="palette-grid" id="palette"></div>
-              <div class="palette-legend">
-                <span><span class="swatch swatch-ans"></span>answered</span>
-                <span><span class="swatch swatch-flag"></span>flagged</span>
-                <span><span class="swatch swatch-un"></span>unanswered</span>
-              </div>
+              <div class="legend">
+              <div class="swatch-item"><div class="swatch ans"></div> Answered</div>
+              <div class="swatch-item"><div class="swatch flag"></div> Flagged</div>
+              <div class="swatch-item"><div class="swatch un"></div> Unanswered</div>
+            </div>
               <div style="margin-top:14px">
                 <button class="btn accent small" style="width:100%" id="btn-submit-2">Finish & score</button>
               </div>
@@ -1227,7 +1231,7 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; <script>document.write(new Date().getFullYear())</script> CyberSkill &amp; Stephen Cheng. All rights reserved.
+      &copy; <span id="copyright-year"></span> CyberSkill &amp; Stephen Cheng. All rights reserved.
     </div>
   </div>
 </footer>
@@ -1242,13 +1246,13 @@ body.tab-hidden::after{content:"Content hidden — return focus to resume.";posi
   document.addEventListener('contextmenu', function(e){ if (ON_EXAM) e.preventDefault(); });
   document.addEventListener('copy',     function(e){ if (ON_EXAM) e.preventDefault(); });
   document.addEventListener('cut',      function(e){ if (ON_EXAM) e.preventDefault(); });
-  document.addEventListener('dragstart',function(e){ e.preventDefault(); });
+  document.addEventListener('dragstart',function(e){ if (ON_EXAM) e.preventDefault(); });
   document.addEventListener('selectstart', function(e){ if (ON_EXAM) e.preventDefault(); });
   document.addEventListener('keydown', function(e){
     var k = (e.key||'').toLowerCase();
     // block devtools & save / view-source / print / copy / screenshot shortcuts
-    if (e.key === 'F12') { e.preventDefault(); return; }
-    if (e.key === 'PrintScreen'){
+    if (ON_EXAM && e.key === 'F12') { e.preventDefault(); return; }
+    if (ON_EXAM && e.key === 'PrintScreen'){
       // we can't actually *block* the OS screenshot key, but we can blank the
       // content briefly so whatever landed in the clipboard is mostly useless
       document.body.classList.add('tab-hidden');
@@ -3371,7 +3375,7 @@ window.__ENC_QUESTIONS = [
     state.items.forEach((it, i) => {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "p-cell";
+      btn.className = "";
       if (it.chosenLetter) btn.classList.add("answered");
       if (it.flagged) btn.classList.add("flagged");
       if (i === state.idx) btn.classList.add("current");
@@ -3495,6 +3499,7 @@ window.__ENC_QUESTIONS = [
     state.focusLoss = window.__focusLoss || 0;
     window.__setOnExam && window.__setOnExam(false);
     document.body.classList.remove("no-select");
+    if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
 
     const total = state.items.length;
     let correct = 0, incorrect = 0, skipped = 0;
@@ -3716,6 +3721,8 @@ window.__ENC_QUESTIONS = [
             const og = copyBtn.textContent;
             copyBtn.textContent = '✓ Copied!';
             setTimeout(() => copyBtn.textContent = og, 2000);
+          }).catch(() => {
+            alert('Copy failed. Please copy manually.');
           });
         };
       }
@@ -3878,6 +3885,8 @@ window.__ENC_QUESTIONS = [
     if (cancelExam) cancelExam.addEventListener("click", () => {
       if (window.confirm("Are you sure you want to exit? Your progress will be lost.")) {
         if (state.timerHandle){ clearInterval(state.timerHandle); state.timerHandle = null; }
+        window.__setOnExam && window.__setOnExam(false);
+        document.body.classList.remove("no-select");
         if (window.__isProctorMode && document.fullscreenElement) {
           document.exitFullscreen().catch(()=>{});
         }
@@ -3903,6 +3912,11 @@ window.__ENC_QUESTIONS = [
     [retake, retake2].forEach(b => b && b.addEventListener("click", () => {
       stopTimer();
       state.finished = false;
+      window.__isProctorMode = false;
+      window.__focusLoss = 0;
+      window.__setOnExam && window.__setOnExam(false);
+      document.body.classList.remove("no-select");
+      if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
       showView("view-start");
     }));
 
@@ -3941,6 +3955,8 @@ window.__ENC_QUESTIONS = [
   }
 
   window.wireExam = wire;
+  window.showView = showView;
+  window.startExam = startExam;
 })();
 
 </script>
@@ -4014,9 +4030,9 @@ window.__ENC_QUESTIONS = [
       
       if (data && data.length > 0) {
         contentEl.innerHTML = data.map(c => `
-          <div style="margin-bottom:10px; padding:10px; background:var(--bg); border:1px solid var(--line); border-radius:4px;">
+            <div style="margin-bottom:10px; padding:10px; background:var(--bg); border:1px solid var(--line); border-radius:4px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.8rem; color:var(--ink-soft);">
-              <strong>${c.nickname || 'Anonymous'}</strong>
+              <strong>${(c.nickname || 'Anonymous').replace(/[&<>"']/g, ch => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[ch]))}</strong>
               <span>${new Date(c.created_at).toLocaleDateString()}</span>
             </div>
             <div>${c.comment.replace(/[&<>"']/g, ch => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[ch]))}</div>
@@ -4059,6 +4075,7 @@ window.__ENC_QUESTIONS = [
 
   async function hashPIN(pin) {
     if (!pin) return null;
+    if (!/^\d{6}$/.test(pin)) return null;
     const msgBuffer = new TextEncoder().encode(pin);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -4180,9 +4197,12 @@ window.__ENC_QUESTIONS = [
       }
       
       if (data) {
-        document.getElementById('stat-total-exams').textContent = data.total_exams || 0;
-        document.getElementById('stat-avg-score').textContent = data.avg_score || 0;
-        document.getElementById('stat-pass-rate').textContent = (data.pass_rate || 0) + '%';
+        const elTotal = document.getElementById('stat-total-exams');
+        if (elTotal) elTotal.textContent = data.total_exams || 0;
+        const elAvg = document.getElementById('stat-avg-score');
+        if (elAvg) elAvg.textContent = data.avg_score || 0;
+        const elPass = document.getElementById('stat-pass-rate');
+        if (elPass) elPass.textContent = (data.pass_rate || 0) + '%';
         
         const hardestEl = document.getElementById('stat-hardest');
         if (data.hardest_questions && data.hardest_questions.length > 0) {
@@ -4468,8 +4488,8 @@ window.__ENC_QUESTIONS = [
 
         const execute = () => {
           startExam(o);
-          // Restore after a brief delay so buildSession uses the filtered pool
-          setTimeout(() => window.setQuestions(originalQs), 100);
+          // Restore immediately after starting so subsequent logic uses original pool
+          window.setQuestions(originalQs);
         };
         
         if (window.verifyUser) {
@@ -4607,13 +4627,13 @@ window.__ENC_QUESTIONS = [
         let optsHtml = q.options.map((o, i) => `
           <div style="margin-top:5px;">
             <strong>Option ${o.letter} (Correct: ${o.correct}):</strong><br/>
-            <textarea id="admin-opt-${q.id}-${i}" style="width:100%; height:40px; padding:4px;">${o.text}</textarea>
+            <textarea id="admin-opt-${q.id}-${i}" style="width:100%; height:40px; padding:4px;">${esc(o.text)}</textarea>
           </div>
         `).join('');
         html += `
           <div class="card" style="padding:15px; display:flex; flex-direction:column; gap:10px;">
             <div style="font-weight:bold">${q.id} - ${q.group}</div>
-            <textarea id="admin-text-${q.id}" style="width:100%; height:80px; padding:8px;">${q.text}</textarea>
+            <textarea id="admin-text-${q.id}" style="width:100%; height:80px; padding:8px;">${esc(q.text)}</textarea>
             ${optsHtml}
             <button class="btn accent small" onclick="saveAdminQuestion('${q.id}')">Save Changes</button>
           </div>
