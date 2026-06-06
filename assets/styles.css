@@ -197,7 +197,7 @@ p {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: var(--gold-400);
+  color: var(--brand-700);
 }
 
 /* Header */
@@ -541,7 +541,7 @@ section {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: #ff4500;
+  background: #d13800;
   color: #fff;
   display: grid;
   place-items: center;
