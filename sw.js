@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ccaf-exam-v2';
+const CACHE_NAME = 'ccaf-exam-v3';
 const ASSETS = [
   './',
   './index.html',
