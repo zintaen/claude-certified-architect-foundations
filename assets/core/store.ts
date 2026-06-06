@@ -14,6 +14,11 @@ export interface Question {
   flagged: boolean;
 }
 
+export interface LeitnerData {
+  box: number;
+  nextReview: number;
+}
+
 export interface State {
   items: Question[];
   idx: number;
@@ -22,12 +27,14 @@ export interface State {
   durationSec: number;
   timerHandle: number | null;
   untimed: boolean;
+  isFlashcardMode: boolean;
   sessionId: string;
   reviewEnabled: boolean;
   reviewLockReason: string;
   finished: boolean;
   timedOut: boolean;
   focusLoss: number;
+  leitner: Record<string, LeitnerData>;
 }
 
 const initialState: State = {
@@ -38,19 +45,23 @@ const initialState: State = {
   durationSec: 0,
   timerHandle: null,
   untimed: false,
+  isFlashcardMode: false,
   sessionId: '',
   reviewEnabled: false,
   reviewLockReason: '',
   finished: false,
   timedOut: false,
   focusLoss: 0,
+  leitner: {},
 };
 
 export type Action =
-  | { type: 'START_EXAM'; payload: { items: Question[]; untimed: boolean; sessionId: string; startedAt: number; durationSec: number; endsAt: number; timerHandle: number | null } }
+  | { type: 'START_EXAM'; payload: { items: Question[]; untimed: boolean; isFlashcardMode: boolean; sessionId: string; startedAt: number; durationSec: number; endsAt: number; timerHandle: number | null } }
   | { type: 'END_EXAM'; payload: { timedOut: boolean; timerHandle?: number | null; focusLoss: number; reviewEnabled: boolean; reviewLockReason: string } }
   | { type: 'RESUME_EXAM'; payload: Partial<State> }
   | { type: 'ANSWER_QUESTION'; payload: { idx: number; letter: string } }
+  | { type: 'PROCESS_FLASHCARD_ANSWER'; payload: { idx: number; letter: string; isCorrect: boolean } }
+  | { type: 'SET_LEITNER_DATA'; payload: Record<string, LeitnerData> }
   | { type: 'FLAG_QUESTION'; payload: { idx: number; flagged: boolean } }
   | { type: 'SET_INDEX'; payload: number }
   | { type: 'INCREMENT_FOCUS_LOSS' }
@@ -88,6 +99,37 @@ function reducer(state: State, action: Action): State {
       newItems[action.payload.idx] = { ...newItems[action.payload.idx], chosenLetter: action.payload.letter };
       return { ...state, items: newItems };
     }
+    case 'PROCESS_FLASHCARD_ANSWER': {
+      const { idx, letter, isCorrect } = action.payload;
+      const newItems = [...state.items];
+      newItems[idx] = { ...newItems[idx], chosenLetter: letter };
+      
+      const qId = newItems[idx].id;
+      const currentLeitner = state.leitner[qId] || { box: 1, nextReview: 0 };
+      
+      let newBox = 1;
+      let reviewOffsetDays = 1; // Default box 1 = 1 day
+
+      if (isCorrect) {
+        newBox = currentLeitner.box + 1;
+      }
+      
+      if (newBox === 2) reviewOffsetDays = 3;
+      else if (newBox >= 3) reviewOffsetDays = 7;
+
+      const nextReview = Date.now() + reviewOffsetDays * 24 * 60 * 60 * 1000;
+
+      return { 
+        ...state, 
+        items: newItems,
+        leitner: {
+          ...state.leitner,
+          [qId]: { box: newBox, nextReview }
+        }
+      };
+    }
+    case 'SET_LEITNER_DATA':
+      return { ...state, leitner: action.payload };
     case 'FLAG_QUESTION': {
       const newItems = [...state.items];
       newItems[action.payload.idx] = { ...newItems[action.payload.idx], flagged: action.payload.flagged };

@@ -1,7 +1,7 @@
 
 import { encQuestions } from './questions';
 import { $, esc, richText } from './utils/dom';
-import { shuffle, pickProportional, sessionId, fmtTime } from './utils/helpers';
+import { shuffle, pickProportional, sessionId, fmtTime, generateRadarSVG } from './utils/helpers';
 import { store, State } from './core/store';
 import { idb, saveProgress, syncQueue } from './services/db';
 import { showToast } from './components/toast';
@@ -491,25 +491,21 @@ declare global {
 
     const dbEl = document.getElementById('domain-breakdown');
     if (dbEl) {
-      let html = '<div class="domain-breakdown"><h4>📊 Performance by Domain</h4>';
-      Object.entries(domainStats).forEach(([key, val]) => {
-        const dpct = (val as any).total ? Math.round((100 * (val as any).correct) / (val as any).total) : 0;
-        const level = dpct >= 70 ? 'high' : dpct >= 50 ? 'mid' : 'low';
-        const label = domainNames[key] || key;
-        html += `<div class="domain-bar">
-          <div class="domain-bar-label"><span>${label}</span><span>${(val as any).correct}/${(val as any).total} (${dpct}%)</span></div>
-          <div class="domain-bar-track"><div class="domain-bar-fill ${level}" style="width:0%">${dpct}%</div></div>
-        </div>`;
-      });
+      const domainNames = {
+        research_pipeline: 'Research Pipeline',
+        code_exploration: 'Code Exploration',
+        customer_support: 'Customer Support',
+        extraction_pipeline: 'Extraction Pipeline',
+        misc: 'Miscellaneous'
+      };
+      const radarHtml = generateRadarSVG(domainStats, domainNames);
+      
+      let html = '<div class="domain-breakdown" style="display:flex; flex-direction:column; align-items:center;">';
+      html += '<h4>📊 Performance Radar</h4>';
+      html += radarHtml;
       html += '</div>';
+      
       dbEl.innerHTML = html;
-      // animate bars
-      requestAnimationFrame(() => {
-        dbEl.querySelectorAll('.domain-bar-fill').forEach((bar) => {
-          const pctVal = bar.textContent;
-          (bar as HTMLElement).style.width = pctVal;
-        });
-      });
     }
 
     // Review gate UI
@@ -1326,19 +1322,11 @@ declare global {
             code_exploration: 'Code Exploration',
             customer_support: 'Customer Support',
             extraction_pipeline: 'Extraction Pipeline',
+            misc: 'Miscellaneous'
           };
+          const radarHtml = generateRadarSVG(domainStats, domainNames);
           html +=
-            '<div class="domain-breakdown" style="margin: 15px 0 25px 0;"><h5>📊 Your Last Attempt by Domain</h5>';
-          Object.entries(domainStats).forEach(([key, val]) => {
-            const dpct = (val as any).total ? Math.round((100 * (val as any).correct) / (val as any).total) : 0;
-            const level = dpct >= 70 ? 'high' : dpct >= 50 ? 'mid' : 'low';
-            const label = domainNames[key] || key;
-            html += `<div class="domain-bar">
-              <div class="domain-bar-label"><span>${label}</span><span>${(val as any).correct}/${(val as any).total} (${dpct}%)</span></div>
-              <div class="domain-bar-track"><div class="domain-bar-fill ${level}" style="width:${dpct}%">${dpct}%</div></div>
-            </div>`;
-          });
-          html += '</div>';
+            '<div class="domain-breakdown" style="margin: 15px 0 25px 0; display:flex; flex-direction:column; align-items:center;"><h5>📊 Your Last Attempt</h5>' + radarHtml + '</div>';
         } catch (e) {}
       }
 
@@ -1492,25 +1480,50 @@ declare global {
       });
     }
 
-    // ---- 2. Flashcard Mode ----
+    // ---- 2. Flashcard Mode (Leitner System) ----
     let fcIndex = 0;
     let fcPool = [];
     const btnFlashcard = document.getElementById('btn-flashcard');
 
+    // Load Leitner from localStorage into store on startup
+    try {
+      const savedLeitner = localStorage.getItem('ccaf-leitner');
+      if (savedLeitner) {
+        store.dispatch({ type: 'SET_LEITNER_DATA', payload: JSON.parse(savedLeitner) });
+      }
+    } catch (e) {}
+
+    // Update the UI counter for "due today"
+    function updateDueCount() {
+      const leitner = store.getState().leitner;
+      const now = Date.now();
+      const dueCount = qs.filter(q => {
+        const data = leitner[q.id];
+        return !data || data.nextReview <= now;
+      }).length;
+      
+      const badge = document.getElementById('fc-due-count');
+      if (badge) badge.textContent = dueCount > 0 ? `(${dueCount} Due)` : '(Caught Up!)';
+      return dueCount;
+    }
+    
+    // Initial call
+    updateDueCount();
+
     window.finishFlashcards = function () {
-      // Clear saved flashcard progress
       localStorage.removeItem('ccaf-fc-pool');
       localStorage.removeItem('ccaf-fc-index');
       const viewCard = document.getElementById('view-flashcard');
       if (viewCard) viewCard.classList.add('hidden');
       document.getElementById('view-start').classList.remove('hidden');
+      updateDueCount();
     };
 
     if (btnFlashcard) {
       btnFlashcard.addEventListener('click', () => {
-        // Try to resume saved session
         const savedPool = localStorage.getItem('ccaf-fc-pool');
         const savedIndex = localStorage.getItem('ccaf-fc-index');
+        
         if (savedPool) {
           try {
             const ids = JSON.parse(savedPool);
@@ -1518,18 +1531,28 @@ declare global {
             fcIndex = parseInt(savedIndex, 10) || 0;
             if (fcIndex >= fcPool.length) {
               fcIndex = 0;
-              fcPool = [...qs].sort(() => Math.random() - 0.5);
+              fcPool = [];
             }
           } catch (e) {
-            fcPool = [...qs].sort(() => Math.random() - 0.5);
-            fcIndex = 0;
+            fcPool = [];
           }
-        } else {
-          fcPool = [...qs].sort(() => Math.random() - 0.5);
+        }
+        
+        if (fcPool.length === 0) {
+          // Generate new pool of Due cards
+          const leitner = store.getState().leitner;
+          const now = Date.now();
+          fcPool = qs.filter(q => {
+            const data = leitner[q.id];
+            return !data || data.nextReview <= now;
+          }).sort(() => Math.random() - 0.5);
           fcIndex = 0;
         }
-        if (fcPool.length === 0) return showToast('No questions available');
-        // Save pool order
+
+        if (fcPool.length === 0) {
+          return showToast('You are caught up! No cards due for review.');
+        }
+
         localStorage.setItem('ccaf-fc-pool', JSON.stringify(fcPool.map((q) => q.id)));
         localStorage.setItem('ccaf-fc-index', String(fcIndex));
 
@@ -1553,7 +1576,7 @@ declare global {
       q.options.forEach((op, i) => {
         const letter = String.fromCharCode(65 + i);
         html += `
-          <div class="r-opt" id="fc-opt-${i}" style="transition: opacity 0.2s;">
+          <div class="r-opt" id="fc-opt-${i}" style="transition: opacity 0.2s; cursor: pointer;">
             <div class="r-line">
               <span class="letter">${letter}</span>
               <span class="r-text">${richText(op.text)}</span>
@@ -1565,47 +1588,65 @@ declare global {
       html += '</div>';
       card.innerHTML = html;
 
+      const btnNext = document.getElementById('fc-btn-next');
+      if (btnNext) btnNext.classList.add('hidden');
       document.getElementById('fc-actions').classList.remove('hidden');
-      document.getElementById('fc-rate').classList.add('hidden');
-    }
 
-    const btnReveal = document.getElementById('fc-btn-reveal');
-    if (btnReveal) {
-      btnReveal.addEventListener('click', () => {
-        const q = fcPool[fcIndex];
-        q.options.forEach((op, i) => {
-          const optDiv = document.getElementById(`fc-opt-${i}`);
-          const whyDiv = document.getElementById(`fc-why-${i}`);
-          if (optDiv && whyDiv) {
-            if (op.correct) {
-              optDiv.classList.add('is-correct');
-            } else {
-              optDiv.style.opacity = '0.5';
+      // Bind click listeners
+      let answered = false;
+      q.options.forEach((op, i) => {
+        const optDiv = document.getElementById(`fc-opt-${i}`);
+        if (optDiv) {
+          optDiv.addEventListener('click', () => {
+            if (answered) return;
+            answered = true;
+            
+            // Dispatch Leitner Box update
+            const letter = String.fromCharCode(65 + i);
+            store.dispatch({
+              type: 'PROCESS_FLASHCARD_ANSWER',
+              payload: { idx: window.QUESTIONS.findIndex(x => x.id === q.id), letter, isCorrect: op.correct }
+            });
+            
+            // Persist to local storage
+            localStorage.setItem('ccaf-leitner', JSON.stringify(store.getState().leitner));
+
+            // Instant Feedback Visuals
+            q.options.forEach((innerOp, j) => {
+              const innerOptDiv = document.getElementById(`fc-opt-${j}`);
+              const whyDiv = document.getElementById(`fc-why-${j}`);
+              if (innerOp.correct) {
+                innerOptDiv.classList.add('is-correct');
+              } else if (i === j) {
+                innerOptDiv.classList.add('is-wrong');
+              } else {
+                innerOptDiv.style.opacity = '0.5';
+              }
+              whyDiv.classList.remove('hidden');
+            });
+            
+            // Show Next Card button
+            if (btnNext) {
+              btnNext.classList.remove('hidden');
             }
-            whyDiv.classList.remove('hidden');
-          }
-        });
-        document.getElementById('fc-actions').classList.add('hidden');
-        document.getElementById('fc-rate').classList.remove('hidden');
+          });
+        }
       });
     }
 
-    const nextCard = () => {
-      fcIndex++;
-      // Save progress (B26)
-      localStorage.setItem('ccaf-fc-index', String(fcIndex));
-      if (fcIndex >= fcPool.length) {
-        showToast("You've finished all flashcards!");
-        window.finishFlashcards();
-      } else {
-        renderFlashcard();
-      }
-    };
-
-    ['fc-btn-easy', 'fc-btn-good', 'fc-btn-hard'].forEach((id) => {
-      const btn = document.getElementById(id);
-      if (btn) btn.addEventListener('click', nextCard);
-    });
+    const btnNext = document.getElementById('fc-btn-next');
+    if (btnNext) {
+      btnNext.addEventListener('click', () => {
+        fcIndex++;
+        localStorage.setItem('ccaf-fc-index', String(fcIndex));
+        if (fcIndex >= fcPool.length) {
+          showToast("You've finished all flashcards for today!");
+          window.finishFlashcards();
+        } else {
+          renderFlashcard();
+        }
+      });
+    }
 
     // ---- 3. Admin Editor ----
     if (new URLSearchParams(window.location.search).get('admin')) {

@@ -83,3 +83,81 @@ export function fmtTime(sec: number): string {
   const ss = String(s).padStart(2, '0');
   return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
 }
+
+export function generateRadarSVG(domainStats: Record<string, any>, labelsMap: Record<string, string>): string {
+  const keys = Object.keys(domainStats);
+  const N = keys.length;
+  if (N < 3) return ''; // Radar needs at least 3 axes
+
+  const size = 300;
+  const cx = size / 2;
+  const cy = size / 2;
+  const radius = 100;
+  
+  // Grid Rings
+  let gridHtml = '';
+  for (let level = 1; level <= 5; level++) {
+    const r = (radius / 5) * level;
+    let points = [];
+    for (let i = 0; i < N; i++) {
+      const angle = (Math.PI * 2 * i) / N - Math.PI / 2;
+      const px = cx + r * Math.cos(angle);
+      const py = cy + r * Math.sin(angle);
+      points.push(`${px},${py}`);
+    }
+    gridHtml += `<polygon points="${points.join(' ')}" fill="none" class="radar-grid" stroke="var(--line)" stroke-width="1" />`;
+  }
+
+  // Axes and Labels
+  let axesHtml = '';
+  let labelsHtml = '';
+  let dataPoints = [];
+
+  keys.forEach((key, i) => {
+    const angle = (Math.PI * 2 * i) / N - Math.PI / 2;
+    
+    // Axis line
+    const px = cx + radius * Math.cos(angle);
+    const py = cy + radius * Math.sin(angle);
+    axesHtml += `<line x1="${cx}" y1="${cy}" x2="${px}" y2="${py}" class="radar-axis" stroke="var(--line)" stroke-width="1" />`;
+
+    // Label
+    const labelRadius = radius + 25;
+    const lx = cx + labelRadius * Math.cos(angle);
+    const ly = cy + labelRadius * Math.sin(angle);
+    const label = labelsMap[key] || key;
+    
+    // Clean up label (wrap if too long)
+    const words = label.split(' ');
+    const shortLabel = words.length > 2 ? words.slice(0, 2).join(' ') + '...' : label;
+
+    let anchor = 'middle';
+    if (Math.abs(Math.cos(angle)) > 0.1) {
+      anchor = Math.cos(angle) > 0 ? 'start' : 'end';
+    }
+
+    labelsHtml += `<text x="${lx}" y="${ly}" class="radar-label" text-anchor="${anchor}" dominant-baseline="middle" fill="var(--ink)" font-size="12px" font-weight="500">${shortLabel}</text>`;
+
+    // Data Point
+    const stat = domainStats[key];
+    const pct = stat.total ? stat.correct / stat.total : 0;
+    const dpRadius = radius * pct;
+    const dx = cx + dpRadius * Math.cos(angle);
+    const dy = cy + dpRadius * Math.sin(angle);
+    dataPoints.push(`${dx},${dy}`);
+    
+    // Add dot
+    axesHtml += `<circle cx="${dx}" cy="${dy}" r="4" fill="var(--brand)" class="radar-dot" style="animation: popIn 0.5s ease backwards; animation-delay: ${0.1 * i}s;" />`;
+  });
+
+  const polygonHtml = `<polygon points="${dataPoints.join(' ')}" class="radar-polygon" fill="var(--brand)" fill-opacity="0.3" stroke="var(--brand)" stroke-width="2" style="animation: fadeIn 1s ease backwards;" />`;
+
+  return `
+    <svg viewBox="0 0 ${size} ${size}" width="100%" height="100%" style="overflow: visible; max-width: 400px; margin: 0 auto; display: block;">
+      ${gridHtml}
+      ${axesHtml}
+      ${polygonHtml}
+      ${labelsHtml}
+    </svg>
+  `;
+}

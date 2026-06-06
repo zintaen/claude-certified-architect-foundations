@@ -622,34 +622,8 @@
                 id="fc-actions"
                 style="margin-top: 20px; display: flex; justify-content: center; gap: 12px"
               >
-                <button class="btn primary" id="fc-btn-reveal">Reveal Answer</button>
-              </div>
-              <div
-                id="fc-rate"
-                class="hidden"
-                style="margin-top: 20px; display: flex; justify-content: center; gap: 12px"
-              >
-                <button
-                  class="btn ghost"
-                  style="color: var(--good); border-color: var(--good)"
-                  id="fc-btn-easy"
-                >
-                  Easy
-                </button>
-                <button
-                  class="btn ghost"
-                  style="color: var(--ink); border-color: var(--line)"
-                  id="fc-btn-good"
-                >
-                  Good
-                </button>
-                <button
-                  class="btn ghost"
-                  style="color: var(--bad); border-color: var(--bad)"
-                  id="fc-btn-hard"
-                >
-                  Hard
-                </button>
+                <!-- This will hold the "Next Card" button after answering -->
+                <button class="btn primary hidden" id="fc-btn-next">Next Card</button>
               </div>
             </div>
           </section>
@@ -732,8 +706,8 @@
                       <button class="btn ghost small" id="btn-targeted">
                         Targeted Practice (Weakest Domain)
                       </button>
-                      <button class="btn ghost small" id="btn-flashcard">
-                        Flashcard Mode (Study Cards)
+                      <button class="btn ghost small" id="btn-flashcard" style="position: relative;">
+                        Flashcard Mode (Study Cards) <span id="fc-due-count" style="margin-left: 4px; color: var(--bad); font-weight: bold;"></span>
                       </button>
                     </div>
                   </div>

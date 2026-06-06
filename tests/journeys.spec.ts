@@ -75,4 +75,26 @@ test.describe('CCAF E2E Journeys', () => {
     await expect(paletteBtn).toHaveClass(/answered/);
     await expect(paletteBtn).toHaveClass(/flagged/);
   });
+
+  test('Leitner Flashcard System', async ({ page }) => {
+    // Assert due count is displayed correctly
+    await expect(page.locator('#fc-due-count')).toBeVisible();
+    
+    // Start Flashcards
+    await page.locator('#btn-flashcard').click();
+    await expect(page.locator('#view-flashcard')).toBeVisible();
+    
+    // Answer the flashcard (instant feedback)
+    await page.locator('.r-opt').first().click();
+    
+    // Assert explanation is revealed
+    await expect(page.locator('.why').first()).toBeVisible();
+    
+    // Assert "Next Card" button appears
+    const nextBtn = page.locator('#fc-btn-next');
+    await expect(nextBtn).toBeVisible();
+    
+    // Click Next
+    await nextBtn.click();
+  });
 });

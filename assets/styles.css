@@ -3029,3 +3029,51 @@ a:focus-visible {
 .lang-select:focus {
   border-color: var(--brand-500);
 }
+
+/* Radar Chart Styles */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  80% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.radar-polygon {
+  transition: all 0.5s ease;
+  transform-origin: center;
+}
+
+.radar-polygon:hover {
+  fill-opacity: 0.5;
+  stroke-width: 3;
+}
+
+.radar-dot {
+  transition: r 0.2s ease;
+  transform-origin: center;
+}
+
+.radar-dot:hover {
+  r: 6;
+}
+
+.radar-label {
+  pointer-events: none;
+}
