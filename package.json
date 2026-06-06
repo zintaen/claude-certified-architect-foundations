@@ -4,7 +4,16 @@
   "description": "[![Live Demo](https://img.shields.io/badge/Live-ccaf.cyberskill.dev-45210E?style=flat-square&logo=vercel)](https://ccaf.cyberskill.dev) [![License](https://img.shields.io/badge/License-Personal%20Educational%20Use-F4BA17?style=flat-square)](./LICENSE)",
   "main": "sw.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "prepare": "husky",
+    "precommit": "lint-staged",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",
@@ -20,5 +29,22 @@
   "homepage": "https://github.com/zintaen/claude-certified-architect-mock-exam#readme",
   "dependencies": {
     "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.9.2",
+    "eslint": "^10.4.1",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "jsdom": "^29.1.1",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vite-plugin-pwa": "^1.3.0",
+    "vitest": "^4.1.8",
+    "workbox-build": "^7.4.1",
+    "workbox-window": "^7.4.1"
   }
 }

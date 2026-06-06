@@ -21,14 +21,14 @@ A production-grade, offline-capable mock exam for the **Claude Certified Archite
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Single-file HTML + CSS + vanilla JS (no build step) |
-| Backend | [Supabase](https://supabase.com) (PostgreSQL RPC, Row-Level Security) |
-| Hosting | [Vercel](https://vercel.com) (static deploy) |
-| PWA | Service Worker with stale-while-revalidate caching |
-| Fonts | [Red Hat Text](https://fonts.google.com/specimen/Red+Hat+Text) via Google Fonts |
-| Analytics | Vercel Web Analytics |
+| Layer     | Technology                                                                      |
+| --------- | ------------------------------------------------------------------------------- |
+| Frontend  | Single-file HTML + CSS + vanilla JS (no build step)                             |
+| Backend   | [Supabase](https://supabase.com) (PostgreSQL RPC, Row-Level Security)           |
+| Hosting   | [Vercel](https://vercel.com) (static deploy)                                    |
+| PWA       | Service Worker with stale-while-revalidate caching                              |
+| Fonts     | [Red Hat Text](https://fonts.google.com/specimen/Red+Hat+Text) via Google Fonts |
+| Analytics | Vercel Web Analytics                                                            |
 
 ## Quick Start
 
@@ -60,6 +60,7 @@ npx vercel --prod
 ## Supabase Integration
 
 The app connects to Supabase for:
+
 - **User auth** (email + hashed PIN via `verify_mock_user` RPC)
 - **Score submission** (via `submit_exam_result` RPC)
 - **Global stats & leaderboard** (via `get_global_stats` RPC)
@@ -69,11 +70,11 @@ The app connects to Supabase for:
 
 ## Browser Compatibility
 
-| Browser | Status |
-|---------|--------|
-| Chrome / Edge 90+ | ✅ Full support |
-| Firefox 90+ | ✅ Full support |
-| Safari 15+ | ✅ Full support |
+| Browser              | Status               |
+| -------------------- | -------------------- |
+| Chrome / Edge 90+    | ✅ Full support      |
+| Firefox 90+          | ✅ Full support      |
+| Safari 15+           | ✅ Full support      |
 | Mobile Chrome/Safari | ✅ Responsive layout |
 
 ## Why I Built It
