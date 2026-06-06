@@ -116,10 +116,14 @@
           </span>
         </a>
         <nav class="nav">
-          <a href="#about">About</a>
+          <a href="#about" data-i18n="nav.about">About</a>
           <a href="#path">Path</a>
           <a href="#reddit">Community</a>
-          <a href="#exam">Practice Exam</a>
+          <a href="#exam" data-i18n="nav.exam">Practice Exam</a>
+          <select id="lang-selector" class="lang-select">
+            <option value="en">EN</option>
+            <option value="es">ES</option>
+          </select>
           <a
             href="https://www.linkedin.com/in/zintaen/"
             target="_blank"
@@ -169,14 +173,15 @@
           <div>
             <div class="hero-slogan slogan">Turn your will into real</div>
             <span class="badge">Unofficial community practice · not affiliated with Anthropic</span>
-            <h1 style="margin-top: 14px">
-              Mock exam for <span>Claude Certified Architect — Foundations</span>
+            <h1 style="margin-top: 14px" data-i18n="hero.title">
+              Claude Certified Architect
             </h1>
-            <p class="lede">
-              A realistic, timed, proctor-style practice exam for <strong>CCAF</strong> — the
-              ~301-level technical certification exclusive to approved Claude Partner Network
-              companies. 60 questions, 120-minute session, 1,000-point score, and full review
-              explanations for every option.
+            <h2 class="subtitle" data-i18n="hero.subtitle">
+              Foundations — Unofficial Mock Exam
+            </h2>
+            <p class="desc" data-i18n="hero.desc">
+              A grueling, production-grade practice exam designed by a certified architect to test
+              your actual mastery of the Claude ecosystem, not just your memorization of the docs.
             </p>
             <div class="cta-row">
               <a href="#exam" class="btn accent"
@@ -203,10 +208,16 @@
             </p>
           </div>
           <aside class="hero-card">
-            <h2 style="margin-top: 0">Exam at a glance</h2>
-            <p style="margin: 0 0 8px">
+            <h2 style="margin-top: 0" data-i18n="glance.title">Exam at a glance</h2>
+            <p style="margin: 0 0 8px" data-i18n="glance.p1">
               Taken from the official CCA-F landing page for partner companies.
             </p>
+            <ul class="glance-list">
+              <li data-i18n="glance.format"><strong>Format:</strong> Multiple choice, multiple select</li>
+              <li data-i18n="glance.duration"><strong>Duration:</strong> 120 minutes</li>
+              <li data-i18n="glance.cost"><strong>Cost:</strong> Free (Mock)</li>
+              <li data-i18n="glance.lang"><strong>Languages:</strong> English, Spanish</li>
+            </ul>
             <div class="hero-stats">
               <div class="stat">
                 <div class="k">~301</div>
@@ -1016,7 +1027,7 @@
             </p>
           </div>
           <div class="footer-col" style="text-align: left">
-            <h3>Creator</h3>
+            <h3 data-i18n="footer.creator">Creator</h3>
             <div class="footer-links">
               <a href="https://www.linkedin.com/in/zintaen/" target="_blank" rel="noopener"
                 >Stephen Cheng (LinkedIn)</a
@@ -1030,7 +1041,7 @@
             </div>
           </div>
           <div class="footer-col" style="text-align: left">
-            <h3>Legal & Disclaimer</h3>
+            <h3 data-i18n="footer.legal">Legal & Disclaimer</h3>
             <p style="font-size: 0.8rem; line-height: 1.5">
               CCAF, Claude, and the Claude Partner Network are Anthropic products/programs. This
               page is an unofficial, community-made study aid and is

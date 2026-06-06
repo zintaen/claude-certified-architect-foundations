@@ -25,6 +25,12 @@ export function pickProportional(all: any[], n: number): any[] {
     (buckets[q.group || 'misc'] = buckets[q.group || 'misc'] || []).push(q);
   });
   const keys = Object.keys(buckets);
+  
+  if (n < keys.length) {
+    // If n is smaller than the number of groups, just pick n random questions
+    return shuffle(all).slice(0, n);
+  }
+
   const total = all.length;
   const want: Record<string, number> = {};
   let assigned = 0;
@@ -35,7 +41,8 @@ export function pickProportional(all: any[], n: number): any[] {
   });
   
   while (assigned > n) {
-    const k = keys.find((key) => want[key] > 1) || keys[0];
+    const k = keys.find((key) => want[key] > 1) || keys.find(key => want[key] > 0);
+    if (!k) break;
     want[k]--;
     assigned--;
   }

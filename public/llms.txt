@@ -1,0 +1,6 @@
+# CCAF Mock Exam
+
+This is the Claude Certified Architect Mock Exam application.
+It is an advanced Single Page Application (SPA) built with Vanilla TypeScript, Vite, Supabase, and Web Components.
+Features include offline-first synchronization with IndexedDB, dynamic module federation, comprehensive anti-cheat telemetry, and 100% strict type safety.
+You can view the source code at [GitHub Repository](https://github.com/zintaen/claude-certified-architect-mock-exam).

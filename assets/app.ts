@@ -7,6 +7,7 @@ import { idb, saveProgress, syncQueue } from './services/db';
 import { showToast } from './components/toast';
 import { telemetry } from './services/telemetry';
 import './components/progress';
+import { initI18n, setLanguage } from './core/i18n';
 
 declare global {
   interface Window {
@@ -69,10 +70,10 @@ declare global {
     console.error('[CCAF Error Boundary] Unhandled Promise Rejection:', e.reason);
   });
 
-  // ---- central state proxy ----
+  // ---- central state proxy (Read Only) ----
   const state = new Proxy({} as State, {
     get(_t, prop: keyof State) { return store.getState()[prop]; },
-    set(_t, prop: keyof State, value: any) { store.setState({ [prop]: value }); return true; }
+    set() { throw new Error('State must be mutated via store.dispatch()'); }
   });
 
   // ---- view switching ----
@@ -106,30 +107,34 @@ declare global {
   function buildSession(opts) {
     const qs = getQuestions();
     const want = Math.max(1, Math.min(qs.length, opts.count | 0));
-    // Group-aware ordering: scenario clusters stay contiguous.
     const pool = pickProportional(qs, want);
-    state.items = pool.map((q) => {
-      // Options are always shuffled per user's request.
-      return {
-        id: q.id,
-        group: q.group,
-        text: q.text,
-        options: shuffle(q.options),
-        chosenLetter: null,
-        flagged: false,
-      };
+    
+    const items = pool.map((q) => ({
+      id: q.id,
+      group: q.group,
+      text: q.text,
+      options: shuffle(q.options) as any,
+      chosenLetter: null,
+      flagged: false,
+    }));
+    
+    const durationSec = opts.untimed ? 0 : Math.max(60, (opts.minutes | 0) * 60);
+    const startedAt = Date.now();
+    const endsAt = durationSec ? startedAt + durationSec * 1000 : 0;
+
+    store.dispatch({
+      type: 'START_EXAM',
+      payload: {
+        items,
+        untimed: !!opts.untimed,
+        sessionId: sessionId(),
+        startedAt,
+        durationSec,
+        endsAt,
+        timerHandle: null
+      }
     });
-    state.idx = 0;
-    state.durationSec = opts.untimed ? 0 : Math.max(60, (opts.minutes | 0) * 60);
-    state.startedAt = Date.now();
-    state.endsAt = state.durationSec ? state.startedAt + state.durationSec * 1000 : 0;
-    state.untimed = !!opts.untimed;
-    state.sessionId = sessionId();
-    state.reviewEnabled = false;
-    state.reviewLockReason = '';
-    state.finished = false;
-    state.timedOut = false;
-    state.focusLoss = 0;
+
     window.__focusLoss = 0;
   }
 
@@ -158,7 +163,7 @@ declare global {
       `;
       row.addEventListener('click', (e) => {
         e.preventDefault();
-        it.chosenLetter = op.letter;
+        store.dispatch({ type: 'ANSWER_QUESTION', payload: { idx: state.idx, letter: op.letter } });
         renderQuestion();
         renderPalette();
         renderProgress();
@@ -166,7 +171,12 @@ declare global {
       host.appendChild(row);
     });
 
-    $('#flag-box').checked = !!it.flagged;
+    const flagBox = $('#flag-box') as HTMLInputElement;
+    flagBox.checked = !!it.flagged;
+    flagBox.onchange = (e) => {
+      store.dispatch({ type: 'FLAG_QUESTION', payload: { idx: state.idx, flagged: (e.target as HTMLInputElement).checked } });
+      renderPalette();
+    };
     $('#btn-prev').disabled = state.idx === 0;
     $('#btn-next').textContent = state.idx === state.items.length - 1 ? 'Last →' : 'Next →';
   }
@@ -184,7 +194,7 @@ declare global {
       if (i === state.idx) btn.classList.add('current');
       btn.textContent = String(i + 1);
       btn.addEventListener('click', () => {
-        state.idx = i;
+        store.dispatch({ type: 'SET_INDEX', payload: i });
         renderQuestion();
         renderPalette();
         renderProgress();
@@ -241,20 +251,25 @@ declare global {
     el.classList.toggle('warn', left <= 600 && left > 60);
     el.classList.toggle('danger', left <= 60);
     if (left <= 0) {
-      state.timedOut = true;
+      store.dispatch({ 
+        type: 'END_EXAM', 
+        payload: { 
+          timedOut: true, 
+          focusLoss: state.focusLoss,
+          reviewEnabled: false,
+          reviewLockReason: 'The 120-minute timer ran out before you could submit. Retake the exam and finish before time expires to unlock explanations.'
+        } 
+      });
       finishExam(true);
     }
   }
   function startTimer() {
     stopTimer();
     tickTimer();
-    state.timerHandle = setInterval(tickTimer, 500);
+    store.dispatch({ type: 'RESUME_EXAM', payload: { timerHandle: window.setInterval(tickTimer, 500) } as Partial<State> });
   }
   function stopTimer() {
-    if (state.timerHandle) {
-      clearInterval(state.timerHandle);
-      state.timerHandle = null;
-    }
+    store.dispatch({ type: 'CLEAR_TIMER' });
   }
 
   // ---- start ----
@@ -312,9 +327,7 @@ declare global {
     }
 
     telemetry.stop();
-    state.finished = true;
     stopTimer();
-    state.focusLoss = telemetry.getFocusLosses();
 
     document.body.classList.remove('no-select');
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
@@ -340,17 +353,28 @@ declare global {
     // Review gate: unlocked only if every question was answered AND the timer
     // didn't expire. Untimed mode still requires full completion.
     const allAnswered = skipped === 0;
+    
+    let reviewEnabled = true;
+    let reviewLockReason = '';
+    
     if (!allAnswered) {
-      state.reviewEnabled = false;
-      state.reviewLockReason = `You left ${skipped} question${skipped === 1 ? '' : 's'} unanswered. Finish all 60 questions to unlock explanations.`;
+      reviewEnabled = false;
+      reviewLockReason = `You left ${skipped} question${skipped === 1 ? '' : 's'} unanswered. Finish all 60 questions to unlock explanations.`;
     } else if (!state.untimed && state.timedOut) {
-      state.reviewEnabled = false;
-      state.reviewLockReason =
+      reviewEnabled = false;
+      reviewLockReason =
         'The 120-minute timer ran out before you could submit. Retake the exam and finish before time expires to unlock explanations.';
-    } else {
-      state.reviewEnabled = true;
-      state.reviewLockReason = '';
     }
+
+    store.dispatch({
+      type: 'END_EXAM',
+      payload: {
+        timedOut: state.timedOut,
+        focusLoss: telemetry.getFocusLosses(),
+        reviewEnabled,
+        reviewLockReason
+      }
+    });
 
     // theme the whole card based on pass/fail
     const card = $('#result-card');
@@ -1594,6 +1618,16 @@ declare global {
   // Init everything on DOM ready
   document.addEventListener('DOMContentLoaded', async () => {
     await window.loadQuestions();
+    
+    // Initialise i18n
+    initI18n();
+    const langSelector = document.getElementById('lang-selector') as HTMLSelectElement;
+    if (langSelector) {
+      langSelector.value = localStorage.getItem('lang') || 'en';
+      langSelector.addEventListener('change', (e) => {
+        setLanguage((e.target as HTMLSelectElement).value);
+      });
+    }
     if (window.wireExam) window.wireExam();
     fetchGlobalStats();
     initDarkMode();
