@@ -8,6 +8,7 @@ test.describe('CCAF E2E Journeys', () => {
   });
 
   test('i18n Switcher updates DOM text', async ({ page }) => {
+    await page.goto(`/?channel=test-i18n-${Date.now()}`);
     // Check English
     await expect(page.locator('h1[data-i18n="hero.title"]')).toHaveText('Claude Certified Architect');
     
@@ -21,6 +22,7 @@ test.describe('CCAF E2E Journeys', () => {
   });
 
   test('Untimed Practice Flow', async ({ page }) => {
+    await page.goto(`/?channel=test-untimed-${Date.now()}`);
     // Set question count to 1 for quick E2E testing
     await page.evaluate(() => {
       (document.getElementById('opt-count') as HTMLInputElement).value = '1';
@@ -54,6 +56,7 @@ test.describe('CCAF E2E Journeys', () => {
   });
 
   test('State Management & Palette Rendering', async ({ page }) => {
+    await page.goto(`/?channel=test-state-${Date.now()}`);
     // Set question count to 2
     await page.evaluate(() => {
       (document.getElementById('opt-count') as HTMLInputElement).value = '2';
@@ -77,6 +80,7 @@ test.describe('CCAF E2E Journeys', () => {
   });
 
   test('Leitner Flashcard System', async ({ page }) => {
+    await page.goto(`/?channel=test-leitner-${Date.now()}`);
     // Assert due count is displayed correctly
     await expect(page.locator('#fc-due-count')).toBeVisible();
     
@@ -96,5 +100,36 @@ test.describe('CCAF E2E Journeys', () => {
     
     // Click Next
     await nextBtn.click();
+  });
+
+  test('Cross-Tab Concurrency', async ({ context }) => {
+    // Open two pages in the same browser context (sharing BroadcastChannel)
+    const channelId = `cross-tab-${Date.now()}`;
+    const page1 = await context.newPage();
+    const page2 = await context.newPage();
+    
+    await page1.goto(`/?channel=${channelId}`);
+    await page2.goto(`/?channel=${channelId}`);
+    
+    await page1.waitForLoadState('networkidle');
+    await page2.waitForLoadState('networkidle');
+
+    // Start Practice on page 1
+    await page1.evaluate(() => {
+      (document.getElementById('opt-count') as HTMLInputElement).value = '1';
+    });
+    await page1.locator('#btn-practice').click();
+    
+    // Page 1 is running
+    await expect(page1.locator('#view-running')).toBeVisible();
+    
+    // Page 2 should automatically enter running view because of BroadcastChannel syncing START_EXAM
+    await expect(page2.locator('#view-running')).toBeVisible();
+    
+    // Answer question on Page 2
+    await page2.locator('.opt').first().click();
+    
+    // Page 1 should reflect the answered state instantly
+    await expect(page1.locator('.opt').first()).toHaveClass(/sel/);
   });
 });

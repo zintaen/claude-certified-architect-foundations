@@ -76,8 +76,40 @@ declare global {
     set() { throw new Error('State must be mutated via store.dispatch()'); }
   });
 
+  // Cross-Tab Concurrency Sync Hook
+  store.subscribe((newState) => {
+    // Determine the correct view based on the state
+    let targetView = 'view-start';
+    if (newState.isFlashcardMode && !newState.finished) targetView = 'view-flashcard';
+    else if (newState.items.length > 0 && !newState.finished) targetView = 'view-running';
+    else if (newState.finished) targetView = 'view-result';
+
+    console.log('[DEBUG_VIEW] newState:', newState, '=> targetView:', targetView);
+    document.body.setAttribute('data-debug-view', targetView);
+    document.body.setAttribute('data-debug-flashcard', String(newState.isFlashcardMode));
+    document.body.setAttribute('data-debug-items', String(newState.items.length));
+
+    // If targetView is currently hidden, show it
+    const targetEl = document.getElementById(targetView);
+    if (targetEl && targetEl.classList.contains('hidden') && targetView !== 'view-start') {
+      showView(targetView);
+    }
+
+    // Force re-render of active components if running
+    if (targetView === 'view-running') {
+      renderQuestion();
+      renderPalette();
+      renderProgress();
+    } else if (targetView === 'view-result') {
+      renderResultDOM(); // which renders the result page
+    }
+  });
+
   // ---- view switching ----
-  function showView(id) {
+  let isTransitioning = false;
+  let pendingView: string | null = null;
+
+  function showView(id: string) {
     const updateDOM = () => {
       [
         'view-start',
@@ -92,16 +124,35 @@ declare global {
         if (v === id) el.classList.remove('hidden');
         else el.classList.add('hidden');
       });
-      // scroll to exam section on view change
       const sec = document.getElementById('exam');
       if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
-    if (document.startViewTransition) {
-      document.startViewTransition(() => updateDOM());
-    } else {
+    if (!document.startViewTransition) {
       updateDOM();
+      return;
     }
+
+    if (isTransitioning) {
+      pendingView = id;
+      return;
+    }
+
+    isTransitioning = true;
+    const transition = document.startViewTransition(() => updateDOM());
+
+    transition.finished
+      .finally(() => {
+        isTransitioning = false;
+        if (pendingView) {
+          const next = pendingView;
+          pendingView = null;
+          showView(next);
+        }
+      })
+      .catch(e => {
+        console.error('[CCAF Error Boundary] View Transition Aborted:', e);
+      });
   }
 
   function buildSession(opts) {
@@ -375,6 +426,28 @@ declare global {
         reviewLockReason
       }
     });
+
+    renderResultDOM();
+  }
+
+  function renderResultDOM() {
+    const total = state.items.length;
+    let correct = 0,
+      incorrect = 0,
+      skipped = 0;
+    state.items.forEach((it) => {
+      if (!it.chosenLetter) {
+        skipped++;
+        return;
+      }
+      const chosen = it.options.find((o) => o.letter === it.chosenLetter);
+      if (chosen && chosen.correct) correct++;
+      else incorrect++;
+    });
+    const score1000 = Math.round((correct / total) * 1000);
+    const passed = score1000 >= 700;
+    const pct = Math.round((correct / total) * 100);
+    const usedSec = Math.max(0, Math.floor((Date.now() - state.startedAt) / 1000));
 
     // theme the whole card based on pass/fail
     const card = $('#result-card');
@@ -1605,7 +1678,7 @@ declare global {
             const letter = String.fromCharCode(65 + i);
             store.dispatch({
               type: 'PROCESS_FLASHCARD_ANSWER',
-              payload: { idx: window.QUESTIONS.findIndex(x => x.id === q.id), letter, isCorrect: op.correct }
+              payload: { idx: window.QUESTIONS.findIndex(x => x.id === q.id), qId: q.id, letter, isCorrect: op.correct }
             });
             
             // Persist to local storage
@@ -1628,22 +1701,18 @@ declare global {
             // Show Next Card button
             if (btnNext) {
               btnNext.classList.remove('hidden');
+              btnNext.onclick = () => {
+                fcIndex++;
+                localStorage.setItem('ccaf-fc-index', String(fcIndex));
+                if (fcIndex >= fcPool.length) {
+                  showToast("You've finished all flashcards for today!");
+                  window.finishFlashcards();
+                } else {
+                  renderFlashcard();
+                }
+              };
             }
           });
-        }
-      });
-    }
-
-    const btnNext = document.getElementById('fc-btn-next');
-    if (btnNext) {
-      btnNext.addEventListener('click', () => {
-        fcIndex++;
-        localStorage.setItem('ccaf-fc-index', String(fcIndex));
-        if (fcIndex >= fcPool.length) {
-          showToast("You've finished all flashcards for today!");
-          window.finishFlashcards();
-        } else {
-          renderFlashcard();
         }
       });
     }

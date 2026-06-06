@@ -60,7 +60,7 @@ export type Action =
   | { type: 'END_EXAM'; payload: { timedOut: boolean; timerHandle?: number | null; focusLoss: number; reviewEnabled: boolean; reviewLockReason: string } }
   | { type: 'RESUME_EXAM'; payload: Partial<State> }
   | { type: 'ANSWER_QUESTION'; payload: { idx: number; letter: string } }
-  | { type: 'PROCESS_FLASHCARD_ANSWER'; payload: { idx: number; letter: string; isCorrect: boolean } }
+  | { type: 'PROCESS_FLASHCARD_ANSWER'; payload: { idx: number; qId: string; letter: string; isCorrect: boolean } }
   | { type: 'SET_LEITNER_DATA'; payload: Record<string, LeitnerData> }
   | { type: 'FLAG_QUESTION'; payload: { idx: number; flagged: boolean } }
   | { type: 'SET_INDEX'; payload: number }
@@ -100,11 +100,10 @@ function reducer(state: State, action: Action): State {
       return { ...state, items: newItems };
     }
     case 'PROCESS_FLASHCARD_ANSWER': {
-      const { idx, letter, isCorrect } = action.payload;
+      const { idx, qId, letter, isCorrect } = action.payload;
       const newItems = [...state.items];
-      newItems[idx] = { ...newItems[idx], chosenLetter: letter };
+      newItems[idx] = { ...(newItems[idx] || {}), chosenLetter: letter } as any;
       
-      const qId = newItems[idx].id;
       const currentLeitner = state.leitner[qId] || { box: 1, nextReview: 0 };
       
       let newBox = 1;
@@ -152,10 +151,23 @@ type Listener = (state: State) => void;
 class Store {
   private state: State;
   private listeners: Set<Listener>;
+  private channel: BroadcastChannel;
+  private ignoreBroadcast = false;
 
   constructor(initial: State) {
     this.state = { ...initial };
     this.listeners = new Set();
+    
+    // Cross-tab concurrency setup
+    const channelName = new URLSearchParams(window.location.search).get('channel') || 'ccaf-sync';
+    this.channel = new BroadcastChannel(channelName);
+    this.channel.onmessage = (e) => {
+      // Received an action from another tab.
+      // Set ignoreBroadcast so we don't echo it back.
+      this.ignoreBroadcast = true;
+      this.dispatch(e.data);
+      this.ignoreBroadcast = false;
+    };
   }
 
   getState(): State {
@@ -165,6 +177,9 @@ class Store {
   dispatch(action: Action) {
     this.state = reducer(this.state, action);
     this.notify();
+    if (!this.ignoreBroadcast && action.type !== 'CLEAR_TIMER') {
+      this.channel.postMessage(action);
+    }
   }
 
   subscribe(listener: Listener): () => void {
