@@ -168,13 +168,11 @@
         <div class="container hero-grid">
           <div>
             <div class="hero-slogan slogan" data-i18n="hero.slogan">Turn your will into real</div>
-            <span class="badge" data-i18n="hero.badge">Unofficial community practice · not affiliated with Anthropic</span>
-            <h1 style="margin-top: 14px" data-i18n="hero.title">
-              Claude Certified Architect
-            </h1>
-            <h2 class="subtitle" data-i18n="hero.subtitle">
-              Foundations — Unofficial Mock Exam
-            </h2>
+            <span class="badge" data-i18n="hero.badge"
+              >Unofficial community practice · not affiliated with Anthropic</span
+            >
+            <h1 style="margin-top: 14px" data-i18n="hero.title">Claude Certified Architect</h1>
+            <h2 class="subtitle" data-i18n="hero.subtitle">Foundations — Unofficial Mock Exam</h2>
             <p class="desc" data-i18n="hero.desc">
               A grueling, production-grade practice exam designed by a certified architect to test
               your actual mastery of the Claude ecosystem, not just your memorization of the docs.
@@ -187,7 +185,9 @@
                   <path d="m13 6 6 6-6 6" />
                 </svg>
               </a>
-              <a href="#path" class="btn ghost" data-i18n="hero.how_access_works">How access works</a>
+              <a href="#path" class="btn ghost" data-i18n="hero.how_access_works"
+                >How access works</a
+              >
             </div>
             <p style="margin-top: 16px; font-size: 0.88rem; color: var(--muted)">
               Official registration:
@@ -209,7 +209,9 @@
               Taken from the official CCA-F landing page for partner companies.
             </p>
             <ul class="glance-list">
-              <li data-i18n="glance.format"><strong>Format:</strong> Multiple choice, multiple select</li>
+              <li data-i18n="glance.format">
+                <strong>Format:</strong> Multiple choice, multiple select
+              </li>
               <li data-i18n="glance.duration"><strong>Duration:</strong> 120 minutes</li>
               <li data-i18n="glance.cost"><strong>Cost:</strong> Free (Mock)</li>
               <li data-i18n="glance.lang"><strong>Languages:</strong> English, Spanish</li>
@@ -535,13 +537,44 @@
             </div>
           </div>
           <div class="leaderboard" id="leaderboard-container">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
-              <h3 style="margin: 0;">🏆 Leaderboard</h3>
-              <div class="lb-controls" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                <input type="text" id="lb-search" class="input" placeholder="Search name..." style="width: 140px; padding: 6px 10px; font-size: 0.85rem;" aria-label="Search leaderboard by name">
-                <input type="date" id="lb-date-start" class="input" style="padding: 6px 10px; font-size: 0.85rem; width: 125px;" aria-label="Start date">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 12px;
+              "
+            >
+              <h3 style="margin: 0">🏆 Leaderboard</h3>
+              <div
+                class="lb-controls"
+                style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap"
+              >
+                <input
+                  type="text"
+                  id="lb-search"
+                  class="input"
+                  placeholder="Search name..."
+                  style="width: 140px; padding: 6px 10px; font-size: 0.85rem"
+                  aria-label="Search leaderboard by name"
+                />
+                <input
+                  type="date"
+                  id="lb-date-start"
+                  class="input"
+                  style="padding: 6px 10px; font-size: 0.85rem; width: 125px"
+                  aria-label="Start date"
+                />
                 <span style="font-size: 0.85rem; color: var(--muted)">to</span>
-                <input type="date" id="lb-date-end" class="input" style="padding: 6px 10px; font-size: 0.85rem; width: 125px;" aria-label="End date">
+                <input
+                  type="date"
+                  id="lb-date-end"
+                  class="input"
+                  style="padding: 6px 10px; font-size: 0.85rem; width: 125px"
+                  aria-label="End date"
+                />
               </div>
             </div>
             <div class="lb-scroll">
@@ -584,9 +617,7 @@
             <div class="container" style="max-width: 900px; padding: 40px 20px">
               <div class="section-head">
                 <h2>Admin Question Editor</h2>
-                <button class="btn ghost small" id="btn-admin-back">
-                  ← Back to Start
-                </button>
+                <button class="btn ghost small" id="btn-admin-back">← Back to Start</button>
               </div>
               <div id="admin-editor-root"></div>
             </div>
@@ -705,16 +736,18 @@
                       <button class="btn ghost small" id="btn-targeted">
                         Targeted Practice (Weakest Domain)
                       </button>
-                      <button class="btn ghost small" id="btn-flashcard" style="position: relative;">
-                        Flashcard Mode (Study Cards) <span id="fc-due-count" style="margin-left: 4px; color: var(--bad); font-weight: bold;"></span>
+                      <button class="btn ghost small" id="btn-flashcard" style="position: relative">
+                        Flashcard Mode (Study Cards)
+                        <span
+                          id="fc-due-count"
+                          style="margin-left: 4px; color: var(--bad); font-weight: bold"
+                        ></span>
                       </button>
                     </div>
                   </div>
 
                   <div class="rules">
-                    <h2 style="margin-top: 4px; font-size: 1.15rem">
-                      Rules
-                    </h2>
+                    <h2 style="margin-top: 4px; font-size: 1.15rem">Rules</h2>
                     <ul>
                       <li>
                         Pass mark on the real exam isn't public — this mock flags
@@ -1034,6 +1067,5 @@
     <!-- Integrity / anti-copy / anti-capture deterrents -->
 
     <script type="module" src="/src/app.ts"></script>
-
   </body>
 </html>
