@@ -381,97 +381,85 @@ interface DomainStat {
   window.startExam = ExamEngine.startExam;
 })();
 
-(function () {
-  const SUPABASE_URL = 'https://idtmcfqcgvecrivvtsxv.supabase.co';
-  const SUPABASE_ANON_KEY =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkdG1jZnFjZ3ZlY3JpdnZ0c3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NjYwNjAsImV4cCI6MjA5NTM0MjA2MH0.SBB3j0xIjJt4hp9PzD0tX4VOd2vY5gIu6BddspVVFn4';
-  let sbClient = null;
-  if (typeof createClient !== 'undefined') {
-    sbClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    window.sbClient = sbClient;
-  } else {
-    console.warn('Supabase SDK not loaded — online features disabled.');
+window.loadQuestions = async function () {
+  let localQuestions = [];
+  if (encQuestions) {
+    try {
+      localQuestions = await new Promise((resolve, reject) => {
+        const worker = new DecryptionWorker();
+        worker.onmessage = (e) => {
+          if (e.data.success) {
+            resolve(e.data.questions);
+          } else {
+            reject(new Error(e.data.error));
+          }
+          worker.terminate();
+        };
+        worker.onerror = (err) => {
+          reject(err);
+          worker.terminate();
+        };
+        worker.postMessage({ encQuestions });
+      });
+      window.QUESTIONS = localQuestions; // Set it globally too
+    } catch (e) {
+      console.error('Failed to decode local questions via worker', e);
+    }
   }
 
-  window.loadQuestions = async function () {
-    let localQuestions = [];
-    if (encQuestions) {
-      try {
-        localQuestions = await new Promise((resolve, reject) => {
-          const worker = new DecryptionWorker();
-          worker.onmessage = (e) => {
-            if (e.data.success) {
-              resolve(e.data.questions);
-            } else {
-              reject(new Error(e.data.error));
-            }
-            worker.terminate();
-          };
-          worker.onerror = (err) => {
-            reject(err);
-            worker.terminate();
-          };
-          worker.postMessage({ encQuestions });
-        });
-        window.QUESTIONS = localQuestions; // Set it globally too
-      } catch (e) {
-        console.error('Failed to decode local questions via worker', e);
-      }
-    }
-
-    if (sbClient) {
-      try {
-        const { data, error } = await sbClient
-          .from('questions')
-          .select('*')
-          .order('id', { ascending: true });
-        if (error) throw error;
-        if (data && data.length > 0) {
-          window.setQuestions(data);
-        } else {
-          window.setQuestions(localQuestions);
-          // Seed DB if empty and user is admin
-          if (new URLSearchParams(window.location.search).get('admin')) {
-            for (let q of localQuestions) {
-              await sbClient.from('questions').upsert(q);
-            }
-          }
-        }
-      } catch (e) {
-        console.warn('Supabase questions error, using local', e);
-        window.setQuestions(localQuestions);
-      }
-    } else {
-      window.setQuestions(localQuestions);
-    }
-  };
-
-  window.loadComments = async function (questionId: string, containerId: string) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    container.classList.toggle('hidden');
-    if (container.classList.contains('hidden')) return;
-
-    const contentEl = container.querySelector('.comments-content');
-    contentEl.innerHTML = 'Loading...';
-
-    if (!sbClient) {
-      contentEl.innerHTML = 'Offline mode - comments disabled.';
-      return;
-    }
-
+  if (sbClient) {
     try {
       const { data, error } = await sbClient
-        .from('question_comments')
+        .from('questions')
         .select('*')
-        .eq('question_id', questionId)
-        .order('created_at', { ascending: false });
+        .order('id', { ascending: true });
       if (error) throw error;
-
       if (data && data.length > 0) {
-        contentEl.innerHTML = data
-          .map(
-            (c) => `
+        window.setQuestions(data);
+      } else {
+        window.setQuestions(localQuestions);
+        // Seed DB if empty and user is admin
+        if (new URLSearchParams(window.location.search).get('admin')) {
+          for (let q of localQuestions) {
+            await sbClient.from('questions').upsert(q);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Supabase questions error, using local', e);
+      window.setQuestions(localQuestions);
+    }
+  } else {
+    window.setQuestions(localQuestions);
+  }
+};
+
+window.loadComments = async function (questionId: string, containerId: string) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.classList.toggle('hidden');
+  if (container.classList.contains('hidden')) return;
+
+  const contentEl = container.querySelector('.comments-content');
+  contentEl.innerHTML = 'Loading...';
+
+  if (!sbClient) {
+    contentEl.innerHTML = 'Offline mode - comments disabled.';
+    return;
+  }
+
+  try {
+    const { data, error } = await sbClient
+      .from('question_comments')
+      .select('*')
+      .eq('question_id', questionId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      contentEl.innerHTML = data
+        .map(
+          (c) => `
             <div style="margin-bottom:10px; padding:10px; background:var(--bg); border:1px solid var(--line); border-radius:4px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.8rem; color:var(--ink-soft);">
               <strong>${(c.nickname || 'Anonymous').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch])}</strong>
@@ -480,229 +468,228 @@ interface DomainStat {
             <div>${c.comment.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch])}</div>
           </div>
         `
-          )
-          .join('');
-      } else {
-        contentEl.innerHTML = 'No comments yet. Be the first!';
-      }
-    } catch (e) {
-      contentEl.innerHTML = 'Failed to load comments.';
+        )
+        .join('');
+    } else {
+      contentEl.innerHTML = 'No comments yet. Be the first!';
     }
-  };
+  } catch (e) {
+    contentEl.innerHTML = 'Failed to load comments.';
+  }
+};
 
-  window.postComment = async function (questionId: string, containerId: string) {
-    if (!sbClient) return showToast('You are offline.');
-    const email = document.getElementById('auth-email')
-      ? (document.getElementById('auth-email') as HTMLInputElement).value.trim()
-      : '';
-    const nickname = document.getElementById('auth-nickname')
-      ? (document.getElementById('auth-nickname') as HTMLInputElement).value.trim()
-      : '';
-    if (!email || !nickname)
-      return showToast('Please set an email and nickname on the Start screen to comment.');
+window.postComment = async function (questionId: string, containerId: string) {
+  if (!sbClient) return showToast('You are offline.');
+  const email = document.getElementById('auth-email')
+    ? (document.getElementById('auth-email') as HTMLInputElement).value.trim()
+    : '';
+  const nickname = document.getElementById('auth-nickname')
+    ? (document.getElementById('auth-nickname') as HTMLInputElement).value.trim()
+    : '';
+  if (!email || !nickname)
+    return showToast('Please set an email and nickname on the Start screen to comment.');
 
-    const inputEl = document.getElementById(`comment-input-${questionId}`) as HTMLInputElement;
-    if (!inputEl || !inputEl.value.trim()) return;
+  const inputEl = document.getElementById(`comment-input-${questionId}`) as HTMLInputElement;
+  if (!inputEl || !inputEl.value.trim()) return;
 
-    try {
-      const { error } = await sbClient.from('question_comments').insert({
-        question_id: questionId,
-        user_email: email,
-        nickname: nickname,
-        comment: inputEl.value.trim(),
-      });
-      if (error) throw error;
+  try {
+    const { error } = await sbClient.from('question_comments').insert({
+      question_id: questionId,
+      user_email: email,
+      nickname: nickname,
+      comment: inputEl.value.trim(),
+    });
+    if (error) throw error;
 
-      inputEl.value = '';
-      // Reload comments
-      document.getElementById(containerId)?.classList.add('hidden');
-      window.loadComments(questionId, containerId).catch(console.error);
-    } catch (e) {
-      showToast('Failed to post comment: ' + (e instanceof Error ? e.message : String(e)));
-    }
-  };
+    inputEl.value = '';
+    // Reload comments
+    document.getElementById(containerId)?.classList.add('hidden');
+    window.loadComments(questionId, containerId).catch(console.error);
+  } catch (e) {
+    showToast('Failed to post comment: ' + (e instanceof Error ? e.message : String(e)));
+  }
+};
 
-  // ---- Verify user (called before exam starts) ----
-  window.verifyUser = async function () {
-    const email = document.getElementById('auth-email')
-      ? (document.getElementById('auth-email') as HTMLInputElement).value.trim()
-      : '';
-    const pin = document.getElementById('auth-pin')
-      ? (document.getElementById('auth-pin') as HTMLInputElement).value.trim()
-      : '';
-    const nickname = document.getElementById('auth-nickname')
-      ? (document.getElementById('auth-nickname') as HTMLInputElement).value.trim()
-      : '';
+// ---- Verify user (called before exam starts) ----
+window.verifyUser = async function () {
+  const email = document.getElementById('auth-email')
+    ? (document.getElementById('auth-email') as HTMLInputElement).value.trim()
+    : '';
+  const pin = document.getElementById('auth-pin')
+    ? (document.getElementById('auth-pin') as HTMLInputElement).value.trim()
+    : '';
+  const nickname = document.getElementById('auth-nickname')
+    ? (document.getElementById('auth-nickname') as HTMLInputElement).value.trim()
+    : '';
 
-    if (!email && !pin) return true; // guest mode
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showToast('Please provide a valid email format.');
-      return false;
-    }
-    if (!sbClient) return true; // Supabase offline — allow anyway
-    if ((email && !pin) || (!email && pin) || !/^\d{6}$/.test(pin)) {
-      showToast('Please provide both a valid email and a 6-digit PIN, or leave both blank.');
-      return false;
-    }
-
-    const startBtn = document.getElementById('btn-start');
-    const practiceBtn = document.getElementById('btn-practice');
-    const ogStart = startBtn ? startBtn.innerHTML : '';
-    const ogPractice = practiceBtn ? practiceBtn.innerHTML : '';
-
-    if (startBtn) startBtn.innerHTML = 'Verifying...';
-    if (practiceBtn) practiceBtn.innerHTML = 'Verifying...';
-
-    try {
-      const p_pin_hash = await hashPIN(pin);
-      const { data, error } = await sbClient.rpc('verify_mock_user', {
-        p_email: email,
-        p_pin_hash: p_pin_hash,
-        p_nickname: nickname || null,
-      });
-
-      if (error) {
-        console.error('Verification error:', error);
-        showToast('Error connecting to server. Please try again.');
-        return false;
-      }
-      if (data && !data.success) {
-        showToast('Authentication failed: ' + data.error);
-        return false;
-      }
-
-      // If verified, try to load their history for the dashboard
-      loadDashboard(email, p_pin_hash);
-
-      return true;
-    } catch (e) {
-      console.error(e);
-      showToast('Something went wrong during verification.');
-      return false;
-    } finally {
-      if (startBtn) startBtn.innerHTML = ogStart;
-      if (practiceBtn) practiceBtn.innerHTML = ogPractice;
-    }
-  };
-
-  // ---- Submit result ----
-  window.submitToSupabase = ExamEngine.submitToSupabase;
-
-  async function flushSyncQueue() {
-    if (!navigator.onLine || !sbClient) return;
-    const q = (await syncQueue.get()) as Array<Record<string, unknown>>;
-    if (q.length === 0) return;
-    console.log(`Flushing ${q.length} offline submissions...`);
-    for (const payload of q) {
-      const { data, error } = await sbClient.rpc('submit_exam_result', payload);
-      // Remove item only if it succeeded or if it returned an explicit error object indicating success
-      if (!error && data?.success) {
-        await syncQueue.remove(payload.offline_id as string);
-      } else {
-        console.warn('Failed to flush offline payload', payload, error, data);
-      }
-    }
-    fetchGlobalStats();
+  if (!email && !pin) return true; // guest mode
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('Please provide a valid email format.');
+    return false;
+  }
+  if (!sbClient) return true; // Supabase offline — allow anyway
+  if ((email && !pin) || (!email && pin) || !/^\d{6}$/.test(pin)) {
+    showToast('Please provide both a valid email and a 6-digit PIN, or leave both blank.');
+    return false;
   }
 
-  window.addEventListener('online', flushSyncQueue);
-  flushSyncQueue().catch(console.error);
+  const startBtn = document.getElementById('btn-start');
+  const practiceBtn = document.getElementById('btn-practice');
+  const ogStart = startBtn ? startBtn.innerHTML : '';
+  const ogPractice = practiceBtn ? practiceBtn.innerHTML : '';
 
-  const lbSearchInput = document.getElementById('lb-search');
-  const lbDateStartInput = document.getElementById('lb-date-start');
-  const lbDateEndInput = document.getElementById('lb-date-end');
-  if (lbSearchInput) lbSearchInput.addEventListener('input', renderLeaderboard);
-  if (lbDateStartInput) lbDateStartInput.addEventListener('change', renderLeaderboard);
-  if (lbDateEndInput) lbDateEndInput.addEventListener('change', renderLeaderboard);
+  if (startBtn) startBtn.innerHTML = 'Verifying...';
+  if (practiceBtn) practiceBtn.innerHTML = 'Verifying...';
 
-  // ---- Dark Mode ----
-  function initDarkMode() {
-    const toggle = document.getElementById('theme-toggle');
-    const saved = localStorage.getItem('ccaf-dark-mode');
+  try {
+    const p_pin_hash = await hashPIN(pin);
+    const { data, error } = await sbClient.rpc('verify_mock_user', {
+      p_email: email,
+      p_pin_hash: p_pin_hash,
+      p_nickname: nickname || null,
+    });
 
-    // Light theme by default — only apply dark if user explicitly chose it
-    if (saved === 'true') {
-      document.documentElement.classList.add('dark-mode');
-      if (toggle) toggle.textContent = '🌙';
+    if (error) {
+      console.error('Verification error:', error);
+      showToast('Error connecting to server. Please try again.');
+      return false;
+    }
+    if (data && !data.success) {
+      showToast('Authentication failed: ' + data.error);
+      return false;
     }
 
-    if (toggle) {
-      toggle.addEventListener('click', () => {
-        const isDark = document.documentElement.classList.toggle('dark-mode');
-        toggle.textContent = isDark ? '🌙' : '☀️';
-        localStorage.setItem('ccaf-dark-mode', isDark.toString());
-        // Add a subtle spin animation
-        toggle.style.transform = 'scale(1.1) rotate(360deg)';
-        setTimeout(() => (toggle.style.transform = ''), 300);
-      });
+    // If verified, try to load their history for the dashboard
+    loadDashboard(email, p_pin_hash);
+
+    return true;
+  } catch (e) {
+    console.error(e);
+    showToast('Something went wrong during verification.');
+    return false;
+  } finally {
+    if (startBtn) startBtn.innerHTML = ogStart;
+    if (practiceBtn) practiceBtn.innerHTML = ogPractice;
+  }
+};
+
+// ---- Submit result ----
+window.submitToSupabase = ExamEngine.submitToSupabase;
+
+async function flushSyncQueue() {
+  if (!navigator.onLine || !sbClient) return;
+  const q = (await syncQueue.get()) as Array<Record<string, unknown>>;
+  if (q.length === 0) return;
+  console.log(`Flushing ${q.length} offline submissions...`);
+  for (const payload of q) {
+    const { data, error } = await sbClient.rpc('submit_exam_result', payload);
+    // Remove item only if it succeeded or if it returned an explicit error object indicating success
+    if (!error && data?.success) {
+      await syncQueue.remove(payload.offline_id as string);
+    } else {
+      console.warn('Failed to flush offline payload', payload, error, data);
     }
   }
+  fetchGlobalStats();
+}
 
-  // ---- Auto-load dashboard on email/pin blur ----
-  function initAuthListeners() {
-    const emailEl = document.getElementById('auth-email') as HTMLInputElement;
-    const pinEl = document.getElementById('auth-pin') as HTMLInputElement;
+window.addEventListener('online', flushSyncQueue);
+flushSyncQueue().catch(console.error);
 
-    // Auto-login from localStorage (PIN is stored as hash)
-    const savedEmail = localStorage.getItem('ccaf-email');
-    const savedPinHash = localStorage.getItem('ccaf-pin-hash');
-    // Migration: if old plaintext pin exists, hash it and migrate
-    const legacyPin = localStorage.getItem('ccaf-pin');
-    if (savedEmail && legacyPin && !savedPinHash) {
-      hashPIN(legacyPin)
-        .then((h) => {
-          if (!h) return;
-          localStorage.setItem('ccaf-pin-hash', h);
-          localStorage.removeItem('ccaf-pin');
-          loadDashboard(savedEmail, h).catch(console.error);
-        })
-        .catch((e) => console.error('PIN migration failed', e));
-      if (emailEl) emailEl.value = savedEmail;
-      if (pinEl) pinEl.value = legacyPin;
-    } else if (savedEmail && savedPinHash && emailEl) {
-      emailEl.value = savedEmail;
-      // Don't populate pin field with hash — leave it blank (user can re-enter if needed)
-      loadDashboard(savedEmail, savedPinHash).catch(console.error);
-    }
+const lbSearchInput = document.getElementById('lb-search');
+const lbDateStartInput = document.getElementById('lb-date-start');
+const lbDateEndInput = document.getElementById('lb-date-end');
+if (lbSearchInput) lbSearchInput.addEventListener('input', renderLeaderboard);
+if (lbDateStartInput) lbDateStartInput.addEventListener('change', renderLeaderboard);
+if (lbDateEndInput) lbDateEndInput.addEventListener('change', renderLeaderboard);
 
-    if (pinEl) {
-      pinEl.addEventListener('blur', async () => {
-        const email = emailEl?.value.trim();
-        const pin = pinEl.value.trim();
-        if (email && /^\d{6}$/.test(pin)) {
-          const pinHash = await hashPIN(pin);
-          localStorage.setItem('ccaf-email', email);
-          localStorage.setItem('ccaf-pin-hash', pinHash);
-          localStorage.removeItem('ccaf-pin'); // clean up any legacy
-          loadDashboard(email, pinHash).catch(console.error);
-        }
-      });
-    }
+// ---- Dark Mode ----
+function initDarkMode() {
+  const toggle = document.getElementById('theme-toggle');
+  const saved = localStorage.getItem('ccaf-dark-mode');
+
+  // Light theme by default — only apply dark if user explicitly chose it
+  if (saved === 'true') {
+    document.documentElement.classList.add('dark-mode');
+    if (toggle) toggle.textContent = '🌙';
   }
 
-  // Init everything on DOM ready
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      await window.loadQuestions();
-    } catch (e) {
-      console.error('[CCAF] loadQuestions failed', e);
-    }
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      toggle.textContent = isDark ? '🌙' : '☀️';
+      localStorage.setItem('ccaf-dark-mode', isDark.toString());
+      // Add a subtle spin animation
+      toggle.style.transform = 'scale(1.1) rotate(360deg)';
+      setTimeout(() => (toggle.style.transform = ''), 300);
+    });
+  }
+}
 
-    // Initialise i18n
-    initI18n();
-    const langSelector = document.getElementById('lang-selector') as HTMLSelectElement;
-    if (langSelector) {
-      langSelector.value = localStorage.getItem('lang') || 'en';
-      langSelector.addEventListener('change', (e) => {
-        setLanguage((e.target as HTMLSelectElement).value);
-      });
-    }
-    if (window.wireExam) window.wireExam();
-    fetchGlobalStats().catch(console.error);
-    initDarkMode();
+// ---- Auto-load dashboard on email/pin blur ----
+function initAuthListeners() {
+  const emailEl = document.getElementById('auth-email') as HTMLInputElement;
+  const pinEl = document.getElementById('auth-pin') as HTMLInputElement;
 
-    initAuthListeners();
-    const fcEngine = new FlashcardEngine();
-    fcEngine.initAdminAndFlashcards();
-  });
-})();
+  // Auto-login from localStorage (PIN is stored as hash)
+  const savedEmail = localStorage.getItem('ccaf-email');
+  const savedPinHash = localStorage.getItem('ccaf-pin-hash');
+  // Migration: if old plaintext pin exists, hash it and migrate
+  const legacyPin = localStorage.getItem('ccaf-pin');
+  if (savedEmail && legacyPin && !savedPinHash) {
+    hashPIN(legacyPin)
+      .then((h) => {
+        if (!h) return;
+        localStorage.setItem('ccaf-pin-hash', h);
+        localStorage.removeItem('ccaf-pin');
+        loadDashboard(savedEmail, h).catch(console.error);
+      })
+      .catch((e) => console.error('PIN migration failed', e));
+    if (emailEl) emailEl.value = savedEmail;
+    if (pinEl) pinEl.value = legacyPin;
+  } else if (savedEmail && savedPinHash && emailEl) {
+    emailEl.value = savedEmail;
+    // Don't populate pin field with hash — leave it blank (user can re-enter if needed)
+    loadDashboard(savedEmail, savedPinHash).catch(console.error);
+  }
+
+  if (pinEl) {
+    pinEl.addEventListener('blur', async () => {
+      const email = emailEl?.value.trim();
+      const pin = pinEl.value.trim();
+      if (email && /^\d{6}$/.test(pin)) {
+        const pinHash = await hashPIN(pin);
+        localStorage.setItem('ccaf-email', email);
+        localStorage.setItem('ccaf-pin-hash', pinHash);
+        localStorage.removeItem('ccaf-pin'); // clean up any legacy
+        loadDashboard(email, pinHash).catch(console.error);
+      }
+    });
+  }
+}
+
+// Init everything on DOM ready
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await window.loadQuestions();
+  } catch (e) {
+    console.error('[CCAF] loadQuestions failed', e);
+  }
+
+  // Initialise i18n
+  initI18n();
+  const langSelector = document.getElementById('lang-selector') as HTMLSelectElement;
+  if (langSelector) {
+    langSelector.value = localStorage.getItem('lang') || 'en';
+    langSelector.addEventListener('change', (e) => {
+      setLanguage((e.target as HTMLSelectElement).value);
+    });
+  }
+  if (window.wireExam) window.wireExam();
+  fetchGlobalStats().catch(console.error);
+  initDarkMode();
+
+  initAuthListeners();
+  const fcEngine = new FlashcardEngine();
+  fcEngine.initAdminAndFlashcards();
+});
