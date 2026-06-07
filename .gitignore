@@ -39,3 +39,10 @@ npm-debug.log*
 *.tmp
 .eslintcache
 questions_backup.json
+
+# KI / Agent artifacts
+.agents/
+
+# MCP / Local Supabase
+supabase/
+

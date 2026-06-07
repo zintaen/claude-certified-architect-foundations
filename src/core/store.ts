@@ -205,6 +205,10 @@ class Store {
     return this.state;
   }
 
+  getBroadcastDepth(): number {
+    return this.broadcastDepth;
+  }
+
   dispatch(action: Action) {
     this.state = reducer(this.state, action);
     this.notify();

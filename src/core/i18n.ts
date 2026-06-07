@@ -15,6 +15,10 @@ const en: TranslationDictionary = {
   'hero.desc':
     'A grueling, production-grade practice exam designed by a certified architect to test your actual mastery of the Claude ecosystem, not just your memorization of the docs.',
   'hero.start': 'Start Mock Exam',
+  'hero.slogan': 'Turn your will into real',
+  'hero.badge': 'Unofficial community practice · not affiliated with Anthropic',
+  'hero.start_practice': 'Start practice exam',
+  'hero.how_access_works': 'How access works',
 
   'glance.title': 'Exam at a glance',
   'glance.p1': 'Taken from the official CCA-F landing page for partner companies.',
@@ -22,9 +26,14 @@ const en: TranslationDictionary = {
   'glance.duration': 'Duration: 120 minutes',
   'glance.cost': 'Cost: Free (Mock)',
   'glance.lang': 'Languages: English, Spanish',
+  'glance.stat.level': 'Level',
+  'glance.stat.questions': 'Questions',
+  'glance.stat.proctored': 'Proctored',
+  'glance.stat.per_attempt': 'Per attempt*',
 
   'btn.start': 'Start Mock Exam',
   'btn.flashcard': 'Flashcard Mode',
+  'btn.support': 'Support us',
 
   'footer.creator': 'Creator',
   'footer.legal': 'Legal & Disclaimer',
@@ -44,6 +53,10 @@ const es: TranslationDictionary = {
   'hero.desc':
     'Un examen de práctica agotador y de nivel de producción diseñado por un arquitecto certificado para evaluar tu dominio real del ecosistema de Claude, no solo tu memorización de la documentación.',
   'hero.start': 'Iniciar Examen',
+  'hero.slogan': 'Convierte tu voluntad en realidad',
+  'hero.badge': 'Práctica no oficial de la comunidad · no afiliada a Anthropic',
+  'hero.start_practice': 'Iniciar examen de práctica',
+  'hero.how_access_works': 'Cómo funciona el acceso',
 
   'glance.title': 'El examen de un vistazo',
   'glance.p1': 'Tomado de la página oficial de CCA-F para empresas asociadas.',
@@ -51,9 +64,14 @@ const es: TranslationDictionary = {
   'glance.duration': 'Duración: 120 minutos',
   'glance.cost': 'Costo: Gratis (Práctica)',
   'glance.lang': 'Idiomas: Inglés, Español',
+  'glance.stat.level': 'Nivel',
+  'glance.stat.questions': 'Preguntas',
+  'glance.stat.proctored': 'Supervisado',
+  'glance.stat.per_attempt': 'Por intento*',
 
   'btn.start': 'Iniciar Examen',
   'btn.flashcard': 'Modo Tarjetas',
+  'btn.support': 'Apóyanos',
 
   'footer.creator': 'Creador',
   'footer.legal': 'Aviso Legal',

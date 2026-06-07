@@ -45,6 +45,7 @@ export const idb = {
 export const syncQueue = {
   add: (payload: any) => sendMsg('sync_add', { val: payload }),
   get: () => sendMsg('sync_get'),
+  remove: (key: string) => sendMsg('sync_remove', { key }),
   clear: () => sendMsg('sync_clear'),
 };
 

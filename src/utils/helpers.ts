@@ -25,7 +25,7 @@ export function pickProportional(all: any[], n: number): any[] {
     (buckets[q.group || 'misc'] = buckets[q.group || 'misc'] || []).push(q);
   });
   const keys = Object.keys(buckets);
-  
+
   if (n < keys.length) {
     // If n is smaller than the number of groups, just pick n random questions
     return shuffle(all).slice(0, n);
@@ -39,9 +39,9 @@ export function pickProportional(all: any[], n: number): any[] {
     want[k] = Math.max(1, share);
     assigned += want[k];
   });
-  
+
   while (assigned > n) {
-    const k = keys.find((key) => want[key] > 1) || keys.find(key => want[key] > 0);
+    const k = keys.find((key) => want[key] > 1) || keys.find((key) => want[key] > 0);
     if (!k) break;
     want[k]--;
     assigned--;
@@ -84,7 +84,10 @@ export function fmtTime(sec: number): string {
   return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
 }
 
-export function generateRadarSVG(domainStats: Record<string, any>, labelsMap: Record<string, string>): string {
+export function generateRadarSVG(
+  domainStats: Record<string, any>,
+  labelsMap: Record<string, string>
+): string {
   const keys = Object.keys(domainStats);
   const N = keys.length;
   if (N < 3) return ''; // Radar needs at least 3 axes
@@ -93,7 +96,7 @@ export function generateRadarSVG(domainStats: Record<string, any>, labelsMap: Re
   const cx = size / 2;
   const cy = size / 2;
   const radius = 100;
-  
+
   // Grid Rings
   let gridHtml = '';
   for (let level = 1; level <= 5; level++) {
@@ -115,7 +118,7 @@ export function generateRadarSVG(domainStats: Record<string, any>, labelsMap: Re
 
   keys.forEach((key, i) => {
     const angle = (Math.PI * 2 * i) / N - Math.PI / 2;
-    
+
     // Axis line
     const px = cx + radius * Math.cos(angle);
     const py = cy + radius * Math.sin(angle);
@@ -126,7 +129,7 @@ export function generateRadarSVG(domainStats: Record<string, any>, labelsMap: Re
     const lx = cx + labelRadius * Math.cos(angle);
     const ly = cy + labelRadius * Math.sin(angle);
     const label = labelsMap[key] || key;
-    
+
     // Clean up label (wrap if too long)
     const words = label.split(' ');
     const shortLabel = words.length > 2 ? words.slice(0, 2).join(' ') + '...' : label;
@@ -145,7 +148,7 @@ export function generateRadarSVG(domainStats: Record<string, any>, labelsMap: Re
     const dx = cx + dpRadius * Math.cos(angle);
     const dy = cy + dpRadius * Math.sin(angle);
     dataPoints.push(`${dx},${dy}`);
-    
+
     // Add dot
     axesHtml += `<circle cx="${dx}" cy="${dy}" r="4" fill="var(--brand)" class="radar-dot" style="animation: popIn 0.5s ease backwards; animation-delay: ${0.1 * i}s;" />`;
   });
@@ -160,4 +163,13 @@ export function generateRadarSVG(domainStats: Record<string, any>, labelsMap: Re
       ${labelsHtml}
     </svg>
   `;
+}
+
+export async function hashPIN(pin: string): Promise<string | null> {
+  if (!pin) return null;
+  if (!/^\d{6}$/.test(pin)) return null;
+  const msgBuffer = new TextEncoder().encode(pin);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }

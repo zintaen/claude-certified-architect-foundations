@@ -5,19 +5,28 @@ export default defineConfig({
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['assets/cyberskill-logo.svg', 'assets/styles.css'],
       manifest: false, // already providing manifest.json
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,json}'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\//,
-            handler: 'NetworkFirst',
+            handler: 'CacheFirst',
             options: {
-              cacheName: 'api-cache',
-              networkTimeoutSeconds: 10,
-              cacheableResponse: {
-                statuses: [0, 200],
+              cacheName: 'google-fonts',
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 }, // 1 year
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/rpc\/submit_exam_result/,
+            handler: 'NetworkOnly',
+            options: {
+              backgroundSync: {
+                name: 'exam-sync-queue',
+                options: {
+                  maxRetentionTime: 24 * 60, // Retry for up to 24 Hours
+                },
               },
             },
           },
@@ -42,6 +51,11 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
+        manualChunks(id) {
+          if (id.includes('@supabase/supabase-js')) {
+            return 'vendor';
+          }
+        },
       },
     },
   },

@@ -79,15 +79,25 @@ export class TelemetryService {
   private initKeyboardTracking() {
     window.addEventListener('keydown', (e) => {
       if (!this.active || !this.isProctorMode) return;
-      
+
       // Prevent copy/paste/print
       if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'v' || e.key === 'p')) {
         e.preventDefault();
         showToast('Keyboard shortcuts are disabled during proctored exams', 'error');
       }
-      
+
       // Prevent F12 / DevTools
-      if (e.key === 'F12' || ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c'))) {
+      if (
+        e.key === 'F12' ||
+        ((e.ctrlKey || e.metaKey) &&
+          e.shiftKey &&
+          (e.key === 'I' ||
+            e.key === 'i' ||
+            e.key === 'J' ||
+            e.key === 'j' ||
+            e.key === 'C' ||
+            e.key === 'c'))
+      ) {
         e.preventDefault();
         this.triggerViolation('Developer Tools shortcut detected');
       }

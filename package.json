@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/zintaen/claude-certified-architect-mock-exam#readme",
   "dependencies": {
+    "@supabase/supabase-js": "^2.107.0",
     "dotenv": "^17.4.2"
   },
   "devDependencies": {
