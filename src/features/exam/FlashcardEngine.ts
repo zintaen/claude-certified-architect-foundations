@@ -3,6 +3,11 @@ import { store } from '../../core/store';
 import { showToast } from '../../components/toast';
 import { idb } from '../../services/db';
 import { state, renderResultDOM } from '../../core/ExamEngine';
+import { tracer, meter } from '../../telemetry';
+
+const flashcardsRated = meter.createCounter('flashcards.rated', {
+  description: 'Flashcards rated',
+});
 
 export class FlashcardEngine {
   private fcIndex = 0;
@@ -246,21 +251,34 @@ export class FlashcardEngine {
   }
 
   private async rateCard(q: any, op: any, i: number) {
-    const letter = String.fromCharCode(65 + i);
-    store.dispatch({
-      type: 'PROCESS_FLASHCARD_ANSWER',
-      payload: {
-        idx: window.QUESTIONS.findIndex((x: any) => x.id === q.id),
-        qId: q.id,
-        letter,
-        isCorrect: op.correct,
-      },
+    return tracer.startActiveSpan('flashcard.rate', async (span) => {
+      try {
+        const letter = String.fromCharCode(65 + i);
+        span.setAttribute('flashcard.isCorrect', op.correct);
+
+        store.dispatch({
+          type: 'PROCESS_FLASHCARD_ANSWER',
+          payload: {
+            idx: window.QUESTIONS.findIndex((x: any) => x.id === q.id),
+            qId: q.id,
+            letter,
+            isCorrect: op.correct,
+          },
+        });
+
+        // Persist to IndexedDB
+        await idb.set('ccaf-leitner', store.getState().leitner);
+
+        flashcardsRated.add(1, { correct: String(op.correct) });
+        this.flipCard(q, i);
+        span.end();
+      } catch (err) {
+        span.recordException(err as Error);
+        span.setStatus({ code: 2, message: (err as Error).message });
+        span.end();
+        throw err;
+      }
     });
-
-    // Persist to IndexedDB
-    await idb.set('ccaf-leitner', store.getState().leitner);
-
-    this.flipCard(q, i);
   }
 
   private flipCard(q: any, chosenIdx: number) {

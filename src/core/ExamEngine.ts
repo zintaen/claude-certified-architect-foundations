@@ -13,6 +13,10 @@ import { showToast } from '../components/toast';
 import { telemetry } from '../services/telemetry';
 import { fetchGlobalStats } from '../features/leaderboard/leaderboard';
 import { sbClient } from '../services/supabase';
+import { tracer, meter } from '../telemetry';
+
+const examsStarted = meter.createCounter('exam.started', { description: 'Exams started' });
+const examsSubmitted = meter.createCounter('exam.submitted', { description: 'Exams submitted' });
 
 interface ExamOpts {
   count: number;
@@ -213,33 +217,53 @@ export function stopTimer() {
 }
 
 export function startExam(opts: ExamOpts) {
-  if (state.items.length > 0 && !state.finished) return;
-  window.__isProctorMode = !opts.untimed;
+  tracer.startActiveSpan('exam.start', (span) => {
+    try {
+      span.setAttribute('exam.minutes', opts.minutes || 0);
+      span.setAttribute('exam.untimed', !!opts.untimed);
 
-  if (window.__isProctorMode) {
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().catch((err) => {
-        console.warn('Fullscreen request failed', err);
-      });
+      if (state.items.length > 0 && !state.finished) {
+        span.end();
+        return;
+      }
+
+      examsStarted.add(1, { untimed: String(!!opts.untimed) });
+
+      window.__isProctorMode = !opts.untimed;
+
+      if (window.__isProctorMode) {
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch((err) => {
+            console.warn('Fullscreen request failed', err);
+            span.recordException(err);
+          });
+        }
+      }
+
+      window.finishExamForProctor = () => finishExam(true);
+
+      buildSession(opts);
+
+      const sidEl = document.getElementById('session-id');
+      if (sidEl) sidEl.textContent = state.sessionId;
+      window.showView?.('view-running');
+      renderQuestion();
+      renderPalette();
+      renderProgress();
+      document.body.classList.add('no-select');
+
+      telemetry.onViolation = () => finishExam(true);
+      telemetry.start(window.__isProctorMode);
+
+      startTimer();
+      span.end();
+    } catch (err) {
+      span.recordException(err as Error);
+      span.setStatus({ code: 2, message: (err as Error).message });
+      span.end();
+      throw err;
     }
-  }
-
-  window.finishExamForProctor = () => finishExam(true);
-
-  buildSession(opts);
-
-  const sidEl = document.getElementById('session-id');
-  if (sidEl) sidEl.textContent = state.sessionId;
-  window.showView?.('view-running');
-  renderQuestion();
-  renderPalette();
-  renderProgress();
-  document.body.classList.add('no-select');
-
-  telemetry.onViolation = () => finishExam(true);
-  telemetry.start(window.__isProctorMode);
-
-  startTimer();
+  });
 }
 
 export function finishExam(force: boolean) {
@@ -608,57 +632,76 @@ export function renderReview() {
 }
 
 export async function submitToSupabase(score: number, wrongAnswers: number[], timeTaken: number) {
-  const email = document.getElementById('auth-email')
-    ? (document.getElementById('auth-email') as HTMLInputElement).value.trim()
-    : '';
-  const pin = document.getElementById('auth-pin')
-    ? (document.getElementById('auth-pin') as HTMLInputElement).value.trim()
-    : '';
-  const nickname = document.getElementById('auth-nickname')
-    ? (document.getElementById('auth-nickname') as HTMLInputElement).value.trim()
-    : '';
+  return tracer.startActiveSpan('exam.submit', async (span) => {
+    try {
+      span.setAttribute('exam.score', score);
+      span.setAttribute('exam.timeTaken', timeTaken);
 
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    console.warn('Invalid email format. Skipping submission.');
-    return;
-  }
+      const email = document.getElementById('auth-email')
+        ? (document.getElementById('auth-email') as HTMLInputElement).value.trim()
+        : '';
+      const pin = document.getElementById('auth-pin')
+        ? (document.getElementById('auth-pin') as HTMLInputElement).value.trim()
+        : '';
+      const nickname = document.getElementById('auth-nickname')
+        ? (document.getElementById('auth-nickname') as HTMLInputElement).value.trim()
+        : '';
 
-  if (!sbClient) return;
-  let p_email: string | null = null;
-  let p_pin_hash: string | null = null;
-  let p_nickname: string | null = nickname || null;
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        console.warn('Invalid email format. Skipping submission.');
+        span.setAttribute('exam.skipped', true);
+        span.end();
+        return;
+      }
 
-  if (email && pin) {
-    p_email = email;
-    p_pin_hash = await hashPIN(pin);
-  }
+      if (!sbClient) {
+        span.end();
+        return;
+      }
+      let p_email: string | null = null;
+      let p_pin_hash: string | null = null;
+      let p_nickname: string | null = nickname || null;
 
-  try {
-    const payload = {
-      p_email: p_email,
-      p_pin_hash: p_pin_hash,
-      p_score: score,
-      p_wrong_answers: wrongAnswers,
-      p_time_taken: timeTaken,
-      p_nickname: p_nickname,
-    };
+      if (email && pin) {
+        p_email = email;
+        p_pin_hash = await hashPIN(pin);
+      }
 
-    if (!navigator.onLine) {
-      console.warn('Offline. Queuing submission for later.');
-      await syncQueue.add(payload);
-      return;
+      const payload = {
+        p_email: p_email,
+        p_pin_hash: p_pin_hash,
+        p_score: score,
+        p_wrong_answers: wrongAnswers,
+        p_time_taken: timeTaken,
+        p_nickname: p_nickname,
+      };
+
+      if (!navigator.onLine) {
+        console.warn('Offline. Queuing submission for later.');
+        span.addEvent('Queued for offline sync');
+        await syncQueue.add(payload);
+        span.end();
+        return;
+      }
+
+      const { data, error } = await sbClient.rpc('submit_exam_result', payload);
+      if (error) {
+        console.error('Error submitting result:', error);
+        span.recordException(error);
+        await syncQueue.add(payload);
+      } else if (data && !data.success) {
+        showToast('Failed to save score: ' + data.error);
+        span.setStatus({ code: 2, message: data.error });
+      } else {
+        examsSubmitted.add(1, { pass: String(score >= 700) });
+        setTimeout(fetchGlobalStats, 2000);
+      }
+      span.end();
+    } catch (e) {
+      console.error('Supabase exception:', e);
+      span.recordException(e as Error);
+      span.setStatus({ code: 2, message: (e as Error).message });
+      span.end();
     }
-
-    const { data, error } = await sbClient.rpc('submit_exam_result', payload);
-    if (error) {
-      console.error('Error submitting result:', error);
-      await syncQueue.add(payload);
-    } else if (data && !data.success) {
-      showToast('Failed to save score: ' + data.error);
-    } else {
-      setTimeout(fetchGlobalStats, 2000);
-    }
-  } catch (e) {
-    console.error('Supabase exception:', e);
-  }
+  });
 }
