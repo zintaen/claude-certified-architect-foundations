@@ -95,17 +95,24 @@ export function renderLeaderboard() {
 }
 
 export async function fetchGlobalStats() {
-  if (!sbClient) return; // Supabase offline
+  if (!sbClient) {
+    console.log('[CCAF] sbClient is null!');
+    return;
+  }
   try {
-    // Add 8s timeout to avoid infinite "Loading..." state (B25)
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
-    const { data, error } = await sbClient.rpc(
-      'get_global_stats',
-      {},
-      { signal: controller.signal }
-    );
-    clearTimeout(timeout);
+    console.log('[CCAF] Fetching global stats...');
+    // Create a timeout promise to race against the RPC call
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Global stats fetch timed out')), 8000);
+    });
+
+    const rpcPromise = sbClient.rpc('get_global_stats', {});
+
+    const res: any = await Promise.race([rpcPromise, timeoutPromise]);
+    console.log('[CCAF] Global stats response:', res);
+
+    const { data, error } = res;
+
     if (error) {
       console.error('Error fetching global stats:', error);
       showStatsError();
@@ -141,6 +148,8 @@ export async function fetchGlobalStats() {
       // Leaderboard
       globalLeaderboardData = data.leaderboard || [];
       renderLeaderboard();
+    } else {
+      console.log('[CCAF] data is falsy!', data);
     }
   } catch (e) {
     console.error('Fetch stats exception:', e);

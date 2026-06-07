@@ -26,12 +26,18 @@ export function showStatsError() {
 export async function loadDashboard(email: string, pinHash: string) {
   if (!sbClient) return; // Supabase offline
   try {
-    const { data, error } = await sbClient
-      .rpc('get_user_history', {
+    let data = null;
+    let error = null;
+    try {
+      const res = await sbClient.rpc('get_user_history', {
         p_email: email,
         p_pin_hash: pinHash,
-      })
-      .catch((err: any) => ({ error: err, data: null }));
+      });
+      data = res.data;
+      error = res.error;
+    } catch (err: any) {
+      error = err;
+    }
     if (error || !data || !data.success) {
       showToast('Authentication failed or service unreachable.');
       return;
