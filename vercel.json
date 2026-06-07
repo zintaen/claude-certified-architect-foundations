@@ -2,7 +2,7 @@
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "headers": [
     {
-      "source": "/assets/(.*)\.ts",
+      "source": "/assets/(.*)\\.ts",
       "headers": [
         {
           "key": "Content-Type",
