@@ -423,10 +423,7 @@ p {
   font-size: 0.85rem;
   border-radius: 10px;
 }
-.btn[disabled] {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+
 .btn svg {
   width: 16px;
   height: 16px;
@@ -1002,14 +999,7 @@ code.mark {
   border-color: var(--accent);
   color: var(--bg);
 }
-.swatch.flag {
-  border-color: #e87726;
-  background: var(--bg);
-}
-.swatch.un {
-  background: var(--bg);
-  border-color: var(--line);
-}
+
 .swatch.flag {
   background: #fdf1d3;
   border-color: #ebc966;
@@ -2306,19 +2296,19 @@ body.tab-hidden::after {
 .lb-table tr:hover td {
   background: var(--card);
 }
-.lb-rank {
+#leaderboard-body .lb-rank {
   width: 44px;
-  text-align: center !important;
+  text-align: center;
   font-size: 1.15rem;
 }
 .lb-rank.gold {
   text-shadow: 0 2px 4px rgba(212, 175, 55, 0.4);
 }
-.lb-score {
+#leaderboard-body .lb-score {
   color: var(--ink);
   font-family: 'Red Hat Text', system-ui, sans-serif;
   font-size: 1.05rem;
-  text-align: right !important;
+  text-align: right;
 }
 .lb-date {
   font-size: 0.8rem;
@@ -2326,8 +2316,8 @@ body.tab-hidden::after {
   font-weight: 500;
   white-space: nowrap;
 }
-.lb-status {
-  text-align: center !important;
+#leaderboard-body .lb-status {
+  text-align: center;
 }
 .lb-badge {
   display: inline-block;
@@ -3016,10 +3006,10 @@ a:focus-visible {
 }
 
 .lang-select {
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 4px;
-  color: var(--text);
+  color: var(--ink);
   font-family: inherit;
   font-size: 0.85rem;
   padding: 4px 8px;
@@ -3027,7 +3017,7 @@ a:focus-visible {
   outline: none;
 }
 .lang-select:focus {
-  border-color: var(--brand-500);
+  border-color: var(--accent);
 }
 
 /* Radar Chart Styles */
@@ -3076,4 +3066,26 @@ a:focus-visible {
 
 .radar-label {
   pointer-events: none;
+}
+
+/* Footer title — semantic replacement for <h3> in footer columns */
+.footer-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 0.5em;
+  letter-spacing: -0.01em;
+  line-height: 1.18;
+}
+
+/* Accessibility: respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

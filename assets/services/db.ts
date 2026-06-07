@@ -3,7 +3,7 @@ import { State } from '../core/store';
 const worker = new Worker(new URL('./db.worker.ts', import.meta.url), { type: 'module' });
 
 let msgId = 0;
-const pending = new Map<number, { resolve: (val: any) => void, reject: (err: any) => void }>();
+const pending = new Map<number, { resolve: (val: any) => void; reject: (err: any) => void }>();
 
 worker.onmessage = (e) => {
   const { id, result, error } = e.data;
@@ -15,10 +15,23 @@ worker.onmessage = (e) => {
   }
 };
 
-function sendMsg(type: string, payload: any = {}): Promise<any> {
+function sendMsg(type: string, payload: Record<string, unknown> = {}): Promise<unknown> {
   return new Promise((resolve, reject) => {
     const id = ++msgId;
-    pending.set(id, { resolve, reject });
+    const timer = setTimeout(() => {
+      pending.delete(id);
+      reject(new Error(`Worker timeout: ${type} (id=${id})`));
+    }, 10_000);
+    pending.set(id, {
+      resolve: (val: unknown) => {
+        clearTimeout(timer);
+        resolve(val);
+      },
+      reject: (err: unknown) => {
+        clearTimeout(timer);
+        reject(err);
+      },
+    });
     worker.postMessage({ id, type, ...payload });
   });
 }
@@ -26,13 +39,13 @@ function sendMsg(type: string, payload: any = {}): Promise<any> {
 export const idb = {
   get: (key: string) => sendMsg('get', { key }),
   set: (key: string, val: any) => sendMsg('set', { key, val }),
-  delete: (key: string) => sendMsg('delete', { key })
+  delete: (key: string) => sendMsg('delete', { key }),
 };
 
 export const syncQueue = {
   add: (payload: any) => sendMsg('sync_add', { val: payload }),
   get: () => sendMsg('sync_get'),
-  clear: () => sendMsg('sync_clear')
+  clear: () => sendMsg('sync_clear'),
 };
 
 export async function saveProgress(state: State): Promise<void> {

@@ -56,11 +56,35 @@ const initialState: State = {
 };
 
 export type Action =
-  | { type: 'START_EXAM'; payload: { items: Question[]; untimed: boolean; isFlashcardMode: boolean; sessionId: string; startedAt: number; durationSec: number; endsAt: number; timerHandle: number | null } }
-  | { type: 'END_EXAM'; payload: { timedOut: boolean; timerHandle?: number | null; focusLoss: number; reviewEnabled: boolean; reviewLockReason: string } }
+  | {
+      type: 'START_EXAM';
+      payload: {
+        items: Question[];
+        untimed: boolean;
+        isFlashcardMode: boolean;
+        sessionId: string;
+        startedAt: number;
+        durationSec: number;
+        endsAt: number;
+        timerHandle: number | null;
+      };
+    }
+  | {
+      type: 'END_EXAM';
+      payload: {
+        timedOut: boolean;
+        timerHandle?: number | null;
+        focusLoss: number;
+        reviewEnabled: boolean;
+        reviewLockReason: string;
+      };
+    }
   | { type: 'RESUME_EXAM'; payload: Partial<State> }
   | { type: 'ANSWER_QUESTION'; payload: { idx: number; letter: string } }
-  | { type: 'PROCESS_FLASHCARD_ANSWER'; payload: { idx: number; qId: string; letter: string; isCorrect: boolean } }
+  | {
+      type: 'PROCESS_FLASHCARD_ANSWER';
+      payload: { idx: number; qId: string; letter: string; isCorrect: boolean };
+    }
   | { type: 'SET_LEITNER_DATA'; payload: Record<string, LeitnerData> }
   | { type: 'FLAG_QUESTION'; payload: { idx: number; flagged: boolean } }
   | { type: 'SET_INDEX'; payload: number }
@@ -70,68 +94,75 @@ export type Action =
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'START_EXAM':
-      return { 
-        ...state, 
-        ...action.payload, 
-        finished: false, 
+      return {
+        ...state,
+        ...action.payload,
+        finished: false,
         idx: 0,
         reviewEnabled: false,
         reviewLockReason: '',
         timedOut: false,
-        focusLoss: 0
+        focusLoss: 0,
       };
     case 'END_EXAM':
       if (state.timerHandle) clearInterval(state.timerHandle);
       if (action.payload.timerHandle) clearInterval(action.payload.timerHandle);
-      return { 
-        ...state, 
-        finished: true, 
-        timedOut: action.payload.timedOut, 
+      return {
+        ...state,
+        finished: true,
+        timedOut: action.payload.timedOut,
         timerHandle: null,
         focusLoss: action.payload.focusLoss,
         reviewEnabled: action.payload.reviewEnabled,
-        reviewLockReason: action.payload.reviewLockReason
+        reviewLockReason: action.payload.reviewLockReason,
       };
     case 'RESUME_EXAM':
       return { ...state, ...action.payload };
     case 'ANSWER_QUESTION': {
       const newItems = [...state.items];
-      newItems[action.payload.idx] = { ...newItems[action.payload.idx], chosenLetter: action.payload.letter };
+      newItems[action.payload.idx] = {
+        ...newItems[action.payload.idx],
+        chosenLetter: action.payload.letter,
+      };
       return { ...state, items: newItems };
     }
     case 'PROCESS_FLASHCARD_ANSWER': {
       const { idx, qId, letter, isCorrect } = action.payload;
       const newItems = [...state.items];
-      newItems[idx] = { ...(newItems[idx] || {}), chosenLetter: letter } as any;
-      
+      if (idx < 0 || idx >= newItems.length) return state;
+      newItems[idx] = { ...newItems[idx], chosenLetter: letter };
+
       const currentLeitner = state.leitner[qId] || { box: 1, nextReview: 0 };
-      
+
       let newBox = 1;
       let reviewOffsetDays = 1; // Default box 1 = 1 day
 
       if (isCorrect) {
         newBox = currentLeitner.box + 1;
       }
-      
+
       if (newBox === 2) reviewOffsetDays = 3;
       else if (newBox >= 3) reviewOffsetDays = 7;
 
       const nextReview = Date.now() + reviewOffsetDays * 24 * 60 * 60 * 1000;
 
-      return { 
-        ...state, 
+      return {
+        ...state,
         items: newItems,
         leitner: {
           ...state.leitner,
-          [qId]: { box: newBox, nextReview }
-        }
+          [qId]: { box: newBox, nextReview },
+        },
       };
     }
     case 'SET_LEITNER_DATA':
       return { ...state, leitner: action.payload };
     case 'FLAG_QUESTION': {
       const newItems = [...state.items];
-      newItems[action.payload.idx] = { ...newItems[action.payload.idx], flagged: action.payload.flagged };
+      newItems[action.payload.idx] = {
+        ...newItems[action.payload.idx],
+        flagged: action.payload.flagged,
+      };
       return { ...state, items: newItems };
     }
     case 'SET_INDEX':
@@ -152,21 +183,21 @@ class Store {
   private state: State;
   private listeners: Set<Listener>;
   private channel: BroadcastChannel;
-  private ignoreBroadcast = false;
+  private broadcastDepth = 0;
 
   constructor(initial: State) {
     this.state = { ...initial };
     this.listeners = new Set();
-    
+
     // Cross-tab concurrency setup
     const channelName = new URLSearchParams(window.location.search).get('channel') || 'ccaf-sync';
     this.channel = new BroadcastChannel(channelName);
     this.channel.onmessage = (e) => {
       // Received an action from another tab.
-      // Set ignoreBroadcast so we don't echo it back.
-      this.ignoreBroadcast = true;
+      // Increment depth so we don't echo it back.
+      this.broadcastDepth++;
       this.dispatch(e.data);
-      this.ignoreBroadcast = false;
+      this.broadcastDepth--;
     };
   }
 
@@ -177,7 +208,7 @@ class Store {
   dispatch(action: Action) {
     this.state = reducer(this.state, action);
     this.notify();
-    if (!this.ignoreBroadcast && action.type !== 'CLEAR_TIMER') {
+    if (this.broadcastDepth === 0 && action.type !== 'CLEAR_TIMER') {
       this.channel.postMessage(action);
     }
   }

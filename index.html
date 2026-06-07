@@ -66,8 +66,7 @@
     </script>
     <link rel="preload" href="assets/styles.css" as="style" />
     <link rel="stylesheet" href="assets/styles.css" />
-    <link rel="modulepreload" href="assets/questions.ts" />
-    <link rel="modulepreload" href="assets/app.ts" />
+
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -115,12 +114,12 @@
             <span class="brand-sub">CCAF Practice</span>
           </span>
         </a>
-        <nav class="nav">
+        <nav class="nav" aria-label="Main navigation">
           <a href="#about" data-i18n="nav.about">About</a>
           <a href="#path">Path</a>
           <a href="#reddit">Community</a>
           <a href="#exam" data-i18n="nav.exam">Practice Exam</a>
-          <select id="lang-selector" class="lang-select">
+          <select id="lang-selector" class="lang-select" aria-label="Select language">
             <option value="en">EN</option>
             <option value="es">ES</option>
           </select>
@@ -580,7 +579,7 @@
             <div class="container" style="max-width: 900px; padding: 40px 20px">
               <div class="section-head">
                 <h2>Admin Question Editor</h2>
-                <button class="btn ghost small" onclick="showView('view-start')">
+                <button class="btn ghost small" id="btn-admin-back">
                   ← Back to Start
                 </button>
               </div>
@@ -598,7 +597,7 @@
                 style="display: flex; justify-content: space-between; align-items: center"
               >
                 <h2 style="margin: 0">Flashcard Mode</h2>
-                <button class="btn ghost small" onclick="finishFlashcards()">End Session</button>
+                <button class="btn ghost small" id="btn-fc-end">End Session</button>
               </div>
               <ccaf-progress id="fc-progress" total="0" answered="0"></ccaf-progress>
 
@@ -638,7 +637,7 @@
                 <span>CCAF Practice — Session</span>
                 <span id="session-id" class="chip mono" title="Session ID">—</span>
               </div>
-              <div id="timer" class="timer" role="timer" aria-live="off" aria-atomic="true">
+              <div id="timer" class="timer" role="timer" aria-live="polite" aria-atomic="true">
                 02:00:00
               </div>
             </div>
@@ -675,12 +674,14 @@
                           class="auth-input"
                           placeholder="Nickname (for leaderboard)"
                           maxlength="20"
+                          aria-label="Nickname"
                         />
                         <input
                           type="email"
                           id="auth-email"
                           class="auth-input"
                           placeholder="Email address"
+                          aria-label="Email"
                         />
                         <input
                           type="password"
@@ -689,6 +690,7 @@
                           placeholder="6-digit PIN"
                           maxlength="6"
                           pattern="\d{6}"
+                          aria-label="PIN"
                         />
                       </div>
                     </div>
@@ -1001,7 +1003,7 @@
             </p>
           </div>
           <div class="footer-col" style="text-align: left">
-            <h3 data-i18n="footer.creator">Creator</h3>
+            <p class="footer-title" data-i18n="footer.creator">Creator</p>
             <div class="footer-links">
               <a href="https://www.linkedin.com/in/zintaen/" target="_blank" rel="noopener"
                 >Stephen Cheng (LinkedIn)</a
@@ -1015,7 +1017,7 @@
             </div>
           </div>
           <div class="footer-col" style="text-align: left">
-            <h3 data-i18n="footer.legal">Legal & Disclaimer</h3>
+            <p class="footer-title" data-i18n="footer.legal">Legal & Disclaimer</p>
             <p style="font-size: 0.8rem; line-height: 1.5">
               CCAF, Claude, and the Claude Partner Network are Anthropic products/programs. This
               page is an unofficial, community-made study aid and is

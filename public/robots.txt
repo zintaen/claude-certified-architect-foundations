@@ -1,4 +1,11 @@
 User-agent: *
 Allow: /
+Disallow: /?admin
 
-Sitemap: https://claude-certified-architect-mock-exam-cyberskill.vercel.app/sitemap.xml
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+Sitemap: https://ccaf.cyberskill.dev/sitemap.xml

@@ -1,5 +1,7 @@
 export class CcafProgress extends HTMLElement {
-  static get observedAttributes() { return ['total', 'answered']; }
+  static get observedAttributes() {
+    return ['total', 'answered'];
+  }
 
   private bar: HTMLElement;
   private label: HTMLElement;
@@ -33,7 +35,7 @@ export class CcafProgress extends HTMLElement {
           color: rgba(255,255,255,0.6);
         }
       </style>
-      <div class="progress-wrapper">
+      <div class="progress-wrapper" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0">
         <div class="progress-track" aria-hidden="true">
           <div class="progress-fill" style="width: 0%"></div>
         </div>
@@ -54,6 +56,11 @@ export class CcafProgress extends HTMLElement {
     const pct = total ? Math.round((answered / total) * 100) : 0;
     this.bar.style.width = `${pct}%`;
     this.label.textContent = `${answered} / ${total} answered`;
+    const wrapper = this.shadowRoot!.querySelector('.progress-wrapper');
+    if (wrapper) {
+      wrapper.setAttribute('aria-valuenow', String(answered));
+      wrapper.setAttribute('aria-valuemax', String(total));
+    }
   }
 }
 customElements.define('ccaf-progress', CcafProgress);

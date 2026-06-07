@@ -37,12 +37,12 @@ export class CcafToast extends HTMLElement {
           to { opacity: 0; transform: translateY(20px); }
         }
       </style>
-      <div class="toast-container" id="container"></div>
+      <div class="toast-container" id="container" role="alert" aria-live="assertive"></div>
     `;
     this.container = this.shadowRoot!.getElementById('container') as HTMLElement;
   }
 
-  show(msg: string, type: 'info'|'error'|'success' = 'info', duration = 3000) {
+  show(msg: string, type: 'info' | 'error' | 'success' = 'info', duration = 3000) {
     const el = document.createElement('div');
     el.className = `toast ${type}`;
     el.textContent = msg;
@@ -55,7 +55,7 @@ export class CcafToast extends HTMLElement {
 }
 customElements.define('ccaf-toast', CcafToast);
 
-export function showToast(msg: string, type: 'info'|'error'|'success' = 'info') {
+export function showToast(msg: string, type: 'info' | 'error' | 'success' = 'info') {
   let toastEl = document.querySelector('ccaf-toast') as CcafToast;
   if (!toastEl) {
     toastEl = document.createElement('ccaf-toast') as CcafToast;

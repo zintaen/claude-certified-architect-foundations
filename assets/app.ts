@@ -1,4 +1,3 @@
-
 import { encQuestions } from './questions';
 import { $, esc, richText } from './utils/dom';
 import { shuffle, pickProportional, sessionId, fmtTime, generateRadarSVG } from './utils/helpers';
@@ -28,13 +27,25 @@ declare global {
     finishFlashcards?: () => void;
     saveAdminQuestion?: (id: string, q: any) => void;
     showView?: (id: string) => void;
-    startExam?: (opts: any) => void;
-    loadComments?: (q: string, c: string) => void;
+    startExam?: (opts: ExamOpts) => void;
+    loadComments?: (q: string, c: string) => Promise<void>;
     postComment?: (q: string, c: string) => void;
+    supabase?: { createClient: (url: string, key: string) => any };
   }
 }
 
+interface ExamOpts {
+  count: number;
+  minutes: number;
+  untimed: boolean;
+  shuffleOptions?: boolean;
+  review?: boolean;
+}
 
+interface DomainStat {
+  total: number;
+  correct: number;
+}
 
 /* =======================================================================
    CCAF Mock — Exam Engine
@@ -72,8 +83,12 @@ declare global {
 
   // ---- central state proxy (Read Only) ----
   const state = new Proxy({} as State, {
-    get(_t, prop: keyof State) { return store.getState()[prop]; },
-    set() { throw new Error('State must be mutated via store.dispatch()'); }
+    get(_t, prop: keyof State) {
+      return store.getState()[prop];
+    },
+    set() {
+      throw new Error('State must be mutated via store.dispatch()');
+    },
   });
 
   // Cross-Tab Concurrency Sync Hook
@@ -83,11 +98,6 @@ declare global {
     if (newState.isFlashcardMode && !newState.finished) targetView = 'view-flashcard';
     else if (newState.items.length > 0 && !newState.finished) targetView = 'view-running';
     else if (newState.finished) targetView = 'view-result';
-
-    console.log('[DEBUG_VIEW] newState:', newState, '=> targetView:', targetView);
-    document.body.setAttribute('data-debug-view', targetView);
-    document.body.setAttribute('data-debug-flashcard', String(newState.isFlashcardMode));
-    document.body.setAttribute('data-debug-items', String(newState.items.length));
 
     // If targetView is currently hidden, show it
     const targetEl = document.getElementById(targetView);
@@ -150,25 +160,25 @@ declare global {
           showView(next);
         }
       })
-      .catch(e => {
+      .catch((e) => {
         console.error('[CCAF Error Boundary] View Transition Aborted:', e);
       });
   }
 
-  function buildSession(opts) {
+  function buildSession(opts: ExamOpts) {
     const qs = getQuestions();
     const want = Math.max(1, Math.min(qs.length, opts.count | 0));
     const pool = pickProportional(qs, want);
-    
+
     const items = pool.map((q) => ({
       id: q.id,
       group: q.group,
       text: q.text,
-      options: shuffle(q.options) as any,
+      options: shuffle(q.options),
       chosenLetter: null,
       flagged: false,
     }));
-    
+
     const durationSec = opts.untimed ? 0 : Math.max(60, (opts.minutes | 0) * 60);
     const startedAt = Date.now();
     const endsAt = durationSec ? startedAt + durationSec * 1000 : 0;
@@ -182,8 +192,8 @@ declare global {
         startedAt,
         durationSec,
         endsAt,
-        timerHandle: null
-      }
+        timerHandle: null,
+      },
     });
 
     window.__focusLoss = 0;
@@ -225,7 +235,10 @@ declare global {
     const flagBox = $('#flag-box') as HTMLInputElement;
     flagBox.checked = !!it.flagged;
     flagBox.onchange = (e) => {
-      store.dispatch({ type: 'FLAG_QUESTION', payload: { idx: state.idx, flagged: (e.target as HTMLInputElement).checked } });
+      store.dispatch({
+        type: 'FLAG_QUESTION',
+        payload: { idx: state.idx, flagged: (e.target as HTMLInputElement).checked },
+      });
       renderPalette();
     };
     $('#btn-prev').disabled = state.idx === 0;
@@ -258,7 +271,7 @@ declare global {
   function renderProgress() {
     const total = state.items.length;
     const done = state.items.filter((x) => x.chosenLetter).length;
-        const examProgress = $('#exam-progress');
+    const examProgress = $('#exam-progress');
     if (examProgress) {
       examProgress.setAttribute('total', total.toString());
       examProgress.setAttribute('answered', done.toString());
@@ -302,14 +315,15 @@ declare global {
     el.classList.toggle('warn', left <= 600 && left > 60);
     el.classList.toggle('danger', left <= 60);
     if (left <= 0) {
-      store.dispatch({ 
-        type: 'END_EXAM', 
-        payload: { 
-          timedOut: true, 
+      store.dispatch({
+        type: 'END_EXAM',
+        payload: {
+          timedOut: true,
           focusLoss: state.focusLoss,
           reviewEnabled: false,
-          reviewLockReason: 'The 120-minute timer ran out before you could submit. Retake the exam and finish before time expires to unlock explanations.'
-        } 
+          reviewLockReason:
+            'The 120-minute timer ran out before you could submit. Retake the exam and finish before time expires to unlock explanations.',
+        },
       });
       finishExam(true);
     }
@@ -317,14 +331,23 @@ declare global {
   function startTimer() {
     stopTimer();
     tickTimer();
-    store.dispatch({ type: 'RESUME_EXAM', payload: { timerHandle: window.setInterval(tickTimer, 500) } as Partial<State> });
+    const handle = window.setInterval(tickTimer, 500);
+    store.dispatch({ type: 'RESUME_EXAM', payload: { timerHandle: handle } as Partial<State> });
   }
   function stopTimer() {
     store.dispatch({ type: 'CLEAR_TIMER' });
   }
 
   // ---- start ----
-  function startExam(opts) {
+  function startExam(opts: {
+    count: number;
+    minutes: number;
+    untimed: boolean;
+    shuffleOptions?: boolean;
+    review?: boolean;
+  }) {
+    // Guard: prevent re-entry while an exam is active
+    if (state.items.length > 0 && !state.finished) return;
     window.__isProctorMode = !opts.untimed;
 
     if (window.__isProctorMode) {
@@ -346,7 +369,7 @@ declare global {
     renderPalette();
     renderProgress();
     document.body.classList.add('no-select');
-    
+
     telemetry.onViolation = () => finishExam(true);
     telemetry.start(window.__isProctorMode);
 
@@ -355,11 +378,7 @@ declare global {
 
   // Proctor mode fullscreen change listener
   document.addEventListener('fullscreenchange', () => {
-    if (
-      window.__isProctorMode &&
-      !document.fullscreenElement &&
-      !state.finished
-    ) {
+    if (window.__isProctorMode && !document.fullscreenElement && !state.finished) {
       showToast('Proctor Mode Violation: You exited fullscreen. Your exam is terminated.');
       finishExam(true);
     }
@@ -404,10 +423,10 @@ declare global {
     // Review gate: unlocked only if every question was answered AND the timer
     // didn't expire. Untimed mode still requires full completion.
     const allAnswered = skipped === 0;
-    
+
     let reviewEnabled = true;
     let reviewLockReason = '';
-    
+
     if (!allAnswered) {
       reviewEnabled = false;
       reviewLockReason = `You left ${skipped} question${skipped === 1 ? '' : 's'} unanswered. Finish all 60 questions to unlock explanations.`;
@@ -423,8 +442,8 @@ declare global {
         timedOut: state.timedOut,
         focusLoss: telemetry.getFocusLosses(),
         reviewEnabled,
-        reviewLockReason
-      }
+        reviewLockReason,
+      },
     });
 
     renderResultDOM();
@@ -544,12 +563,6 @@ declare global {
     }
 
     // Domain breakdown
-    const domainNames = {
-      research_pipeline: 'Research Pipeline',
-      code_exploration: 'Code Exploration',
-      customer_support: 'Customer Support',
-      extraction_pipeline: 'Extraction Pipeline',
-    };
     const domainStats = {};
     state.items.forEach((it) => {
       const g = it.group || 'misc';
@@ -569,15 +582,16 @@ declare global {
         code_exploration: 'Code Exploration',
         customer_support: 'Customer Support',
         extraction_pipeline: 'Extraction Pipeline',
-        misc: 'Miscellaneous'
+        misc: 'Miscellaneous',
       };
       const radarHtml = generateRadarSVG(domainStats, domainNames);
-      
-      let html = '<div class="domain-breakdown" style="display:flex; flex-direction:column; align-items:center;">';
+
+      let html =
+        '<div class="domain-breakdown" style="display:flex; flex-direction:column; align-items:center;">';
       html += '<h4>📊 Performance Radar</h4>';
       html += radarHtml;
       html += '</div>';
-      
+
       dbEl.innerHTML = html;
     }
 
@@ -682,7 +696,7 @@ declare global {
     host.innerHTML = '';
     state.items.forEach((it, i) => {
       const chosen = it.chosenLetter;
-      const correctOpt = it.options.find((o) => (o as any).correct);
+      const correctOpt = it.options.find((o) => o.correct);
       const wasCorrect = chosen && correctOpt && chosen === correctOpt.letter;
 
       const card = document.createElement('div');
@@ -779,8 +793,11 @@ declare global {
         if (starting) return;
         starting = true;
         try {
-          if (window.verifyUser) { const v: any = await window.verifyUser(); if (!v) return; }
-          (window as any).startExam(readOpts());
+          if (window.verifyUser) {
+            const v = await window.verifyUser();
+            if (!v) return;
+          }
+          window.startExam?.(readOpts());
         } finally {
           starting = false;
         }
@@ -792,10 +809,13 @@ declare global {
         if (starting) return;
         starting = true;
         try {
-          if (window.verifyUser) { const v: any = await window.verifyUser(); if (!v) return; }
+          if (window.verifyUser) {
+            const v = await window.verifyUser();
+            if (!v) return;
+          }
           const o = readOpts();
           o.untimed = true;
-          (window as any).startExam(o);
+          window.startExam?.(o);
         } finally {
           starting = false;
         }
@@ -805,7 +825,7 @@ declare global {
     if (next)
       next.addEventListener('click', () => {
         if (state.idx < state.items.length - 1) {
-          state.idx++;
+          store.dispatch({ type: 'SET_INDEX', payload: state.idx + 1 });
           renderQuestion();
           renderPalette();
           renderProgress();
@@ -818,21 +838,14 @@ declare global {
     if (prev)
       prev.addEventListener('click', () => {
         if (state.idx > 0) {
-          state.idx--;
+          store.dispatch({ type: 'SET_INDEX', payload: state.idx - 1 });
           renderQuestion();
           renderPalette();
           renderProgress();
         }
       });
 
-    const flag = $('#flag-box');
-    if (flag)
-      flag.addEventListener('change', () => {
-        const it = state.items[state.idx];
-        if (!it) return;
-        it.flagged = flag.checked;
-        renderPalette();
-      });
+    // Flag handler is set in renderQuestion() via flagBox.onchange — no duplicate here.
 
     const submit1 = $('#btn-submit');
     const submit2 = $('#btn-submit-2');
@@ -843,10 +856,7 @@ declare global {
     if (cancelExam)
       cancelExam.addEventListener('click', () => {
         if (window.confirm('Are you sure you want to exit? Your progress will be lost.')) {
-          if (state.timerHandle) {
-            clearInterval(state.timerHandle);
-            state.timerHandle = null;
-          }
+          store.dispatch({ type: 'CLEAR_TIMER' });
 
           document.body.classList.remove('no-select');
           if (window.__isProctorMode && document.fullscreenElement) {
@@ -879,7 +889,19 @@ declare global {
         b &&
         b.addEventListener('click', () => {
           stopTimer();
-          state.finished = false;
+          store.dispatch({
+            type: 'START_EXAM',
+            payload: {
+              items: [],
+              untimed: false,
+              isFlashcardMode: false,
+              sessionId: '',
+              startedAt: 0,
+              durationSec: 0,
+              endsAt: 0,
+              timerHandle: null,
+            },
+          });
           window.__isProctorMode = false;
           window.__focusLoss = 0;
 
@@ -901,7 +923,10 @@ declare global {
         const i = parseInt(k, 10) - 1;
         const op = it.options[i];
         if (op) {
-          it.chosenLetter = op.letter;
+          store.dispatch({
+            type: 'ANSWER_QUESTION',
+            payload: { idx: state.idx, letter: op.letter },
+          });
           renderQuestion();
           renderPalette();
           renderProgress();
@@ -909,21 +934,24 @@ declare global {
         e.preventDefault();
       } else if (k === 'ArrowLeft') {
         if (state.idx > 0) {
-          state.idx--;
+          store.dispatch({ type: 'SET_INDEX', payload: state.idx - 1 });
           renderQuestion();
           renderPalette();
           renderProgress();
         }
       } else if (k === 'ArrowRight') {
         if (state.idx < state.items.length - 1) {
-          state.idx++;
+          store.dispatch({ type: 'SET_INDEX', payload: state.idx + 1 });
           renderQuestion();
           renderPalette();
           renderProgress();
         }
       } else if (k === 'f' || k === 'F') {
-        it.flagged = !it.flagged;
-        $('#flag-box').checked = it.flagged;
+        store.dispatch({
+          type: 'FLAG_QUESTION',
+          payload: { idx: state.idx, flagged: !it.flagged },
+        });
+        $('#flag-box').checked = !it.flagged;
         renderPalette();
       }
     });
@@ -937,6 +965,16 @@ declare global {
         return '';
       }
     });
+    // Admin back button (moved from inline onclick)
+    const adminBack = $('#btn-admin-back');
+    if (adminBack) adminBack.addEventListener('click', () => showView('view-start'));
+
+    // Flashcard end session button (moved from inline onclick)
+    const fcEnd = $('#btn-fc-end');
+    if (fcEnd)
+      fcEnd.addEventListener('click', () => {
+        if (window.finishFlashcards) window.finishFlashcards();
+      });
   }
 
   window.wireExam = wire;
@@ -949,8 +987,8 @@ declare global {
   const SUPABASE_ANON_KEY =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkdG1jZnFjZ3ZlY3JpdnZ0c3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NjYwNjAsImV4cCI6MjA5NTM0MjA2MH0.SBB3j0xIjJt4hp9PzD0tX4VOd2vY5gIu6BddspVVFn4';
   let sbClient = null;
-  if ((window as any).supabase) {
-    sbClient = (window as any).supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  if (window.supabase) {
+    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     window.sbClient = sbClient;
   } else {
     console.warn('Supabase SDK not loaded — online features disabled.');
@@ -1065,14 +1103,14 @@ declare global {
 
       inputEl.value = '';
       // Reload comments
-      document.getElementById(containerId).classList.add('hidden');
-      window.loadComments(questionId, containerId);
+      document.getElementById(containerId)?.classList.add('hidden');
+      window.loadComments(questionId, containerId).catch(console.error);
     } catch (e) {
-      showToast('Failed to post comment: ' + e.message);
+      showToast('Failed to post comment: ' + (e instanceof Error ? e.message : String(e)));
     }
   };
 
-  async function hashPIN(pin) {
+  async function hashPIN(pin: string): Promise<string | null> {
     if (!pin) return null;
     if (!/^\d{6}$/.test(pin)) return null;
     const msgBuffer = new TextEncoder().encode(pin);
@@ -1180,13 +1218,13 @@ declare global {
         p_time_taken: timeTaken,
         p_nickname: p_nickname,
       };
-      
+
       if (!navigator.onLine) {
         console.warn('Offline. Queuing submission for later.');
         await syncQueue.add(payload);
         return;
       }
-      
+
       const { data, error } = await sbClient.rpc('submit_exam_result', payload);
       if (error) {
         console.error('Error submitting result:', error);
@@ -1221,7 +1259,7 @@ declare global {
   }
 
   window.addEventListener('online', flushSyncQueue);
-  flushSyncQueue();
+  flushSyncQueue().catch(console.error);
 
   // ---- Fetch global stats + leaderboard ----
   async function fetchGlobalStats() {
@@ -1251,7 +1289,7 @@ declare global {
         if (elPass) elPass.textContent = (data.pass_rate || 0) + '%';
 
         const hardestEl = document.getElementById('stat-hardest');
-        if (data.hardest_questions && data.hardest_questions.length > 0) {
+        if (data.hardest_questions && data.hardest_questions.length > 0 && hardestEl) {
           hardestEl.innerHTML = '';
           data.hardest_questions.forEach((q) => {
             const div = document.createElement('div');
@@ -1264,7 +1302,7 @@ declare global {
             div.appendChild(span2);
             hardestEl.appendChild(div);
           });
-        } else {
+        } else if (hardestEl) {
           hardestEl.textContent = 'Not enough data';
         }
 
@@ -1395,11 +1433,13 @@ declare global {
             code_exploration: 'Code Exploration',
             customer_support: 'Customer Support',
             extraction_pipeline: 'Extraction Pipeline',
-            misc: 'Miscellaneous'
+            misc: 'Miscellaneous',
           };
           const radarHtml = generateRadarSVG(domainStats, domainNames);
           html +=
-            '<div class="domain-breakdown" style="margin: 15px 0 25px 0; display:flex; flex-direction:column; align-items:center;"><h5>📊 Your Last Attempt</h5>' + radarHtml + '</div>';
+            '<div class="domain-breakdown" style="margin: 15px 0 25px 0; display:flex; flex-direction:column; align-items:center;"><h5>📊 Your Last Attempt</h5>' +
+            radarHtml +
+            '</div>';
         } catch (e) {}
       }
 
@@ -1461,17 +1501,20 @@ declare global {
     // Migration: if old plaintext pin exists, hash it and migrate
     const legacyPin = localStorage.getItem('ccaf-pin');
     if (savedEmail && legacyPin && !savedPinHash) {
-      hashPIN(legacyPin).then((h) => {
-        localStorage.setItem('ccaf-pin-hash', h);
-        localStorage.removeItem('ccaf-pin');
-        loadDashboard(savedEmail, h);
-      });
+      hashPIN(legacyPin)
+        .then((h) => {
+          if (!h) return;
+          localStorage.setItem('ccaf-pin-hash', h);
+          localStorage.removeItem('ccaf-pin');
+          loadDashboard(savedEmail, h).catch(console.error);
+        })
+        .catch((e) => console.error('PIN migration failed', e));
       if (emailEl) emailEl.value = savedEmail;
       if (pinEl) pinEl.value = legacyPin;
     } else if (savedEmail && savedPinHash && emailEl) {
       emailEl.value = savedEmail;
       // Don't populate pin field with hash — leave it blank (user can re-enter if needed)
-      loadDashboard(savedEmail, savedPinHash);
+      loadDashboard(savedEmail, savedPinHash).catch(console.error);
     }
 
     if (pinEl) {
@@ -1483,7 +1526,7 @@ declare global {
           localStorage.setItem('ccaf-email', email);
           localStorage.setItem('ccaf-pin-hash', pinHash);
           localStorage.removeItem('ccaf-pin'); // clean up any legacy
-          loadDashboard(email, pinHash);
+          loadDashboard(email, pinHash).catch(console.error);
         }
       });
     }
@@ -1511,7 +1554,8 @@ declare global {
         let lowestPct = 100;
 
         Object.entries(domainStats).forEach(([key, val]) => {
-          const pct = (val as any).total ? Math.round((100 * (val as any).correct) / (val as any).total) : 0;
+          const v = val as DomainStat;
+          const pct = v.total ? Math.round((100 * v.correct) / v.total) : 0;
           if (pct < lowestPct) {
             lowestPct = pct;
             weakestGroup = key;
@@ -1537,16 +1581,21 @@ declare global {
         };
 
         const execute = () => {
-          (window as any).startExam(o);
+          window.startExam?.(o);
           // Restore immediately after starting so subsequent logic uses original pool
           window.setQuestions(originalQs);
         };
 
         if (window.verifyUser) {
-          window.verifyUser().then((valid) => {
-            if (valid) execute();
-            else window.setQuestions(originalQs);
-          });
+          window
+            .verifyUser()
+            .then((valid) => {
+              if (valid) execute();
+              else window.setQuestions(originalQs);
+            })
+            .catch(() => {
+              window.setQuestions(originalQs);
+            });
         } else {
           execute();
         }
@@ -1570,25 +1619,38 @@ declare global {
     function updateDueCount() {
       const leitner = store.getState().leitner;
       const now = Date.now();
-      const dueCount = qs.filter(q => {
+      const dueCount = qs.filter((q) => {
         const data = leitner[q.id];
         return !data || data.nextReview <= now;
       }).length;
-      
+
       const badge = document.getElementById('fc-due-count');
       if (badge) badge.textContent = dueCount > 0 ? `(${dueCount} Due)` : '(Caught Up!)';
       return dueCount;
     }
-    
+
     // Initial call
     updateDueCount();
 
     window.finishFlashcards = function () {
       localStorage.removeItem('ccaf-fc-pool');
       localStorage.removeItem('ccaf-fc-index');
-      const viewCard = document.getElementById('view-flashcard');
-      if (viewCard) viewCard.classList.add('hidden');
-      document.getElementById('view-start').classList.remove('hidden');
+      // Reset store so subscribe() no longer thinks we're in flashcard mode
+      store.dispatch({
+        type: 'START_EXAM',
+        payload: {
+          items: [],
+          untimed: false,
+          isFlashcardMode: false,
+          sessionId: '',
+          startedAt: 0,
+          durationSec: 0,
+          endsAt: 0,
+          timerHandle: null,
+        },
+      });
+      document.getElementById('view-flashcard')?.classList.add('hidden');
+      document.getElementById('view-start')?.classList.remove('hidden');
       updateDueCount();
     };
 
@@ -1596,7 +1658,7 @@ declare global {
       btnFlashcard.addEventListener('click', () => {
         const savedPool = localStorage.getItem('ccaf-fc-pool');
         const savedIndex = localStorage.getItem('ccaf-fc-index');
-        
+
         if (savedPool) {
           try {
             const ids = JSON.parse(savedPool);
@@ -1610,15 +1672,17 @@ declare global {
             fcPool = [];
           }
         }
-        
+
         if (fcPool.length === 0) {
           // Generate new pool of Due cards
           const leitner = store.getState().leitner;
           const now = Date.now();
-          fcPool = qs.filter(q => {
-            const data = leitner[q.id];
-            return !data || data.nextReview <= now;
-          }).sort(() => Math.random() - 0.5);
+          fcPool = qs
+            .filter((q) => {
+              const data = leitner[q.id];
+              return !data || data.nextReview <= now;
+            })
+            .sort(() => Math.random() - 0.5);
           fcIndex = 0;
         }
 
@@ -1629,8 +1693,23 @@ declare global {
         localStorage.setItem('ccaf-fc-pool', JSON.stringify(fcPool.map((q) => q.id)));
         localStorage.setItem('ccaf-fc-index', String(fcIndex));
 
-        document.getElementById('view-start').classList.add('hidden');
-        document.getElementById('view-flashcard').classList.remove('hidden');
+        // Set store to flashcard mode so subscribe() callback knows we're in flashcard mode
+        store.dispatch({
+          type: 'START_EXAM',
+          payload: {
+            items: fcPool.map((q) => ({ ...q, chosenLetter: '', flagged: false })),
+            untimed: true,
+            isFlashcardMode: true,
+            sessionId: `fc-${Date.now()}`,
+            startedAt: Date.now(),
+            durationSec: 0,
+            endsAt: 0,
+            timerHandle: null,
+          },
+        });
+
+        document.getElementById('view-start')?.classList.add('hidden');
+        document.getElementById('view-flashcard')?.classList.remove('hidden');
         renderFlashcard();
       });
     }
@@ -1659,11 +1738,11 @@ declare global {
         `;
       });
       html += '</div>';
-      card.innerHTML = html;
+      if (card) card.innerHTML = html;
 
       const btnNext = document.getElementById('fc-btn-next');
       if (btnNext) btnNext.classList.add('hidden');
-      document.getElementById('fc-actions').classList.remove('hidden');
+      document.getElementById('fc-actions')?.classList.remove('hidden');
 
       // Bind click listeners
       let answered = false;
@@ -1673,14 +1752,19 @@ declare global {
           optDiv.addEventListener('click', () => {
             if (answered) return;
             answered = true;
-            
+
             // Dispatch Leitner Box update
             const letter = String.fromCharCode(65 + i);
             store.dispatch({
               type: 'PROCESS_FLASHCARD_ANSWER',
-              payload: { idx: window.QUESTIONS.findIndex(x => x.id === q.id), qId: q.id, letter, isCorrect: op.correct }
+              payload: {
+                idx: window.QUESTIONS.findIndex((x) => x.id === q.id),
+                qId: q.id,
+                letter,
+                isCorrect: op.correct,
+              },
             });
-            
+
             // Persist to local storage
             localStorage.setItem('ccaf-leitner', JSON.stringify(store.getState().leitner));
 
@@ -1697,7 +1781,7 @@ declare global {
               }
               whyDiv.classList.remove('hidden');
             });
-            
+
             // Show Next Card button
             if (btnNext) {
               btnNext.classList.remove('hidden');
@@ -1719,16 +1803,20 @@ declare global {
 
     // ---- 3. Admin Editor ----
     if (new URLSearchParams(window.location.search).get('admin')) {
-      document.getElementById('view-start').classList.add('hidden');
-      document.getElementById('view-admin').classList.remove('hidden');
+      document.getElementById('view-start')?.classList.add('hidden');
+      document.getElementById('view-admin')?.classList.remove('hidden');
       import('./admin/admin').then((m) => m.initAdmin(qs)).catch(console.error);
     }
   }
 
   // Init everything on DOM ready
   document.addEventListener('DOMContentLoaded', async () => {
-    await window.loadQuestions();
-    
+    try {
+      await window.loadQuestions();
+    } catch (e) {
+      console.error('[CCAF] loadQuestions failed', e);
+    }
+
     // Initialise i18n
     initI18n();
     const langSelector = document.getElementById('lang-selector') as HTMLSelectElement;
@@ -1739,7 +1827,7 @@ declare global {
       });
     }
     if (window.wireExam) window.wireExam();
-    fetchGlobalStats();
+    fetchGlobalStats().catch(console.error);
     initDarkMode();
 
     initAuthListeners();

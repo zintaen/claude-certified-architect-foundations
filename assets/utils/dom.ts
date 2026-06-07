@@ -1,13 +1,13 @@
-export const $ = (sel: string, root: ParentNode = document): any => 
+export const $ = (sel: string, root: ParentNode = document): HTMLElement | null =>
   root.querySelector(sel);
 
-export const $$ = (sel: string, root: ParentNode = document): any[] => 
+export const $$ = (sel: string, root: ParentNode = document): HTMLElement[] =>
   Array.from(root.querySelectorAll(sel));
 
 export const esc = (s: string | null | undefined): string =>
   String(s || '').replace(
     /[&<>"']/g,
-    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string)
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string
   );
 
 export function richText(s: string | null | undefined): string {

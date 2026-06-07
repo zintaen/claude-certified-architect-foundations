@@ -1,4 +1,4 @@
 {
-  "*.js": "eslint --cache --fix",
-  "*.{js,css,md,json}": "prettier --write"
+  "*.{js,ts}": "eslint --cache --fix",
+  "*.{js,ts,css,md,json}": "prettier --write"
 }
