@@ -174,7 +174,7 @@ interface DomainStat {
       id: q.id,
       group: q.group,
       text: q.text,
-      options: shuffle(q.options),
+      options: shuffle(q.options) as Option[],
       chosenLetter: null,
       flagged: false,
     }));
@@ -241,7 +241,7 @@ interface DomainStat {
       });
       renderPalette();
     };
-    $('#btn-prev').disabled = state.idx === 0;
+    ($('#btn-prev') as HTMLButtonElement).disabled = state.idx === 0;
     $('#btn-next').textContent = state.idx === state.items.length - 1 ? 'Last →' : 'Next →';
   }
 
@@ -416,9 +416,9 @@ interface DomainStat {
       else incorrect++;
     });
     const score1000 = Math.round((correct / total) * 1000);
-    const passed = score1000 >= 700;
-    const pct = Math.round((correct / total) * 100);
-    const usedSec = Math.max(0, Math.floor((Date.now() - state.startedAt) / 1000));
+    const _passed = score1000 >= 700;
+    const _pct = Math.round((correct / total) * 100);
+    const _usedSec = Math.max(0, Math.floor((Date.now() - state.startedAt) / 1000));
 
     // Review gate: unlocked only if every question was answered AND the timer
     // didn't expire. Untimed mode still requires full completion.
@@ -498,7 +498,7 @@ interface DomainStat {
       function step(t) {
         const k = Math.min(1, (t - started) / dur);
         const eased = 1 - Math.pow(1 - k, 3);
-        valEl.textContent = Math.round(target * eased);
+        valEl.textContent = String(Math.round(target * eased));
         if (k < 1) requestAnimationFrame(step);
       }
       requestAnimationFrame(step);
@@ -506,9 +506,9 @@ interface DomainStat {
     const pctEl = $('#score-pct');
     if (pctEl) pctEl.textContent = `${pct}% correct`;
 
-    $('#r-correct').textContent = correct;
-    $('#r-incorrect').textContent = incorrect;
-    $('#r-skipped').textContent = skipped;
+    $('#r-correct').textContent = String(correct);
+    $('#r-incorrect').textContent = String(incorrect);
+    $('#r-skipped').textContent = String(skipped);
     $('#r-time').textContent = fmtTime(usedSec);
 
     const tag = $('#pass-tag');
@@ -609,14 +609,14 @@ interface DomainStat {
         gateTitle.textContent = 'Explanations unlocked';
         gateMsg.textContent =
           'Every option — correct and incorrect — has a full explanation in review mode.';
-        reviewBtn.disabled = false;
+        (reviewBtn as HTMLButtonElement).disabled = false;
       } else {
         gate.classList.add('locked');
         gate.classList.remove('unlocked');
         gateIcon.textContent = '🔒';
         gateTitle.textContent = 'Review is locked';
         gateMsg.textContent = state.reviewLockReason;
-        reviewBtn.disabled = true;
+        (reviewBtn as HTMLButtonElement).disabled = true;
       }
     }
 
@@ -772,8 +772,8 @@ interface DomainStat {
   // ---- wire up ----
   function readOpts() {
     return {
-      count: parseInt($('#opt-count').value, 10) || 60,
-      minutes: parseInt($('#opt-minutes').value, 10) || 120,
+      count: parseInt(($('#opt-count') as HTMLInputElement).value, 10) || 60,
+      minutes: parseInt(($('#opt-minutes') as HTMLInputElement).value, 10) || 120,
       // Shuffle options and review explanations are always on now.
       shuffleOptions: true,
       review: true,
@@ -951,7 +951,7 @@ interface DomainStat {
           type: 'FLAG_QUESTION',
           payload: { idx: state.idx, flagged: !it.flagged },
         });
-        $('#flag-box').checked = !it.flagged;
+        ($('#flag-box') as HTMLInputElement).checked = !it.flagged;
         renderPalette();
       }
     });
@@ -1242,10 +1242,10 @@ interface DomainStat {
 
   async function flushSyncQueue() {
     if (!navigator.onLine || !sbClient) return;
-    const q = await syncQueue.get();
+    const q = (await syncQueue.get()) as Array<Record<string, unknown>>;
     if (q.length === 0) return;
     console.log(`Flushing ${q.length} offline submissions...`);
-    const remaining = [];
+    const remaining: Array<Record<string, unknown>> = [];
     for (const payload of q) {
       const { error } = await sbClient.rpc('submit_exam_result', payload);
       if (error) remaining.push(payload);
