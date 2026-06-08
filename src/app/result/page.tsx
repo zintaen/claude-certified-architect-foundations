@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useExamStore } from '@/store/examStore';
 import { CheckCircle2, XCircle, ArrowLeft, Share2, Award, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { questions } from '@/data/questions';
+import DOMPurify from 'isomorphic-dompurify';
 
 export default function ResultPage() {
   const store = useExamStore();
@@ -152,7 +154,7 @@ export default function ResultPage() {
                     </div>
                   </div>
 
-                  <div className="text-lg" dangerouslySetInnerHTML={{ __html: it.text }} />
+                  <div className="text-lg" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(it.text) }} />
 
                   <div className="flex flex-col gap-3 mt-4">
                     {it.options.map((opt) => {
@@ -183,7 +185,7 @@ export default function ResultPage() {
                             >
                               {opt.letter}
                             </div>
-                            <div dangerouslySetInnerHTML={{ __html: opt.text }} />
+                            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opt.text) }} />
                           </div>
 
                           {store.reviewEnabled && opt.explain && (

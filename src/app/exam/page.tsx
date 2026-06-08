@@ -7,6 +7,7 @@ import { useExamStore } from '@/store/examStore';
 import { useExamEngine } from '@/hooks/useExamEngine';
 import { questions } from '@/data/questions';
 import { Clock, Flag, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import DOMPurify from 'isomorphic-dompurify';
 
 export default function ExamPage() {
   const router = useRouter();
@@ -126,7 +127,7 @@ export default function ExamPage() {
             >
               <div
                 className="text-lg md:text-xl leading-relaxed whitespace-pre-wrap font-medium"
-                dangerouslySetInnerHTML={{ __html: currentQ.text }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(currentQ.text) }}
               />
 
               <div className="flex flex-col gap-3">
@@ -162,7 +163,7 @@ export default function ExamPage() {
                       </div>
                       <div
                         className="pt-1 text-base leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: opt.text }}
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opt.text) }}
                       />
                       {isSelected && (
                         <CheckCircle2 className="absolute top-4 right-4 w-5 h-5 text-primary opacity-50" />
