@@ -1,6 +1,6 @@
 ---
 name: otel-onboarding-style
-description: "General OpenTelemetry onboarding style for Superlog managed agents: native APIs, signal quality, env vars, LLM metrics, and smoke checks."
+description: 'General OpenTelemetry onboarding style for Superlog managed agents: native APIs, signal quality, env vars, LLM metrics, and smoke checks.'
 ---
 
 # OTel Onboarding Style
@@ -18,18 +18,22 @@ instrumentation can observe directly.
 Do:
 
 ```ts
-const tracer = trace.getTracer("mugline.api");
-const meter = metrics.getMeter("mugline.api");
-const ordersSubmitted = meter.createCounter("orders.submitted");
+const tracer = trace.getTracer('mugline.api');
+const meter = metrics.getMeter('mugline.api');
+const ordersSubmitted = meter.createCounter('orders.submitted');
 
-await withSpan("order.submit", async (span) => {
-  span.setAttributes({
-    "tenant.id": tenantId,
-    "order.id": orderId,
-    outcome: "success",
-  });
-  ordersSubmitted.add(1, { "tenant.id": tenantId, outcome: "success" });
-}, { tracer });
+await withSpan(
+  'order.submit',
+  async (span) => {
+    span.setAttributes({
+      'tenant.id': tenantId,
+      'order.id': orderId,
+      outcome: 'success',
+    });
+    ordersSubmitted.add(1, { 'tenant.id': tenantId, outcome: 'success' });
+  },
+  { tracer }
+);
 ```
 
 Do not:
@@ -83,9 +87,10 @@ header name lives in one place:
 
 ```ts
 function superlogHeaders(token: string): Record<string, string> {
-  return { "x-api-key": token };
+  return { 'x-api-key': token };
 }
 ```
+
 ```python
 def superlog_headers(token: str) -> dict[str, str]:
     return {"x-api-key": token}
@@ -225,12 +230,12 @@ provider/model/token data.
 
 ```ts
 llmInputTokens.add(inputTokens, {
-  "tenant.id": tenantId,
-  "gen_ai.provider.name": "anthropic",
-  "gen_ai.request.model": model,
-  "app.gen_ai.use_case": "voice.initial_greeting",
-  "app.gen_ai.call_site": "_callMugCopyLlm",
-  outcome: "success",
+  'tenant.id': tenantId,
+  'gen_ai.provider.name': 'anthropic',
+  'gen_ai.request.model': model,
+  'app.gen_ai.use_case': 'voice.initial_greeting',
+  'app.gen_ai.call_site': '_callMugCopyLlm',
+  outcome: 'success',
 });
 ```
 

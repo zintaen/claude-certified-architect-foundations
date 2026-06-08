@@ -1,6 +1,6 @@
 ---
 name: otel-livekit-style
-description: "LiveKit Agents OpenTelemetry style: entrypoint/session lifecycle spans, shutdown callbacks, session metrics, and LLM turn token counters."
+description: 'LiveKit Agents OpenTelemetry style: entrypoint/session lifecycle spans, shutdown callbacks, session metrics, and LLM turn token counters.'
 ---
 
 # OTel LiveKit Style

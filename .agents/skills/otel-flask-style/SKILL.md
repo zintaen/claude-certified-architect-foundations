@@ -1,6 +1,6 @@
 ---
 name: otel-flask-style
-description: "Flask OpenTelemetry style: native FlaskInstrumentor, centralized observability init, Python decorators, OTLP logs, and LLM cost metrics."
+description: 'Flask OpenTelemetry style: native FlaskInstrumentor, centralized observability init, Python decorators, OTLP logs, and LLM cost metrics.'
 ---
 
 # OTel Flask Style

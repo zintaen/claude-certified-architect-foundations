@@ -1,21 +1,20 @@
-"use client";
+'use client';
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { PlayCircle, ShieldCheck, Zap, BarChart, X } from "lucide-react";
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { PlayCircle, ShieldCheck, Zap, BarChart, X } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
   const [showSetup, setShowSetup] = useState(false);
-  const [email, setEmail] = useState("");
-  const [nickname, setNickname] = useState("");
-  const [pin, setPin] = useState("");
+  const [email, setEmail] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [pin, setPin] = useState('');
 
   useEffect(() => {
-     
-    setEmail(localStorage.getItem('ccaf-email') || "");
-    setNickname(localStorage.getItem('ccaf-nickname') || "");
+    setEmail(localStorage.getItem('ccaf-email') || '');
+    setNickname(localStorage.getItem('ccaf-nickname') || '');
   }, []);
 
   const handleStart = () => {
@@ -34,9 +33,8 @@ export default function Home() {
       </div>
 
       <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-12 md:py-24 grid md:grid-cols-2 gap-12 items-center">
-        
         {/* Left Side: Hero Copy */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -49,19 +47,20 @@ export default function Home() {
             </span>
             V2.0: Next.js Rewrite Live
           </div>
-          
+
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
             Master the <br />
             <span className="text-gradient">Claude Architect</span> <br />
             Certification.
           </h1>
-          
+
           <p className="text-lg text-foreground/70 max-w-md">
-            Simulate the exact conditions of the official Anthropic exam. Test your knowledge in prompt engineering, security, model orchestration, and system design.
+            Simulate the exact conditions of the official Anthropic exam. Test your knowledge in
+            prompt engineering, security, model orchestration, and system design.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 mt-4">
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setShowSetup(true)}
@@ -70,7 +69,7 @@ export default function Home() {
               <PlayCircle className="w-5 h-5" />
               Start Mock Exam
             </motion.button>
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => router.push('/leaderboard')}
@@ -82,7 +81,7 @@ export default function Home() {
         </motion.div>
 
         {/* Right Side: Feature Cards */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -96,7 +95,9 @@ export default function Home() {
               <Zap className="w-5 h-5" />
             </div>
             <h3 className="font-semibold">Timed Simulation</h3>
-            <p className="text-sm text-foreground/60">Practice under the real 120-minute time constraint to build your pacing strategy.</p>
+            <p className="text-sm text-foreground/60">
+              Practice under the real 120-minute time constraint to build your pacing strategy.
+            </p>
           </div>
 
           <div className="glass-panel p-6 rounded-xl flex flex-col gap-3 glass-panel-hover transition-all translate-y-0 sm:translate-y-6">
@@ -104,7 +105,10 @@ export default function Home() {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <h3 className="font-semibold">Anti-Cheat Mode</h3>
-            <p className="text-sm text-foreground/60">Experience strict focus-tracking and fullscreen enforcement just like the real proctoring system.</p>
+            <p className="text-sm text-foreground/60">
+              Experience strict focus-tracking and fullscreen enforcement just like the real
+              proctoring system.
+            </p>
           </div>
 
           <div className="glass-panel p-6 rounded-xl flex flex-col gap-3 glass-panel-hover transition-all">
@@ -112,17 +116,20 @@ export default function Home() {
               <BarChart className="w-5 h-5" />
             </div>
             <h3 className="font-semibold">Domain Breakdown</h3>
-            <p className="text-sm text-foreground/60">Identify your weak points with a comprehensive radar chart analysis post-exam.</p>
+            <p className="text-sm text-foreground/60">
+              Identify your weak points with a comprehensive radar chart analysis post-exam.
+            </p>
           </div>
-          
+
           <div className="glass-panel p-6 rounded-xl flex flex-col gap-3 glass-panel-hover transition-all translate-y-0 sm:translate-y-6">
             <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
               <div className="font-bold">60</div>
             </div>
             <h3 className="font-semibold">Curated Scenarios</h3>
-            <p className="text-sm text-foreground/60">Tackle complex, multi-part scenario questions matching the official blueprint.</p>
+            <p className="text-sm text-foreground/60">
+              Tackle complex, multi-part scenario questions matching the official blueprint.
+            </p>
           </div>
-
         </motion.div>
       </main>
 
@@ -136,23 +143,27 @@ export default function Home() {
               exit={{ opacity: 0, scale: 0.95 }}
               className="glass-panel w-full max-w-md p-6 flex flex-col gap-6 rounded-2xl relative"
             >
-              <button 
+              <button
                 onClick={() => setShowSetup(false)}
                 className="absolute top-4 right-4 p-1 rounded-md hover:bg-white/10 transition-colors"
               >
                 <X className="w-5 h-5 opacity-60" />
               </button>
-              
+
               <div>
                 <h2 className="text-xl font-bold mb-1">Exam Setup</h2>
-                <p className="text-sm text-foreground/60">Enter your details to save your score and receive a copy via email.</p>
+                <p className="text-sm text-foreground/60">
+                  Enter your details to save your score and receive a copy via email.
+                </p>
               </div>
 
               <div className="flex flex-col gap-4">
                 <label className="flex flex-col gap-1.5">
-                  <span className="text-sm font-medium opacity-80">Email (Optional, to get results)</span>
-                  <input 
-                    type="email" 
+                  <span className="text-sm font-medium opacity-80">
+                    Email (Optional, to get results)
+                  </span>
+                  <input
+                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="bg-input border border-white/10 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
@@ -161,8 +172,8 @@ export default function Home() {
                 </label>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-sm font-medium opacity-80">Nickname (For leaderboard)</span>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={nickname}
                     onChange={(e) => setNickname(e.target.value)}
                     className="bg-input border border-white/10 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
@@ -170,9 +181,11 @@ export default function Home() {
                   />
                 </label>
                 <label className="flex flex-col gap-1.5">
-                  <span className="text-sm font-medium opacity-80">Secret PIN (To protect your history)</span>
-                  <input 
-                    type="password" 
+                  <span className="text-sm font-medium opacity-80">
+                    Secret PIN (To protect your history)
+                  </span>
+                  <input
+                    type="password"
                     value={pin}
                     onChange={(e) => setPin(e.target.value)}
                     className="bg-input border border-white/10 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-primary/50"

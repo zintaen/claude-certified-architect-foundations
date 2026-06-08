@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { useExamStore } from "@/store/examStore";
-import { useExamEngine } from "@/hooks/useExamEngine";
-import { questions } from "@/data/questions";
-import { Clock, Flag, ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useExamStore } from '@/store/examStore';
+import { useExamEngine } from '@/hooks/useExamEngine';
+import { questions } from '@/data/questions';
+import { Clock, Flag, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 
 export default function ExamPage() {
   const router = useRouter();
@@ -15,7 +15,6 @@ export default function ExamPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-     
     setMounted(true);
     if (store.items.length === 0) {
       // automatically start an exam with 60 questions if none exists
@@ -24,7 +23,7 @@ export default function ExamPage() {
   }, [engine, store.items.length]);
 
   // Timer logic
-  const [timeLeft, setTimeLeft] = useState("");
+  const [timeLeft, setTimeLeft] = useState('');
   const [isDanger, setIsDanger] = useState(false);
 
   useEffect(() => {
@@ -33,13 +32,13 @@ export default function ExamPage() {
       const left = Math.max(0, Math.floor((store.endsAt - Date.now()) / 1000));
       const m = Math.floor(left / 60);
       const s = left % 60;
-      setTimeLeft(`${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`);
+      setTimeLeft(`${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
       setIsDanger(left <= 300); // red if < 5 mins
-      
+
       if (left <= 0) {
         clearInterval(interval);
         engine.finishExam(true);
-        router.push("/result");
+        router.push('/result');
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -51,7 +50,7 @@ export default function ExamPage() {
   const isLast = store.idx === store.items.length - 1;
   const isFirst = store.idx === 0;
 
-  const totalAnswered = store.items.filter(i => i.chosenLetter).length;
+  const totalAnswered = store.items.filter((i) => i.chosenLetter).length;
 
   return (
     <div className="flex-1 flex flex-col md:flex-row h-[calc(100vh-73px)]">
@@ -59,7 +58,9 @@ export default function ExamPage() {
       <aside className="w-full md:w-64 glass-panel border-y-0 border-l-0 overflow-y-auto p-4 flex flex-col gap-4 order-2 md:order-1 h-48 md:h-full shrink-0">
         <div className="flex items-center justify-between pb-4 border-b border-white/5">
           <div className="text-sm font-semibold">Questions</div>
-          <div className="text-xs text-foreground/60">{totalAnswered}/{store.items.length}</div>
+          <div className="text-xs text-foreground/60">
+            {totalAnswered}/{store.items.length}
+          </div>
         </div>
         <div className="grid grid-cols-5 md:grid-cols-4 gap-2">
           {store.items.map((it, i) => {
@@ -81,7 +82,7 @@ export default function ExamPage() {
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-background" />
                 )}
               </button>
-            )
+            );
           })}
         </div>
       </aside>
@@ -90,12 +91,16 @@ export default function ExamPage() {
       <main className="flex-1 flex flex-col order-1 md:order-2 overflow-y-auto relative">
         {/* Topbar: Timer & Controls */}
         <div className="sticky top-0 z-10 glass-panel border-x-0 border-t-0 p-4 flex items-center justify-between">
-          <div className="font-mono text-sm opacity-60">Question {store.idx + 1} of {store.items.length}</div>
+          <div className="font-mono text-sm opacity-60">
+            Question {store.idx + 1} of {store.items.length}
+          </div>
           <div className="flex items-center gap-4">
             {!store.untimed && (
-              <div className={`flex items-center gap-2 font-mono text-lg font-bold px-3 py-1 rounded-md border ${isDanger ? 'bg-red-500/10 text-red-500 border-red-500/30' : 'bg-primary/10 text-primary border-primary/20'}`}>
+              <div
+                className={`flex items-center gap-2 font-mono text-lg font-bold px-3 py-1 rounded-md border ${isDanger ? 'bg-red-500/10 text-red-500 border-red-500/30' : 'bg-primary/10 text-primary border-primary/20'}`}
+              >
                 <Clock className="w-4 h-4" />
-                {timeLeft || "..."}
+                {timeLeft || '...'}
               </div>
             )}
             <button
@@ -119,7 +124,7 @@ export default function ExamPage() {
               transition={{ duration: 0.2 }}
               className="flex flex-col gap-8"
             >
-              <div 
+              <div
                 className="text-lg md:text-xl leading-relaxed whitespace-pre-wrap font-medium"
                 dangerouslySetInnerHTML={{ __html: currentQ.text }}
               />
@@ -129,30 +134,33 @@ export default function ExamPage() {
                   const letter = String.fromCharCode(65 + i);
                   const isSelected = currentQ.chosenLetter === opt.letter;
                   return (
-                    <label 
+                    <label
                       key={opt.letter}
                       className={`
                         relative flex items-start gap-4 p-4 rounded-xl cursor-pointer transition-all border
-                        ${isSelected 
-                          ? 'bg-primary/10 border-primary shadow-[0_0_15px_rgba(251,191,36,0.15)]' 
-                          : 'glass-panel border-white/5 hover:border-white/20'
+                        ${
+                          isSelected
+                            ? 'bg-primary/10 border-primary shadow-[0_0_15px_rgba(251,191,36,0.15)]'
+                            : 'glass-panel border-white/5 hover:border-white/20'
                         }
                       `}
                     >
-                      <input 
-                        type="radio" 
-                        name="q-opt" 
+                      <input
+                        type="radio"
+                        name="q-opt"
                         className="sr-only"
                         checked={isSelected}
                         onChange={() => store.answerQuestion(store.idx, opt.letter)}
                       />
-                      <div className={`
+                      <div
+                        className={`
                         shrink-0 w-8 h-8 flex items-center justify-center rounded-lg font-mono text-sm font-bold border
                         ${isSelected ? 'bg-primary text-primary-foreground border-primary' : 'bg-white/5 border-white/10'}
-                      `}>
+                      `}
+                      >
                         {letter}
                       </div>
-                      <div 
+                      <div
                         className="pt-1 text-base leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: opt.text }}
                       />
@@ -160,7 +168,7 @@ export default function ExamPage() {
                         <CheckCircle2 className="absolute top-4 right-4 w-5 h-5 text-primary opacity-50" />
                       )}
                     </label>
-                  )
+                  );
                 })}
               </div>
             </motion.div>

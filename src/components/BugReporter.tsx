@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Bug, X, Send, Loader2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/lib/supabase";
-import { usePathname } from "next/navigation";
+import { useState } from 'react';
+import { Bug, X, Send, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '@/lib/supabase';
+import { usePathname } from 'next/navigation';
 
 export default function BugReporter() {
   const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const pathname = usePathname();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,7 +23,8 @@ export default function BugReporter() {
     setError(null);
 
     const email = typeof window !== 'undefined' ? localStorage.getItem('ccaf-email') : undefined;
-    const nickname = typeof window !== 'undefined' ? localStorage.getItem('ccaf-nickname') : undefined;
+    const nickname =
+      typeof window !== 'undefined' ? localStorage.getItem('ccaf-nickname') : undefined;
     const browserInfo = typeof navigator !== 'undefined' ? navigator.userAgent : undefined;
 
     try {
@@ -33,22 +34,24 @@ export default function BugReporter() {
         nickname: nickname || undefined,
         route: pathname,
         message: message.trim(),
-        browser_info: browserInfo
+        browser_info: browserInfo,
       });
 
       if (dbError) {
-        console.error("Bug report error:", dbError);
-        throw new Error(dbError.message || "Failed to submit bug report. Make sure the database table is set up.");
+        console.error('Bug report error:', dbError);
+        throw new Error(
+          dbError.message || 'Failed to submit bug report. Make sure the database table is set up.'
+        );
       }
 
       setSuccess(true);
       setTimeout(() => {
         setIsOpen(false);
         setSuccess(false);
-        setMessage("");
+        setMessage('');
       }, 3000);
     } catch (err: unknown) {
-      setError((err as Error).message || "An unexpected error occurred.");
+      setError((err as Error).message || 'An unexpected error occurred.');
     } finally {
       setIsSubmitting(false);
     }
@@ -112,7 +115,7 @@ export default function BugReporter() {
                       required
                     />
                   </div>
-                  
+
                   {error && (
                     <div className="text-xs text-red-400 bg-red-400/10 p-3 rounded-lg border border-red-500/20">
                       {error}

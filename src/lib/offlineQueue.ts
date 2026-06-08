@@ -27,5 +27,5 @@ export const syncQueue = {
       }
     }
     localStorage.setItem('ccaf-sync-queue', JSON.stringify(remaining));
-  }
+  },
 };

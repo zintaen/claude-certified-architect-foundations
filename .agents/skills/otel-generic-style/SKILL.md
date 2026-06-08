@@ -1,6 +1,6 @@
 ---
 name: otel-generic-style
-description: "Generic OpenTelemetry style fallback for languages without a dedicated otel-*-style skill (Go, Java/Kotlin, Ruby, Rust, .NET/C#, PHP, Elixir, plain Node, etc.). Native SDK APIs, module-scope tracers/meters, bounded spans, error recording, OTLP logs, and resource attributes."
+description: 'Generic OpenTelemetry style fallback for languages without a dedicated otel-*-style skill (Go, Java/Kotlin, Ruby, Rust, .NET/C#, PHP, Elixir, plain Node, etc.). Native SDK APIs, module-scope tracers/meters, bounded spans, error recording, OTLP logs, and resource attributes.'
 ---
 
 # Generic OTel Style
@@ -202,7 +202,7 @@ For shell scripts and one-shot tools, even a single `curl` POST to
 `/v1/traces` with a hand-built JSON body is acceptable — that's still
 OTLP, and it composes with everything else in the user's pipeline.
 
-If the language *does* have an SDK but it doesn't load in this particular
+If the language _does_ have an SDK but it doesn't load in this particular
 runtime (bundler, edge, restricted FFI), the same shim approach applies.
 The Supabase Edge skill is one worked example.
 

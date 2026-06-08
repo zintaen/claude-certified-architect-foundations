@@ -1,7 +1,5 @@
 import { supabase } from './supabase';
 
-
-
 export async function fetchGlobalStats() {
   const { data, error } = await supabase.rpc('get_global_stats');
   if (error) {

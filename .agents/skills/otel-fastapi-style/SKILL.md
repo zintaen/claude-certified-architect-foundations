@@ -1,6 +1,6 @@
 ---
 name: otel-fastapi-style
-description: "FastAPI OpenTelemetry style: native FastAPIInstrumentor, centralized observability init, Python decorators, OTLP logs, and LLM cost metrics."
+description: 'FastAPI OpenTelemetry style: native FastAPIInstrumentor, centralized observability init, Python decorators, OTLP logs, and LLM cost metrics.'
 ---
 
 # OTel FastAPI Style

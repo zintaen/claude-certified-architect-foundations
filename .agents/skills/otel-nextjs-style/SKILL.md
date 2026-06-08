@@ -1,6 +1,6 @@
 ---
 name: otel-nextjs-style
-description: "Next.js/Vercel OpenTelemetry style: instrumentation.ts, @vercel/otel bootstrap, native @opentelemetry/api call sites, inline public ingest token, and no raw NodeSDK replacement."
+description: 'Next.js/Vercel OpenTelemetry style: instrumentation.ts, @vercel/otel bootstrap, native @opentelemetry/api call sites, inline public ingest token, and no raw NodeSDK replacement.'
 ---
 
 # OTel Next.js Style
@@ -9,11 +9,11 @@ For Next.js apps, prefer the framework entrypoint.
 
 ```ts
 // instrumentation.ts
-import { registerOTel } from "@vercel/otel";
+import { registerOTel } from '@vercel/otel';
 
 export function register() {
   registerOTel({
-    serviceName: "mugline-web",
+    serviceName: 'mugline-web',
   });
 }
 ```
@@ -27,11 +27,11 @@ keep call sites native. This example uses `@vercel/otel@2.x`; if the installed
 types are v1, use `logRecordProcessor` singular instead.
 
 ```ts
-import Anthropic from "@anthropic-ai/sdk";
-import { AnthropicInstrumentation } from "@arizeai/openinference-instrumentation-anthropic";
-import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
-import { BatchLogRecordProcessor } from "@opentelemetry/sdk-logs";
-import { registerOTel } from "@vercel/otel";
+import Anthropic from '@anthropic-ai/sdk';
+import { AnthropicInstrumentation } from '@arizeai/openinference-instrumentation-anthropic';
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
+import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
+import { registerOTel } from '@vercel/otel';
 
 const anthropicInstrumentation = new AnthropicInstrumentation({
   traceConfig: {
@@ -44,7 +44,7 @@ anthropicInstrumentation.manuallyInstrument(Anthropic);
 
 export function register() {
   registerOTel({
-    serviceName: "mugline-web",
+    serviceName: 'mugline-web',
     instrumentations: [anthropicInstrumentation],
     logRecordProcessors: [new BatchLogRecordProcessor(new OTLPLogExporter())],
   });
@@ -56,19 +56,23 @@ export function register() {
 Use native OTel APIs where auto-instrumentation is blind.
 
 ```ts
-import { withSpan } from "@superlog/otel-helpers";
+import { withSpan } from '@superlog/otel-helpers';
 
-const tracer = trace.getTracer("mugline.web");
-const meter = metrics.getMeter("mugline.web");
-const requests = meter.createCounter("mug.copy.generated");
+const tracer = trace.getTracer('mugline.web');
+const meter = metrics.getMeter('mugline.web');
+const requests = meter.createCounter('mug.copy.generated');
 
 export async function POST(request: Request) {
-  const tenantId = request.headers.get("x-tenant-id") ?? "tenant_demo";
-  return await withSpan("mug.copy.generate", async (span) => {
-    span.setAttribute("tenant.id", tenantId);
-    requests.add(1, { "tenant.id": tenantId, outcome: "success" });
-    return Response.json({ ok: true });
-  }, { tracer });
+  const tenantId = request.headers.get('x-tenant-id') ?? 'tenant_demo';
+  return await withSpan(
+    'mug.copy.generate',
+    async (span) => {
+      span.setAttribute('tenant.id', tenantId);
+      requests.add(1, { 'tenant.id': tenantId, outcome: 'success' });
+      return Response.json({ ok: true });
+    },
+    { tracer }
+  );
 }
 ```
 
@@ -105,14 +109,14 @@ use `@opentelemetry/api-logs` for production log records. Remove pre-existing
 ```ts
 logger.emit({
   severityNumber: SeverityNumber.INFO,
-  severityText: "INFO",
-  body: "generated mug copy",
+  severityText: 'INFO',
+  body: 'generated mug copy',
   attributes: {
-    "tenant.id": tenantId,
-    "gen_ai.provider.name": "anthropic",
-    "gen_ai.request.model": model,
-    "app.gen_ai.use_case": "web.mug_copy",
-    outcome: "success",
+    'tenant.id': tenantId,
+    'gen_ai.provider.name': 'anthropic',
+    'gen_ai.request.model': model,
+    'app.gen_ai.use_case': 'web.mug_copy',
+    outcome: 'success',
   },
 });
 ```
@@ -126,17 +130,17 @@ with the endpoint in the setup block, like a PostHog project token or Sentry
 DSN.
 
 ```ts
-const SUPERLOG_ENDPOINT = "https://intake.superlog.sh";
-const SUPERLOG_PUBLIC_TOKEN = "sl_public_...";
+const SUPERLOG_ENDPOINT = 'https://intake.superlog.sh';
+const SUPERLOG_PUBLIC_TOKEN = 'sl_public_...';
 
 // The token MUST be sent as the `x-api-key` header. Ingest only reads
 // `x-api-key` or `Authorization: Bearer <token>`; any other header name 401s.
 function superlogHeaders(token: string): Record<string, string> {
-  return { "x-api-key": token };
+  return { 'x-api-key': token };
 }
 
 registerOTel({
-  serviceName: "mugline-web",
+  serviceName: 'mugline-web',
   traceExporter: new OTLPTraceExporter({
     url: `${SUPERLOG_ENDPOINT}/v1/traces`,
     headers: superlogHeaders(SUPERLOG_PUBLIC_TOKEN),

@@ -1813,4 +1813,6 @@ export const encQuestions: string = [
 ].join('');
 
 const isBrowser = typeof window !== 'undefined';
-export const questions = isBrowser ? JSON.parse(window.atob(encQuestions)) : JSON.parse(Buffer.from(encQuestions, 'base64').toString('utf8'));
+export const questions = isBrowser
+  ? JSON.parse(window.atob(encQuestions))
+  : JSON.parse(Buffer.from(encQuestions, 'base64').toString('utf8'));

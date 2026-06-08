@@ -1,22 +1,23 @@
-import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
-import Link from "next/link";
-import "./globals.css";
-import BugReporter from "@/components/BugReporter";
+import type { Metadata } from 'next';
+import { Inter, JetBrains_Mono } from 'next/font/google';
+import Link from 'next/link';
+import './globals.css';
+import BugReporter from '@/components/BugReporter';
 
 const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+  variable: '--font-inter',
+  subsets: ['latin'],
 });
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
+  variable: '--font-jetbrains-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "Claude Certified Architect - Mock Exam",
-  description: "Test your skills with a simulated environment for the Anthropic Claude Certified Architect exam.",
+  title: 'Claude Certified Architect - Mock Exam',
+  description:
+    'Test your skills with a simulated environment for the Anthropic Claude Certified Architect exam.',
 };
 
 export default function RootLayout({
@@ -40,15 +41,19 @@ export default function RootLayout({
             </div>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link href="/" className="hover:text-primary transition-colors">Practice</Link>
-            <Link href="/leaderboard" className="hover:text-primary transition-colors">Leaderboard</Link>
-            <Link href="/about" className="hover:text-primary transition-colors">About</Link>
+            <Link href="/" className="hover:text-primary transition-colors">
+              Practice
+            </Link>
+            <Link href="/leaderboard" className="hover:text-primary transition-colors">
+              Leaderboard
+            </Link>
+            <Link href="/about" className="hover:text-primary transition-colors">
+              About
+            </Link>
           </nav>
         </header>
 
-        <main className="flex-1 flex flex-col">
-          {children}
-        </main>
+        <main className="flex-1 flex flex-col">{children}</main>
         <BugReporter />
       </body>
     </html>

@@ -63,14 +63,14 @@ You can also pass `project_id` on any individual call without changing session s
 
 All query tools default to the active project and to the **last 1 hour**. Override with `range: { since, until }` — both accept ISO-8601 (`"2026-05-28T14:00:00Z"`) or ClickHouse expressions (`"now() - INTERVAL 30 MINUTE"`).
 
-| Tool | Use for |
-|---|---|
-| `superlog.list_services` | Confirm which services emitted telemetry in the window |
-| `superlog.query_logs` | Search log bodies; filter by `service`, `severity`, `resource_attrs`, `log_attrs` |
-| `superlog.query_traces` | Find slow/errored spans; filter by `service`, `span_name`, `min_duration_ms`, `status_code`, `span_attrs` |
-| `superlog.query_metrics` | Pull recent metric points by `metric_name` + `service` |
-| `superlog.list_alerts` / `get_alert` | Check existing alerts that may already cover what the user is seeing |
-| `superlog.list_dashboards` / `get_dashboard` | Find an existing dashboard for the affected surface before building queries from scratch |
+| Tool                                         | Use for                                                                                                   |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `superlog.list_services`                     | Confirm which services emitted telemetry in the window                                                    |
+| `superlog.query_logs`                        | Search log bodies; filter by `service`, `severity`, `resource_attrs`, `log_attrs`                         |
+| `superlog.query_traces`                      | Find slow/errored spans; filter by `service`, `span_name`, `min_duration_ms`, `status_code`, `span_attrs` |
+| `superlog.query_metrics`                     | Pull recent metric points by `metric_name` + `service`                                                    |
+| `superlog.list_alerts` / `get_alert`         | Check existing alerts that may already cover what the user is seeing                                      |
+| `superlog.list_dashboards` / `get_dashboard` | Find an existing dashboard for the affected surface before building queries from scratch                  |
 
 ### `query_logs` tips
 

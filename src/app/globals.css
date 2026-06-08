@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-background: var(--background);
@@ -16,7 +16,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
-  
+
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
 }
@@ -24,20 +24,20 @@
 :root {
   --background: #0a0a0c;
   --foreground: #e4e4e7;
-  
+
   --card: rgba(24, 24, 27, 0.4);
   --card-foreground: #e4e4e7;
-  
+
   --primary: #fbbf24; /* Amber/Gold 400 */
   --primary-foreground: #18181b;
-  
+
   --border: rgba(251, 191, 36, 0.15); /* Subtle gold border */
   --input: rgba(39, 39, 42, 0.5);
   --ring: rgba(251, 191, 36, 0.5);
-  
+
   --accent: rgba(39, 39, 42, 0.6);
   --accent-foreground: #fafafa;
-  
+
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
 
@@ -53,7 +53,7 @@
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
-    background-image: 
+    background-image:
       radial-gradient(circle at 15% 50%, rgba(251, 191, 36, 0.03), transparent 25%),
       radial-gradient(circle at 85% 30%, rgba(251, 191, 36, 0.04), transparent 25%);
     background-attachment: fixed;

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { useExamStore } from "@/store/examStore";
-import { CheckCircle2, XCircle, ArrowLeft, Share2, Award, Clock } from "lucide-react";
-import { motion } from "framer-motion";
+import { useEffect, useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useExamStore } from '@/store/examStore';
+import { CheckCircle2, XCircle, ArrowLeft, Share2, Award, Clock } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function ResultPage() {
   const store = useExamStore();
@@ -12,10 +12,9 @@ export default function ResultPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-     
     setMounted(true);
     if (!store.finished || store.items.length === 0) {
-      router.push("/");
+      router.push('/');
     }
   }, [store.finished, store.items.length, router]);
 
@@ -25,12 +24,12 @@ export default function ResultPage() {
     let incorrect = 0;
     let skipped = 0;
 
-    store.items.forEach(it => {
+    store.items.forEach((it) => {
       if (!it.chosenLetter) {
         skipped++;
         return;
       }
-      const chosen = it.options.find(o => o.letter === it.chosenLetter);
+      const chosen = it.options.find((o) => o.letter === it.chosenLetter);
       if (chosen?.correct) correct++;
       else incorrect++;
     });
@@ -38,7 +37,7 @@ export default function ResultPage() {
     const score1000 = Math.round((correct / store.items.length) * 1000);
     const passed = score1000 >= 700;
     const timeSec = Math.max(0, Math.floor((store.endsAt - store.startedAt) / 1000));
-    
+
     return { correct, incorrect, skipped, score1000, passed, timeSec, total: store.items.length };
   }, [store.items, store.endsAt, store.startedAt]);
 
@@ -46,8 +45,8 @@ export default function ResultPage() {
 
   return (
     <div className="flex-1 max-w-4xl w-full mx-auto p-6 md:p-12 flex flex-col gap-8">
-      <button 
-        onClick={() => router.push("/")}
+      <button
+        onClick={() => router.push('/')}
         className="flex items-center gap-2 text-sm text-foreground/60 hover:text-primary transition-colors self-start"
       >
         <ArrowLeft className="w-4 h-4" /> Back to Home
@@ -58,10 +57,12 @@ export default function ResultPage() {
           <h1 className="text-3xl font-bold">Exam Results</h1>
           <p className="text-foreground/60 mt-1">Session ID: {store.sessionId}</p>
         </div>
-        <button 
+        <button
           onClick={() => {
-            navigator.clipboard.writeText(`I scored ${stats.score1000}/1000 on the Claude Certified Architect mock exam!`);
-            alert("Copied to clipboard!");
+            navigator.clipboard.writeText(
+              `I scored ${stats.score1000}/1000 on the Claude Certified Architect mock exam!`
+            );
+            alert('Copied to clipboard!');
           }}
           className="glass-panel px-4 py-2 flex items-center gap-2 rounded-md hover:border-primary/50 transition-colors"
         >
@@ -69,25 +70,27 @@ export default function ResultPage() {
         </button>
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className={`glass-panel p-8 rounded-2xl border-t-4 ${stats.passed ? 'border-t-green-500' : 'border-t-red-500'} flex flex-col md:flex-row items-center gap-8`}
       >
         <div className="flex-1 flex flex-col items-center md:items-start">
-          <div className={`text-sm font-bold uppercase tracking-widest ${stats.passed ? 'text-green-500' : 'text-red-500'}`}>
+          <div
+            className={`text-sm font-bold uppercase tracking-widest ${stats.passed ? 'text-green-500' : 'text-red-500'}`}
+          >
             {stats.passed ? '✓ Passed (Mock Threshold)' : '✗ Below Threshold'}
           </div>
           <div className="text-6xl font-bold mt-2 font-mono tracking-tight">
             {stats.score1000} <span className="text-2xl text-foreground/40">/ 1000</span>
           </div>
           <p className="text-foreground/70 mt-4 text-center md:text-left max-w-sm">
-            {stats.passed 
-              ? "Excellent work! You've demonstrated a solid understanding of the architect blueprint." 
-              : "Keep practicing. Review the explanations below to identify your weak spots."}
+            {stats.passed
+              ? "Excellent work! You've demonstrated a solid understanding of the architect blueprint."
+              : 'Keep practicing. Review the explanations below to identify your weak spots.'}
           </p>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
           <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-black/20">
             <CheckCircle2 className="w-6 h-6 text-green-500 mb-1" />
@@ -100,7 +103,9 @@ export default function ResultPage() {
             <div className="text-xs text-foreground/50 uppercase tracking-wider">Incorrect</div>
           </div>
           <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-black/20">
-            <div className="w-6 h-6 rounded-full border-2 border-foreground/30 flex items-center justify-center text-xs mb-1 font-bold">-</div>
+            <div className="w-6 h-6 rounded-full border-2 border-foreground/30 flex items-center justify-center text-xs mb-1 font-bold">
+              -
+            </div>
             <div className="text-2xl font-bold">{stats.skipped}</div>
             <div className="text-xs text-foreground/50 uppercase tracking-wider">Skipped</div>
           </div>
@@ -118,7 +123,7 @@ export default function ResultPage() {
           <Award className="w-6 h-6 text-primary" />
           Review Questions
         </h2>
-        
+
         {!store.reviewEnabled ? (
           <div className="glass-panel p-6 rounded-xl border-red-500/30 bg-red-500/5">
             <h3 className="text-red-500 font-bold mb-2">Review Locked</h3>
@@ -127,54 +132,71 @@ export default function ResultPage() {
         ) : (
           <div className="flex flex-col gap-6">
             {store.items.map((it, i) => {
-              const chosen = it.options.find(o => o.letter === it.chosenLetter);
+              const chosen = it.options.find((o) => o.letter === it.chosenLetter);
               const isCorrect = chosen?.correct;
 
               return (
                 <div key={it.id} className="glass-panel p-6 rounded-xl flex flex-col gap-4">
                   <div className="flex items-center justify-between pb-4 border-b border-white/10">
                     <div className="font-bold">Question {i + 1}</div>
-                    <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      !it.chosenLetter ? 'bg-foreground/10 text-foreground/60' :
-                      isCorrect ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
-                    }`}>
+                    <div
+                      className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        !it.chosenLetter
+                          ? 'bg-foreground/10 text-foreground/60'
+                          : isCorrect
+                            ? 'bg-green-500/20 text-green-500'
+                            : 'bg-red-500/20 text-red-500'
+                      }`}
+                    >
                       {!it.chosenLetter ? 'Skipped' : isCorrect ? 'Correct' : 'Incorrect'}
                     </div>
                   </div>
-                  
+
                   <div className="text-lg" dangerouslySetInnerHTML={{ __html: it.text }} />
 
                   <div className="flex flex-col gap-3 mt-4">
-                    {it.options.map(opt => {
+                    {it.options.map((opt) => {
                       const isChosen = it.chosenLetter === opt.letter;
                       const isThisCorrect = opt.correct;
-                      
-                      let bgClass = "bg-white/5 border-white/5";
-                      if (isThisCorrect) bgClass = "bg-green-500/10 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.15)]";
-                      else if (isChosen && !isThisCorrect) bgClass = "bg-red-500/10 border-red-500/50";
+
+                      let bgClass = 'bg-white/5 border-white/5';
+                      if (isThisCorrect)
+                        bgClass =
+                          'bg-green-500/10 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.15)]';
+                      else if (isChosen && !isThisCorrect)
+                        bgClass = 'bg-red-500/10 border-red-500/50';
 
                       return (
-                        <div key={opt.letter} className={`p-4 rounded-xl border ${bgClass} flex flex-col gap-2`}>
+                        <div
+                          key={opt.letter}
+                          className={`p-4 rounded-xl border ${bgClass} flex flex-col gap-2`}
+                        >
                           <div className="flex items-start gap-3">
-                            <div className={`shrink-0 w-6 h-6 rounded flex items-center justify-center font-mono text-xs font-bold ${
-                              isThisCorrect ? 'bg-green-500 text-black' : isChosen ? 'bg-red-500 text-white' : 'bg-white/10'
-                            }`}>
+                            <div
+                              className={`shrink-0 w-6 h-6 rounded flex items-center justify-center font-mono text-xs font-bold ${
+                                isThisCorrect
+                                  ? 'bg-green-500 text-black'
+                                  : isChosen
+                                    ? 'bg-red-500 text-white'
+                                    : 'bg-white/10'
+                              }`}
+                            >
                               {opt.letter}
                             </div>
                             <div dangerouslySetInnerHTML={{ __html: opt.text }} />
                           </div>
-                          
+
                           {store.reviewEnabled && opt.explain && (
                             <div className="mt-3 text-sm text-foreground/70 pl-9 border-l-2 border-white/10 ml-3 py-1">
                               {opt.explain}
                             </div>
                           )}
                         </div>
-                      )
+                      );
                     })}
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         )}

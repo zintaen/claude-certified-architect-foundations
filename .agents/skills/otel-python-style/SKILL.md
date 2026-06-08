@@ -1,6 +1,6 @@
 ---
 name: otel-python-style
-description: "Python OpenTelemetry style: module-scope tracers/meters, decorators for bounded work, error spans, logs, and no wrappers."
+description: 'Python OpenTelemetry style: module-scope tracers/meters, decorators for bounded work, error spans, logs, and no wrappers.'
 ---
 
 # OTel Python Style
