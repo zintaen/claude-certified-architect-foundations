@@ -1,4 +1,4 @@
-import { useExamStore, ExamItem } from '@/store/examStore';
+import { useExamStore, Question } from '@/store/examStore';
 import { supabase } from '../lib/supabase';
 import { useCallback } from 'react';
 import { syncQueue } from '../lib/offlineQueue';
@@ -8,12 +8,12 @@ export function useExamEngine() {
   const store = useExamStore();
 
   const buildSession = useCallback(
-    (qs: ExamItem[], count: number, untimed: boolean) => {
+    (qs: Question[], count: number, untimed: boolean) => {
       // Basic shuffle
       const shuffledQs = [...qs].sort(() => Math.random() - 0.5);
       const pool = shuffledQs.slice(0, Math.max(1, count));
 
-      const items: ExamItem[] = pool.map((q) => ({
+      const items: Question[] = pool.map((q) => ({
         ...q,
         options: [...q.options].sort(() => Math.random() - 0.5),
         chosenLetter: null,

@@ -29,13 +29,14 @@ export default function BugReporter() {
 
     try {
       // @ts-expect-error - Table not in local types
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: dbError } = await supabase.from('bug_reports').insert({
         user_email: email || undefined,
         nickname: nickname || undefined,
         route: pathname,
         message: message.trim(),
         browser_info: browserInfo,
-      });
+      } as any);
 
       if (dbError) {
         console.error('Bug report error:', dbError);

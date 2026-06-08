@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [history, setHistory] = useState<Record<string, unknown> | null>(null);
+  const [history, setHistory] = useState<Record<string, any> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +27,7 @@ export default function DashboardPage() {
       if (!data) {
         setError('Failed to fetch history or invalid credentials.');
       } else {
-        setHistory(data);
+        setHistory(data as Record<string, any>);
       }
       setLoading(false);
     }
