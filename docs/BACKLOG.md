@@ -7,8 +7,8 @@
 
 ## Phase 2: Security & Architecture
 - [x] Critical | DONE | Install `isomorphic-dompurify` and sanitize all instances of `dangerouslySetInnerHTML` in `src/app/exam/page.tsx` and `src/app/result/page.tsx`.
-- [ ] Medium | IN-PROGRESS | Implement generic `error.tsx` layout boundaries for the `/dashboard`, `/leaderboard`, and `/exam` routes.
+- [x] Medium | DONE | Implement generic `error.tsx` layout boundaries for the `/dashboard`, `/leaderboard`, and `/exam` routes.
 
 ## Phase 3: Cleanup & Refinement
-- [ ] Low | TODO | Update `.gitignore` to explicitly block `test-results/` and `playwright-report/` artifacts.
-- [ ] Low | TODO | Remove unused `eslint-disable` directive in `src/components/BugReporter.tsx`.
+- [x] Low | DONE | Update `.gitignore` to explicitly block `test-results/` and `playwright-report/` artifacts.
+- [x] Low | DONE | Remove unused `eslint-disable` directive in `src/components/BugReporter.tsx`.
