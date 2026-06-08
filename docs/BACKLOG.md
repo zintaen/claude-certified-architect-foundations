@@ -6,8 +6,8 @@
 - [x] Medium | DONE | Replace `Record<string, any>` types in `src/app/dashboard/page.tsx`, `src/app/leaderboard/page.tsx`, and `src/lib/offlineQueue.ts` with strict Supabase interface types.
 
 ## Phase 2: Security & Architecture
-- [ ] Critical | IN-PROGRESS | Install `isomorphic-dompurify` and sanitize all instances of `dangerouslySetInnerHTML` in `src/app/exam/page.tsx` and `src/app/result/page.tsx`.
-- [ ] Medium | TODO | Implement generic `error.tsx` layout boundaries for the `/dashboard`, `/leaderboard`, and `/exam` routes.
+- [x] Critical | DONE | Install `isomorphic-dompurify` and sanitize all instances of `dangerouslySetInnerHTML` in `src/app/exam/page.tsx` and `src/app/result/page.tsx`.
+- [ ] Medium | IN-PROGRESS | Implement generic `error.tsx` layout boundaries for the `/dashboard`, `/leaderboard`, and `/exam` routes.
 
 ## Phase 3: Cleanup & Refinement
 - [ ] Low | TODO | Update `.gitignore` to explicitly block `test-results/` and `playwright-report/` artifacts.
