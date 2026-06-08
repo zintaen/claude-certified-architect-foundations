@@ -3,6 +3,7 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 
 const SUPERLOG_ENDPOINT = 'https://intake.superlog.sh';
 const SUPERLOG_PUBLIC_TOKEN = 'sl_public_J2phoiOqlazsZdAYUAh_pt9ZDUgRuXs-kOlgB18Z1Fg';
@@ -27,10 +28,11 @@ export function register() {
       ),
     ],
     metricReaders: [
-      // @ts-expect-error - Expected type mismatch between vercel/otel and opentelemetry/exporter-metrics-otlp-http
-      new OTLPMetricExporter({
-        url: `${SUPERLOG_ENDPOINT}/v1/metrics`,
-        headers: superlogHeaders(SUPERLOG_PUBLIC_TOKEN),
+      new PeriodicExportingMetricReader({
+        exporter: new OTLPMetricExporter({
+          url: `${SUPERLOG_ENDPOINT}/v1/metrics`,
+          headers: superlogHeaders(SUPERLOG_PUBLIC_TOKEN),
+        })
       }),
     ],
   });
