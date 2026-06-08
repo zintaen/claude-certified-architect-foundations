@@ -27,10 +27,11 @@ export function register() {
       ),
     ],
     metricReaders: [
+      // @ts-expect-error - Expected type mismatch between vercel/otel and opentelemetry/exporter-metrics-otlp-http
       new OTLPMetricExporter({
         url: `${SUPERLOG_ENDPOINT}/v1/metrics`,
         headers: superlogHeaders(SUPERLOG_PUBLIC_TOKEN),
-      }) as any
+      })
     ],
   });
 }

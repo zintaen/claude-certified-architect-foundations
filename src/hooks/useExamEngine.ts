@@ -1,6 +1,5 @@
-import { useExamStore, Question, Option } from '../store/examStore';
+import { useExamStore, ExamItem } from "@/store/examStore";
 import { supabase } from '../lib/supabase';
-import { trace, metrics } from '@opentelemetry/api';
 import { useCallback } from 'react';
 import { syncQueue } from '../lib/offlineQueue';
 
@@ -8,16 +7,14 @@ import { syncQueue } from '../lib/offlineQueue';
 export function useExamEngine() {
   const store = useExamStore();
 
-  const buildSession = useCallback((qs: any[], count: number, untimed: boolean) => {
+  const buildSession = useCallback((qs: ExamItem[], count: number, untimed: boolean) => {
     // Basic shuffle
     const shuffledQs = [...qs].sort(() => Math.random() - 0.5);
     const pool = shuffledQs.slice(0, Math.max(1, count));
 
-    const items: Question[] = pool.map((q) => ({
-      id: q.id,
-      group: q.group,
-      text: q.text,
-      options: [...q.options].sort(() => Math.random() - 0.5) as Option[],
+    const items: ExamItem[] = pool.map((q) => ({
+      ...q,
+      options: [...q.options].sort(() => Math.random() - 0.5),
       chosenLetter: null,
       flagged: false,
     }));
@@ -100,8 +97,8 @@ export function useExamEngine() {
           console.error(error);
           syncQueue.add(payload);
         }
-      } catch (e) {
-        console.error(e);
+      } catch (err: unknown) {
+        console.warn("Could not save to supabase (maybe local/offline). Queuing offline.", err);
         syncQueue.add(payload);
       }
     }

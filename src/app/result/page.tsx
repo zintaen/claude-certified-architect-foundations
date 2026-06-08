@@ -12,6 +12,7 @@ export default function ResultPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+     
     setMounted(true);
     if (!store.finished || store.items.length === 0) {
       router.push("/");
@@ -128,7 +129,6 @@ export default function ResultPage() {
             {store.items.map((it, i) => {
               const chosen = it.options.find(o => o.letter === it.chosenLetter);
               const isCorrect = chosen?.correct;
-              const correctOpt = it.options.find(o => o.correct);
 
               return (
                 <div key={it.id} className="glass-panel p-6 rounded-xl flex flex-col gap-4">

@@ -7,14 +7,13 @@ import { PlayCircle, ShieldCheck, Zap, BarChart, X } from "lucide-react";
 
 export default function Home() {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
   const [showSetup, setShowSetup] = useState(false);
   const [email, setEmail] = useState("");
   const [nickname, setNickname] = useState("");
   const [pin, setPin] = useState("");
 
   useEffect(() => {
-    setMounted(true);
+     
     setEmail(localStorage.getItem('ccaf-email') || "");
     setNickname(localStorage.getItem('ccaf-nickname') || "");
   }, []);

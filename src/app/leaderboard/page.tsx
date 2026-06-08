@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 
 export default function LeaderboardPage() {
   const router = useRouter();
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function LeaderboardPage() {
               <Star className="w-5 h-5 text-primary" /> Top 10 High Scores
             </h2>
             <div className="glass-panel rounded-2xl overflow-hidden">
-              {stats?.topScores?.map((entry: any, i: number) => (
+              {stats?.topScores?.map((entry: Record<string, unknown>, i: number) => (
                 <motion.div 
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -109,7 +109,7 @@ export default function LeaderboardPage() {
               <div className="mt-4">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-foreground/60 mb-3">Recent Passes</h3>
                 <div className="flex flex-col gap-2">
-                  {stats.recentPasses.map((p: any, i: number) => (
+                  {stats.recentPasses.map((p: Record<string, unknown>, i: number) => (
                     <div key={i} className="glass-panel p-3 rounded-lg text-sm flex items-center justify-between">
                       <span className="font-medium">{p.nickname || "Anonymous"}</span>
                       <span className="font-mono text-green-500">{p.score}</span>

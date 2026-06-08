@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 import BugReporter from "@/components/BugReporter";
 
@@ -39,9 +40,9 @@ export default function RootLayout({
             </div>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <a href="/" className="hover:text-primary transition-colors">Practice</a>
-            <a href="/leaderboard" className="hover:text-primary transition-colors">Leaderboard</a>
-            <a href="/about" className="hover:text-primary transition-colors">About</a>
+            <Link href="/" className="hover:text-primary transition-colors">Practice</Link>
+            <Link href="/leaderboard" className="hover:text-primary transition-colors">Leaderboard</Link>
+            <Link href="/about" className="hover:text-primary transition-colors">About</Link>
           </nav>
         </header>
 

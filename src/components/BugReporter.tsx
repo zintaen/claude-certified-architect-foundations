@@ -27,7 +27,8 @@ export default function BugReporter() {
     const browserInfo = typeof navigator !== 'undefined' ? navigator.userAgent : undefined;
 
     try {
-      const { error: dbError } = await (supabase.from as any)('bug_reports').insert({
+      // @ts-expect-error - Table not in local types
+      const { error: dbError } = await supabase.from('bug_reports').insert({
         user_email: email || undefined,
         nickname: nickname || undefined,
         route: pathname,
@@ -46,8 +47,8 @@ export default function BugReporter() {
         setSuccess(false);
         setMessage("");
       }, 3000);
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "An unexpected error occurred.");
     } finally {
       setIsSubmitting(false);
     }

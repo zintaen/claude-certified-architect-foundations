@@ -15,6 +15,7 @@ export default function ExamPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+     
     setMounted(true);
     if (store.items.length === 0) {
       // automatically start an exam with 60 questions if none exists

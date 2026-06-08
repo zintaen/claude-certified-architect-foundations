@@ -82,7 +82,7 @@ const initialState: ExamState = {
 
 export const useExamStore = create<ExamState & ExamActions>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       ...initialState,
       startExam: (payload) =>
         set((state) => ({

@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [history, setHistory] = useState<any>(null);
+  const [history, setHistory] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -92,7 +92,8 @@ export default function DashboardPage() {
               History
             </h2>
             <div className="glass-panel rounded-2xl overflow-hidden">
-              {history?.attempts?.map((entry: any, i: number) => (
+              { }
+              {((history?.attempts as any[]) || []).map((entry: any, i: number) => (
                 <motion.div 
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}

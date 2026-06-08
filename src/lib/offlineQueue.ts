@@ -4,13 +4,13 @@
 // In a true robust PWA, we'd use IndexedDB.
 
 export const syncQueue = {
-  async add(payload: any) {
+  async add(payload: unknown) {
     if (typeof window === 'undefined') return;
     const queue = JSON.parse(localStorage.getItem('ccaf-sync-queue') || '[]');
     queue.push(payload);
     localStorage.setItem('ccaf-sync-queue', JSON.stringify(queue));
   },
-  async sync(supabaseRpc: (name: string, payload: any) => Promise<any>) {
+  async sync(supabaseRpc: (name: string, payload: unknown) => Promise<unknown>) {
     if (typeof window === 'undefined') return;
     const queue = JSON.parse(localStorage.getItem('ccaf-sync-queue') || '[]');
     if (queue.length === 0) return;
