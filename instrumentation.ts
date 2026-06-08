@@ -32,7 +32,7 @@ export function register() {
         exporter: new OTLPMetricExporter({
           url: `${SUPERLOG_ENDPOINT}/v1/metrics`,
           headers: superlogHeaders(SUPERLOG_PUBLIC_TOKEN),
-        })
+        }),
       }),
     ],
   });
