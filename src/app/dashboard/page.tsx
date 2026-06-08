@@ -6,9 +6,23 @@ import { ArrowLeft, User, Activity } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
+interface Attempt {
+  score: number;
+  time_taken: number;
+  completed_at: string;
+}
+
+interface UserHistory {
+  totalAttempts: number;
+  highestScore: number;
+  passRate: number;
+  averageTime: number;
+  attempts: Attempt[];
+}
+
 export default function DashboardPage() {
   const router = useRouter();
-  const [history, setHistory] = useState<Record<string, any> | null>(null);
+  const [history, setHistory] = useState<UserHistory | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +41,7 @@ export default function DashboardPage() {
       if (!data) {
         setError('Failed to fetch history or invalid credentials.');
       } else {
-        setHistory(data as Record<string, any>);
+        setHistory(data as unknown as UserHistory);
       }
       setLoading(false);
     }
@@ -93,7 +107,7 @@ export default function DashboardPage() {
             <h2 className="text-xl font-bold flex items-center gap-2">History</h2>
             <div className="glass-panel rounded-2xl overflow-hidden">
               {}
-              {((history?.attempts as any[]) || []).map((entry: any, i: number) => (
+              {(history?.attempts || []).map((entry: Attempt, i: number) => (
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}

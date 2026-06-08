@@ -6,15 +6,35 @@ import { Trophy, Medal, Star, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
+interface TopScore {
+  nickname: string;
+  completed_at: string;
+  score: number;
+}
+
+interface RecentPass {
+  nickname: string;
+  score: number;
+}
+
+interface GlobalStats {
+  topScores: TopScore[];
+  totalAttempts: number;
+  averageScore: number;
+  passRate: number;
+  averageTime: number;
+  recentPasses: RecentPass[];
+}
+
 export default function LeaderboardPage() {
   const router = useRouter();
-  const [stats, setStats] = useState<Record<string, any> | null>(null);
+  const [stats, setStats] = useState<GlobalStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       const data = await fetchGlobalStats();
-      setStats(data as Record<string, any>);
+      setStats(data as unknown as GlobalStats);
       setLoading(false);
     }
     load();
@@ -49,7 +69,7 @@ export default function LeaderboardPage() {
               <Star className="w-5 h-5 text-primary" /> Top 10 High Scores
             </h2>
             <div className="glass-panel rounded-2xl overflow-hidden">
-              {stats?.topScores?.map((entry: Record<string, any>, i: number) => (
+              {stats?.topScores?.map((entry: TopScore, i: number) => (
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -123,7 +143,7 @@ export default function LeaderboardPage() {
                   Recent Passes
                 </h3>
                 <div className="flex flex-col gap-2">
-                  {stats.recentPasses.map((p: Record<string, any>, i: number) => (
+                  {stats.recentPasses.map((p: RecentPass, i: number) => (
                     <div
                       key={i}
                       className="glass-panel p-3 rounded-lg text-sm flex items-center justify-between"
