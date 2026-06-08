@@ -425,7 +425,7 @@ export function renderResultDOM() {
         wrongIdxs.push(idx + 1);
       }
     });
-    if (totalAnswered > 0 && !state.untimed && state.items.length === 60) {
+    if (totalAnswered > 0 && !state.untimed) {
       window.submitToSupabase(score1000, wrongIdxs, usedSec);
     } else {
       console.warn('Exam was practice/partial or abandoned. Skipped saving to Supabase.');
