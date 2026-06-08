@@ -1,0 +1,1072 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="index, follow" />
+    <meta
+      property="og:title"
+      content="CyberSkill · CCAF Practice — Claude Certified Architect Foundations Mock Exam"
+    />
+    <meta
+      property="og:description"
+      content="Free CCAF mock exam: 60 questions, 120-minute proctor-style timer, 1000-point scoring, full review explanations. Turn your will into real."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://claude-certified-architect-mock-exam-cyberskill.vercel.app"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CyberSkill · CCAF Practice Mock Exam" />
+    <meta
+      name="twitter:description"
+      content="Free 60-question mock exam for Claude Certified Architect — Foundations. Timed, scored, with full explanations."
+    />
+    <meta property="og:image" content="https://ccaf.cyberskill.dev/cyberskill-logo.svg" />
+    <meta name="twitter:image" content="https://ccaf.cyberskill.dev/cyberskill-logo.svg" />
+    <link rel="canonical" href="https://ccaf.cyberskill.dev/" />
+    <title>Claude Certified Architect — Mock Exam (Unofficial)</title>
+    <meta
+      name="description"
+      content="Free CCAF mock exam by CyberSkill. 60 questions, 120-minute proctor-style timer, 1000-point scoring, review explanations. Turn your will into real."
+    />
+    <meta name="theme-color" content="#45210E" />
+    <link rel="icon" type="image/svg+xml" href="/cyberskill-logo.svg" />
+    <link rel="apple-touch-icon" href="/cyberskill-logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@500;700&display=swap"
+      as="style"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@500;700&display=swap"
+    /></noscript>
+    <script>
+      window.va =
+        window.va ||
+        function () {
+          (window.vaq = window.vaq || []).push(arguments);
+        };
+    </script>
+
+    <script>
+      /* Prevent FOUC: apply dark mode synchronously before first paint */
+      if (localStorage.getItem('ccaf-dark-mode') === 'true')
+        document.documentElement.classList.add('dark-mode');
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "CyberSkill CCAF Practice Exam",
+        "description": "Free mock exam for Claude Certified Architect — Foundations. 60 questions, 120-minute timer, full review explanations.",
+        "url": "https://ccaf.cyberskill.dev",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": {
+          "@type": "Person",
+          "name": "Stephen Cheng",
+          "url": "https://www.linkedin.com/in/zintaen/"
+        }
+      }
+    </script>
+    <script type="module" crossorigin src="/assets/main-DitiFYDH.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-1VNLd2iN.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-BGFnJ2b-.js">
+    <link rel="stylesheet" crossorigin href="/assets/main-C3P4P1HU.css">
+  <script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
+  <body>
+    <a class="skip-link" href="#exam">Skip to exam</a>
+    <div class="confetti-container hidden" id="confetti-container"></div>
+    <button
+      class="theme-toggle"
+      id="theme-toggle"
+      aria-label="Toggle dark mode"
+      title="Toggle dark/light mode"
+    >
+      ☀️
+    </button>
+    <div class="watermark" aria-hidden="true"></div>
+    <div id="wm-text" aria-hidden="true"></div>
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="#top" aria-label="CyberSkill CCAF PRACTICE">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-wordmark">
+            <span class="brand-name">CyberSkill</span>
+            <span class="brand-sub">CCAF Practice</span>
+          </span>
+        </a>
+        <nav class="nav" aria-label="Main navigation">
+          <a href="#about" data-i18n="nav.about">About</a>
+          <a href="#path">Path</a>
+          <a href="#reddit">Community</a>
+          <a href="#exam" data-i18n="nav.exam">Practice Exam</a>
+          <select id="lang-selector" class="lang-select" aria-label="Select language">
+            <option value="en">EN</option>
+            <option value="es">ES</option>
+          </select>
+          <a
+            href="https://www.linkedin.com/in/zintaen/"
+            target="_blank"
+            rel="noopener"
+            class="social-icon"
+            aria-label="LinkedIn"
+            title="LinkedIn"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+              />
+            </svg>
+          </a>
+          <a
+            href="https://wa.me/84906878091"
+            target="_blank"
+            rel="noopener"
+            class="social-icon"
+            aria-label="WhatsApp"
+            title="WhatsApp"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"
+              />
+            </svg>
+          </a>
+          <a
+            href="#tip"
+            class="pill"
+            style="
+              border-color: var(--accent-dark);
+              color: var(--ink);
+              background: var(--accent-soft);
+            "
+            data-i18n="btn.support"
+            >Support us</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- HERO / INTRO -->
+      <section class="hero" id="about">
+        <div class="container hero-grid">
+          <div>
+            <div class="hero-slogan slogan" data-i18n="hero.slogan">Turn your will into real</div>
+            <span class="badge" data-i18n="hero.badge"
+              >Unofficial community practice · not affiliated with Anthropic</span
+            >
+            <h1 style="margin-top: 14px" data-i18n="hero.title">Claude Certified Architect</h1>
+            <h2 class="subtitle" data-i18n="hero.subtitle">Foundations — Unofficial Mock Exam</h2>
+            <p class="desc" data-i18n="hero.desc">
+              A grueling, production-grade practice exam designed by a certified architect to test
+              your actual mastery of the Claude ecosystem, not just your memorization of the docs.
+            </p>
+            <div class="cta-row">
+              <a href="#exam" class="btn accent" data-i18n="hero.start_practice"
+                >Start practice exam
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 12h14" />
+                  <path d="m13 6 6 6-6 6" />
+                </svg>
+              </a>
+              <a href="#path" class="btn ghost" data-i18n="hero.how_access_works"
+                >How access works</a
+              >
+            </div>
+            <p style="margin-top: 16px; font-size: 0.88rem; color: var(--muted)">
+              Official registration:
+              <a
+                href="https://anthropic.skilljar.com/claude-certified-architect-foundations-access-request"
+                target="_blank"
+                rel="noopener"
+                >anthropic.skilljar.com</a
+              >
+              · Academy:
+              <a href="https://anthropic.skilljar.com/" target="_blank" rel="noopener"
+                >Anthropic Academy</a
+              >
+            </p>
+          </div>
+          <aside class="hero-card">
+            <h2 style="margin-top: 0" data-i18n="glance.title">Exam at a glance</h2>
+            <p style="margin: 0 0 8px" data-i18n="glance.p1">
+              Taken from the official CCA-F landing page for partner companies.
+            </p>
+            <ul class="glance-list">
+              <li data-i18n="glance.format">
+                <strong>Format:</strong> Multiple choice, multiple select
+              </li>
+              <li data-i18n="glance.duration"><strong>Duration:</strong> 120 minutes</li>
+              <li data-i18n="glance.cost"><strong>Cost:</strong> Free (Mock)</li>
+              <li data-i18n="glance.lang"><strong>Languages:</strong> English, Spanish</li>
+            </ul>
+            <div class="hero-stats">
+              <div class="stat">
+                <div class="k">~301</div>
+                <div class="l" data-i18n="glance.stat.level">Level</div>
+              </div>
+              <div class="stat">
+                <div class="k">60</div>
+                <div class="l" data-i18n="glance.stat.questions">Questions</div>
+              </div>
+              <div class="stat">
+                <div class="k">120 min</div>
+                <div class="l" data-i18n="glance.stat.proctored">Proctored</div>
+              </div>
+              <div class="stat">
+                <div class="k">$99</div>
+                <div class="l" data-i18n="glance.stat.per_attempt">Per attempt*</div>
+              </div>
+            </div>
+            <p style="margin-top: 10px; font-size: 0.82rem; color: var(--muted)">
+              *Fixed partner discount. Results within 2 business days with section breakdowns and a
+              digital certificate recognized by companies using Claude.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- PARTNER BENEFITS -->
+      <section>
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <span class="pill">Why it matters</span>
+              <h2>Why CCAF is a partner-only credential</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <div class="card feature">
+              <div class="ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                </svg>
+              </div>
+              <h3>Proves production-grade practice</h3>
+              <p>
+                A 301-level exam for practitioners at partner companies who are ready to demonstrate
+                deeper, applied expertise with Claude — not introductory knowledge.
+              </p>
+            </div>
+            <div class="card feature">
+              <div class="ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="8" r="6" />
+                  <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+                </svg>
+              </div>
+              <h3>Recognized by customers</h3>
+              <p>
+                Digital certificate recognized by companies using Claude, backed by Anthropic. A
+                credential to stand behind on customer engagements.
+              </p>
+            </div>
+            <div class="card feature">
+              <div class="ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M11 17a4 4 0 0 1-8 0v-1a4 4 0 0 1 4-4" />
+                  <path d="M17 17a4 4 0 0 0 4-4v-1a4 4 0 0 0-4-4" />
+                  <path d="M12 4v8" />
+                  <path d="M9 7h6" />
+                </svg>
+              </div>
+              <h3>First milestone to partnership</h3>
+              <p>
+                Certification is the first technical milestone on the Claude Partner Network (CPN)
+                path — it unlocks the rest of the tiering and program benefits.
+              </p>
+            </div>
+            <div class="card feature">
+              <div class="ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+              </div>
+              <h3>Study what you'll actually ship</h3>
+              <p>
+                Questions test practical ground: prompt engineering for tool use, managing context
+                windows, multi-agent orchestration, and Human-in-the-Loop workflows.
+              </p>
+            </div>
+            <div class="card feature">
+              <div class="ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="13" r="8" />
+                  <path d="M12 9v4l2 2" />
+                  <path d="M5 3 2 6" />
+                  <path d="m22 6-3-3" />
+                  <path d="M6.38 18.7 4 21" />
+                  <path d="M17.64 18.67 20 21" />
+                </svg>
+              </div>
+              <h3>One proctored session</h3>
+              <p>
+                60 multiple-choice questions, end-to-end, in a single 120-minute session. No
+                external resources or breaks — this mock mirrors that flow.
+              </p>
+            </div>
+            <div class="card feature">
+              <div class="ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
+                  <path d="M12 18V6" />
+                </svg>
+              </div>
+              <h3>Partner-only pricing</h3>
+              <p>
+                A fixed $99 discount is offered to approved Claude Partner Network companies. This
+                practice exam is free — because your first attempt shouldn't be blind.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HOW TO GET ACCESS -->
+      <section id="path" style="background: var(--bg-2)">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <span class="pill">Access path</span>
+              <h2>How a partner unlocks CCAF</h2>
+            </div>
+          </div>
+          <div class="steps">
+            <div class="step">
+              <h3>Complete the Claude Partner Network application</h3>
+              <p>
+                Apply to join the CPN. Once your application clears initial review, you're approved
+                to move forward on the path to partnership.
+              </p>
+            </div>
+            <div class="step">
+              <h3>Access Anthropic Academy with your partner company email</h3>
+              <p>
+                Academy access is granted by <em>company email domain</em>. Personal emails won't
+                work.
+              </p>
+            </div>
+            <div class="step">
+              <h3>Send 10 colleagues through the CPN Learning Path</h3>
+              <p>
+                Pick the people who anchor your Claude practice — delivery leads, architects,
+                engineers you'd put on a customer engagement.
+              </p>
+            </div>
+            <div class="step">
+              <h3>Submit the completion form</h3>
+              <p>
+                Use the official form at <span class="mono">clau.de/CPN-LearningPath</span> once all
+                10 have finished.
+              </p>
+            </div>
+            <div class="step">
+              <h3>Anthropic validates completion</h3>
+              <p>
+                Current SLA is around 5 business days, often faster. You'll receive confirmation
+                that you've met the criteria.
+              </p>
+            </div>
+            <div class="step">
+              <h3>Your organization gets cleared for CCAF</h3>
+              <p>Access is still determined by company email domain at exam time.</p>
+            </div>
+            <div class="step">
+              <h3>Register for Claude Certified Architect — Foundations</h3>
+              <p>
+                Head to the landing page, download the exam guide, register, and take the 120-minute
+                proctored exam.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- REDDIT STORY -->
+      <section id="reddit">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <span class="pill">My story</span>
+              <h2>I just passed CCAF — and I built this mock from what I learned</h2>
+            </div>
+          </div>
+          <div class="card reddit">
+            <div class="logo">r/</div>
+            <div>
+              <div class="meta">
+                r/ClaudeAI · my post: "Just passed the new Claude Certified Architect (Foundations)"
+                · Early Adopter badge
+              </div>
+              <blockquote>
+                I just got my results back and managed to snag the Early Adopter badge as well.
+                Following up on my recent DP-600 certification, I really wanted to validate my
+                architecture skills specifically on the Anthropic side. The exam covers a lot of
+                practical ground on prompt engineering for tool use, managing context windows
+                efficiently, and handling Human-in-the-Loop workflows — so I wrote up my full
+                playbook and bundled the resources I actually used into the chips below.
+              </blockquote>
+              <div class="links">
+                <a
+                  class="chip"
+                  href="https://www.reddit.com/r/ClaudeAI/comments/1to0xfc/comment/ooabw3z"
+                  target="_blank"
+                  rel="noopener"
+                  >Read my Reddit post ↗</a
+                >
+                <a
+                  class="chip"
+                  href="https://anthropic.skilljar.com/claude-certified-architect-foundations-access-request"
+                  target="_blank"
+                  rel="noopener"
+                  >Request exam access</a
+                >
+                <a
+                  class="chip"
+                  href="https://anthropic.skilljar.com/"
+                  target="_blank"
+                  rel="noopener"
+                  >Training courses</a
+                >
+                <a
+                  class="chip"
+                  href="https://github.com/anthropics/anthropic-cookbook"
+                  target="_blank"
+                  rel="noopener"
+                  >Anthropic Cookbook</a
+                >
+                <a
+                  class="chip"
+                  href="https://share.google/0eqIbebzRMUt8KTc8"
+                  target="_blank"
+                  rel="noopener"
+                  >Exam Guide</a
+                >
+                <a
+                  class="chip"
+                  href="https://drive.google.com/file/d/1luC0rnrET4tDYtS7xe5jUxMDZA-4qNf-/view?usp=sharing"
+                  target="_blank"
+                  rel="noopener"
+                  >My playbook (Google Drive)</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DONATE / BUY ME A BANANA -->
+      <section id="tip">
+        <div class="container">
+          <div class="donate">
+            <div class="coin" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
+                <path d="M12 18V6" />
+              </svg>
+            </div>
+            <div>
+              <h3>Did this help you pass? Tip the maintainer.</h3>
+              <p>
+                This mock exam is free and ad-free. If it shaved hours off your prep, a small tip
+                keeps it updated as more questions roll in — or use it to reach out about CCAF prep.
+              </p>
+            </div>
+            <a
+              class="btn primary"
+              href="https://buymeacoffee.com/zintaen"
+              target="_blank"
+              rel="noopener"
+              >Support CyberSkill
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12h14" />
+                <path d="m13 6 6 6-6 6" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- GLOBAL STATS -->
+      <section id="global-stats" style="background: var(--bg); border-top: 1px solid var(--line)">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <span class="pill">Community Insights</span>
+              <h2>Global Statistics</h2>
+            </div>
+          </div>
+          <div class="global-stats-grid" id="stats-container">
+            <div class="stat">
+              <div class="k" id="stat-total-exams">-</div>
+              <div class="l">Total Exams</div>
+            </div>
+            <div class="stat">
+              <div class="k" id="stat-avg-score">-</div>
+              <div class="l">Avg Score</div>
+            </div>
+            <div class="stat">
+              <div class="k" id="stat-pass-rate">-</div>
+              <div class="l">Pass Rate</div>
+            </div>
+            <div class="stat">
+              <div class="k" id="stat-hardest" style="font-size: 1rem; margin-top: 6px">
+                Loading...
+              </div>
+              <div class="l">Hardest Questions</div>
+            </div>
+          </div>
+          <div class="leaderboard" id="leaderboard-container">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 12px;
+              "
+            >
+              <h3 style="margin: 0">🏆 Leaderboard</h3>
+              <div
+                class="lb-controls"
+                style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap"
+              >
+                <input
+                  type="text"
+                  id="lb-search"
+                  class="input"
+                  placeholder="Search name..."
+                  style="width: 140px; padding: 6px 10px; font-size: 0.85rem"
+                  aria-label="Search leaderboard by name"
+                />
+                <input
+                  type="date"
+                  id="lb-date-start"
+                  class="input"
+                  style="padding: 6px 10px; font-size: 0.85rem; width: 125px"
+                  aria-label="Start date"
+                />
+                <span style="font-size: 0.85rem; color: var(--muted)">to</span>
+                <input
+                  type="date"
+                  id="lb-date-end"
+                  class="input"
+                  style="padding: 6px 10px; font-size: 0.85rem; width: 125px"
+                  aria-label="End date"
+                />
+              </div>
+            </div>
+            <div class="lb-scroll">
+              <table class="lb-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Player</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th style="text-align: right">Score</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                  <tr>
+                    <td colspan="5" style="text-align: center; color: var(--muted)">Loading...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="lb-count" id="lb-count"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXAM -->
+      <section id="exam">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <span class="pill">Practice exam</span>
+              <h2>Timed mock — 60 questions, 120 minutes, 1,000-point scale</h2>
+            </div>
+          </div>
+
+          <!-- ==============================
+       ADMIN EDITOR VIEW
+       ============================== -->
+          <section id="view-admin" class="hidden">
+            <div class="container" style="max-width: 900px; padding: 40px 20px">
+              <div class="section-head">
+                <h2>Admin Question Editor</h2>
+                <button class="btn ghost small" id="btn-admin-back">← Back to Start</button>
+              </div>
+              <div id="admin-editor-root"></div>
+            </div>
+          </section>
+
+          <!-- ==============================
+       FLASHCARD VIEW
+       ============================== -->
+          <section id="view-flashcard" class="hidden">
+            <div class="container" style="max-width: 700px; padding: 40px 20px">
+              <div
+                class="section-head"
+                style="display: flex; justify-content: space-between; align-items: center"
+              >
+                <h2 style="margin: 0">Flashcard Mode</h2>
+                <button class="btn ghost small" id="btn-fc-end">End Session</button>
+              </div>
+              <ccaf-progress id="fc-progress" total="0" answered="0"></ccaf-progress>
+
+              <div class="card flashcard" id="fc-card" aria-live="polite" aria-atomic="true">
+                <!-- content injected here -->
+              </div>
+
+              <div
+                id="fc-actions"
+                style="margin-top: 20px; display: flex; justify-content: center; gap: 12px"
+              >
+                <!-- This will hold the "Next Card" button after answering -->
+                <button class="btn primary hidden" id="fc-btn-next">Next Card</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ==============================
+       EXAM WRAP BEGIN
+       ============================== -->
+          <div class="exam-wrap">
+            <div class="exam-head">
+              <div class="title">
+                <span class="brand-mark sm" aria-hidden="true"></span>
+                <span>CCAF Practice — Session</span>
+                <span id="session-id" class="chip mono" title="Session ID">—</span>
+              </div>
+              <div id="timer" class="timer" role="timer" aria-live="polite" aria-atomic="true">
+                02:00:00
+              </div>
+            </div>
+
+            <div class="exam-body">
+              <!-- START SCREEN -->
+              <div id="view-start">
+                <div class="start-grid">
+                  <div>
+                    <h3>Before you start</h3>
+                    <p>
+                      This mock mirrors the real exam exactly: <strong>60 questions</strong>, a
+                      single session with no breaks, question nav + flagging, and a
+                      <strong>120-minute timer</strong>. Length and timing are locked to match the
+                      real CCAF — pick <em>Untimed practice mode</em> below if you just want to
+                      study without the clock. Practice modes and incomplete exams are
+                      <strong>not saved</strong> to your global dashboard stats.
+                    </p>
+
+                    <input id="opt-count" type="hidden" value="60" />
+                    <input id="opt-minutes" type="hidden" value="120" />
+
+                    <div class="auth-box">
+                      <h4>Optional: Save Your Progress</h4>
+                      <p>
+                        Provide your email and a 6-digit PIN to save your score and receive future
+                        mock tests. Leave blank to take as guest.
+                        <em>(Only full 60-Q timed mocks count toward global stats)</em>
+                      </p>
+                      <div class="auth-form">
+                        <input
+                          type="text"
+                          id="auth-nickname"
+                          class="auth-input"
+                          inputmode="text"
+                          placeholder="Nickname (for leaderboard)"
+                          maxlength="20"
+                          aria-label="Nickname"
+                        />
+                        <input
+                          type="email"
+                          inputmode="email"
+                          autocomplete="email"
+                          id="auth-email"
+                          class="auth-input"
+                          placeholder="Email address"
+                          aria-label="Email"
+                        />
+                        <input
+                          type="password"
+                          id="auth-pin"
+                          class="auth-input"
+                          inputmode="numeric"
+                          placeholder="6-digit PIN"
+                          maxlength="6"
+                          pattern="\d{6}"
+                          aria-label="PIN"
+                        />
+                      </div>
+                    </div>
+
+                    <div id="dashboard-container" class="hidden"></div>
+
+                    <div
+                      class="cta-row"
+                      style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap"
+                    >
+                      <button class="btn accent" id="btn-start">Start timed exam (60 Qs)</button>
+                      <button class="btn ghost small" id="btn-practice">
+                        Untimed practice mode
+                      </button>
+                      <button class="btn ghost small" id="btn-targeted">
+                        Targeted Practice (Weakest Domain)
+                      </button>
+                      <button class="btn ghost small" id="btn-flashcard" style="position: relative">
+                        Flashcard Mode (Study Cards)
+                        <span
+                          id="fc-due-count"
+                          style="margin-left: 4px; color: var(--bad); font-weight: bold"
+                        ></span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="rules">
+                    <h2 style="margin-top: 4px; font-size: 1.15rem">Rules</h2>
+                    <ul>
+                      <li>
+                        Pass mark on the real exam isn't public — this mock flags
+                        <strong>700 / 1000</strong> as a working benchmark.
+                      </li>
+                      <li>Each question is weighted equally on the 1,000-point scale.</li>
+                      <li>You can flag and revisit questions from the palette on the right.</li>
+                      <li>Submitting early or running out of time both end the session.</li>
+                      <li>
+                        No external tools, notes, or tabs — this is a proctor-style simulation.
+                      </li>
+                      <li>Switching tabs blurs the exam and records a focus-loss event.</li>
+                    </ul>
+                    <p style="margin-top: 10px; color: var(--muted); font-size: 0.82rem">
+                      Handy shortcuts during the exam: <span class="kbd">1</span>–<span class="kbd"
+                        >4</span
+                      >
+                      pick A–D · <span class="kbd">F</span> flag · <span class="kbd">←</span>/<span
+                        class="kbd"
+                        >→</span
+                      >
+                      navigate.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RUNNING SCREEN -->
+              <div id="view-running" class="hidden">
+                <ccaf-progress id="exam-progress" total="0" answered="0"></ccaf-progress>
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-top: 6px;
+                    margin-bottom: 14px;
+                  "
+                >
+                  <small class="mono" id="progress-text">0 / 0 answered</small>
+                  <div>
+                    <button class="btn ghost small" id="btn-cancel-exam" style="color: var(--bad)">
+                      Quit (abandon session)
+                    </button>
+                    <button class="btn ghost small" id="btn-submit">Submit exam</button>
+                  </div>
+                </div>
+
+                <div class="q-layout">
+                  <div>
+                    <div class="q-card" id="q-card">
+                      <div class="q-num" id="q-num">Question 1 of 60</div>
+                      <div class="q-text" id="q-text">—</div>
+                      <div id="q-opts"></div>
+                      <div class="q-actions">
+                        <label class="flag"
+                          ><input type="checkbox" id="flag-box" /> Flag for review</label
+                        >
+                        <div>
+                          <button class="btn ghost small" id="btn-prev">← Prev</button>
+                          <button class="btn primary small" id="btn-next">Next →</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <aside class="palette" aria-label="Question palette">
+                    <h4>Question palette</h4>
+                    <div class="palette-grid" id="palette"></div>
+                    <div class="legend">
+                      <div class="swatch-item">
+                        <div class="swatch ans"></div>
+                        Answered
+                      </div>
+                      <div class="swatch-item">
+                        <div class="swatch flag"></div>
+                        Flagged
+                      </div>
+                      <div class="swatch-item">
+                        <div class="swatch un"></div>
+                        Unanswered
+                      </div>
+                    </div>
+                    <div style="margin-top: 14px">
+                      <button class="btn accent small" style="width: 100%" id="btn-submit-2">
+                        Finish & score
+                      </button>
+                    </div>
+                  </aside>
+                </div>
+              </div>
+
+              <!-- RESULT SCREEN -->
+              <div id="view-result" class="hidden">
+                <div class="result-v2" id="result-card">
+                  <div class="result-v2-top">
+                    <div class="result-v2-left">
+                      <div class="score-ring big" role="img" aria-label="Score">
+                        <svg viewBox="0 0 220 220">
+                          <defs>
+                            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stop-color="#F6C437" />
+                              <stop offset="100%" stop-color="#E2AC13" />
+                            </linearGradient>
+                            <linearGradient id="ringGradPass" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stop-color="#86A64E" />
+                              <stop offset="100%" stop-color="#567A2E" />
+                            </linearGradient>
+                          </defs>
+                          <circle
+                            class="s-bg"
+                            cx="110"
+                            cy="110"
+                            r="96"
+                            stroke-width="16"
+                            fill="none"
+                          />
+                          <circle
+                            class="s-fg"
+                            id="ring-fg"
+                            cx="110"
+                            cy="110"
+                            r="96"
+                            stroke-width="16"
+                            fill="none"
+                            stroke-dasharray="603.19"
+                            stroke-dashoffset="603.19"
+                          />
+                        </svg>
+                        <div class="center">
+                          <div class="val" id="score-val">0</div>
+                          <div class="label">of 1,000</div>
+                          <div class="pct mono" id="score-pct">—</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="result-v2-right">
+                      <div class="result-eyebrow">
+                        <span class="pass-tag" id="pass-tag">—</span>
+                        <span class="chip mono" id="result-session">—</span>
+                      </div>
+                      <h2 class="result-head" id="result-head">Your result</h2>
+                      <p id="result-summary" class="result-sum"></p>
+                      <div class="result-kpis">
+                        <div class="stat">
+                          <div class="k" id="r-correct">0</div>
+                          <div class="l">Correct</div>
+                        </div>
+                        <div class="stat">
+                          <div class="k" id="r-incorrect">0</div>
+                          <div class="l">Incorrect</div>
+                        </div>
+                        <div class="stat">
+                          <div class="k" id="r-skipped">0</div>
+                          <div class="l">Skipped</div>
+                        </div>
+                        <div class="stat">
+                          <div class="k" id="r-time">0:00</div>
+                          <div class="l">Time used</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="result-v2-footer">
+                    <div id="domain-breakdown"></div>
+                    <div class="review-gate" id="review-gate">
+                      <div class="review-gate-icon" id="review-gate-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="review-gate-title" id="review-gate-title">Review is locked</div>
+                        <div class="review-gate-msg" id="review-gate-msg">
+                          Finish all 60 questions before the timer ends to unlock explanations.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="cta-row">
+                      <button class="btn accent" id="btn-review" disabled>
+                        Review with explanations
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M5 12h14" />
+                          <path d="m13 6 6 6-6 6" />
+                        </svg>
+                      </button>
+                      <button class="btn ghost" id="btn-retake">Retake exam</button>
+                      <button class="btn ghost" id="btn-share" title="Share your result">
+                        <svg
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                          style="
+                            width: 16px;
+                            height: 16px;
+                            stroke: currentColor;
+                            stroke-width: 1.75;
+                            fill: none;
+                          "
+                        >
+                          <circle cx="18" cy="5" r="3" />
+                          <circle cx="6" cy="12" r="3" />
+                          <circle cx="18" cy="19" r="3" />
+                          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                        </svg>
+                        Share
+                      </button>
+                    </div>
+                    <div
+                      id="share-menu"
+                      class="hidden"
+                      style="
+                        margin-top: 10px;
+                        display: flex;
+                        gap: 8px;
+                        flex-wrap: wrap;
+                        justify-content: flex-end;
+                      "
+                    >
+                      <button class="btn ghost small" id="share-copy">📋 Copy text</button>
+                      <a
+                        class="btn ghost small"
+                        id="share-twitter"
+                        href="#"
+                        target="_blank"
+                        rel="noopener"
+                        >𝕏 Twitter</a
+                      >
+                      <a
+                        class="btn ghost small"
+                        id="share-linkedin"
+                        href="#"
+                        target="_blank"
+                        rel="noopener"
+                        >in LinkedIn</a
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- REVIEW SCREEN -->
+              <div id="view-review" class="hidden">
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 10px;
+                  "
+                >
+                  <h3 style="margin: 0">Review mode</h3>
+                  <div>
+                    <button class="btn ghost small" id="btn-back-to-result">← Back to score</button>
+                    <button class="btn accent small" id="btn-retake-2">Retake exam</button>
+                  </div>
+                </div>
+                <p style="margin-top: 0">
+                  Green = correct answer. Red = what you picked (if wrong). Every option has an
+                  explanation.
+                </p>
+                <div id="review-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-col" style="text-align: left">
+            <div class="brand-footer">
+              <span class="brand-mark sm" aria-hidden="true"></span>
+              <span class="brand-name">CyberSkill</span>
+            </div>
+            <div class="slogan" style="margin-top: 4px; margin-bottom: 16px">
+              Turn your will into real
+            </div>
+            <p style="font-size: 0.85rem; max-width: 300px; line-height: 1.6">
+              Providing enterprise-grade practice materials and infrastructure for the Claude
+              Partner Network community.
+            </p>
+          </div>
+          <div class="footer-col" style="text-align: left">
+            <p class="footer-title" data-i18n="footer.creator">Creator</p>
+            <div class="footer-links">
+              <a href="https://www.linkedin.com/in/zintaen/" target="_blank" rel="noopener"
+                >Stephen Cheng (LinkedIn)</a
+              >
+              <a href="https://wa.me/84906878091" target="_blank" rel="noopener"
+                >WhatsApp (+84 90 687 8091)</a
+              >
+              <a href="https://buymeacoffee.com/zintaen" target="_blank" rel="noopener"
+                >Buy me a coffee ☕</a
+              >
+            </div>
+          </div>
+          <div class="footer-col" style="text-align: left">
+            <p class="footer-title" data-i18n="footer.legal">Legal & Disclaimer</p>
+            <p style="font-size: 0.8rem; line-height: 1.5">
+              CCAF, Claude, and the Claude Partner Network are Anthropic products/programs. This
+              page is an unofficial, community-made study aid and is
+              <strong>not affiliated with Anthropic</strong>.
+            </p>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          &copy; <span id="copyright-year"></span> CyberSkill &amp; Stephen Cheng. All rights
+          reserved.
+        </div>
+      </div>
+    </footer>
+
+    <!-- Integrity / anti-copy / anti-capture deterrents -->
+
+  </body>
+</html>

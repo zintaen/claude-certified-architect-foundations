@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+:root {
+  --background: #0a0a0c;
+  --foreground: #e4e4e7;
+  
+  --card: rgba(24, 24, 27, 0.4);
+  --card-foreground: #e4e4e7;
+  
+  --primary: #fbbf24; /* Amber/Gold 400 */
+  --primary-foreground: #18181b;
+  
+  --border: rgba(251, 191, 36, 0.15); /* Subtle gold border */
+  --input: rgba(39, 39, 42, 0.5);
+  --ring: rgba(251, 191, 36, 0.5);
+  
+  --accent: rgba(39, 39, 42, 0.6);
+  --accent-foreground: #fafafa;
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+
+  --success: #10b981;
+  --success-foreground: #fafafa;
+
+  --font-inter: 'Inter', sans-serif;
+  --font-jetbrains-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    background-image: 
+      radial-gradient(circle at 15% 50%, rgba(251, 191, 36, 0.03), transparent 25%),
+      radial-gradient(circle at 85% 30%, rgba(251, 191, 36, 0.04), transparent 25%);
+    background-attachment: fixed;
+  }
+}
+
+.glass-panel {
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.glass-panel-hover:hover {
+  background: rgba(39, 39, 42, 0.6);
+  border-color: rgba(251, 191, 36, 0.3);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.1);
+}
+
+/* Stress Mode specific styling */
+.stress-mode-active {
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+.stress-mode-active * {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Typography utilities */
+.text-gradient {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
