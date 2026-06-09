@@ -28,6 +28,9 @@
     "react-dom": "19.2.4",
     "zustand": "^5.0.14"
   },
+  "overrides": {
+    "postcss": "$postcss"
+  },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
@@ -39,6 +42,7 @@
     "eslint-config-next": "16.2.7",
     "jsdom": "^29.1.1",
     "playwright": "^1.60.0",
+    "postcss": "^8.5.15",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.8"
