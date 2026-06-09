@@ -45,6 +45,32 @@ export default function ExamPage() {
     return () => clearInterval(interval);
   }, [mounted, store.endsAt, store.finished, store.untimed, engine, router]);
 
+  // Anti-cheat logic
+  const [warnings, setWarnings] = useState(0);
+  const [cheatWarning, setCheatWarning] = useState(false);
+
+  useEffect(() => {
+    if (!mounted || store.finished || store.untimed) return;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setWarnings((w) => {
+          const newW = w + 1;
+          if (newW >= 3) {
+            engine.finishExam(true);
+            router.push('/result');
+          } else {
+            setCheatWarning(true);
+          }
+          return newW;
+        });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [mounted, store.finished, store.untimed, engine, router]);
+
   if (!mounted || store.items.length === 0) return null;
 
   const currentQ = store.items[store.idx];
@@ -206,6 +232,34 @@ export default function ExamPage() {
           )}
         </div>
       </main>
+
+      {/* Anti-Cheat Modal */}
+      <AnimatePresence>
+        {cheatWarning && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/90 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="glass-panel max-w-md p-8 flex flex-col gap-4 rounded-xl border-red-500/50 items-center text-center"
+            >
+              <div className="w-16 h-16 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center mb-2">
+                <Flag className="w-8 h-8" />
+              </div>
+              <h2 className="text-2xl font-bold text-red-500">Focus Lost</h2>
+              <p className="text-foreground/80">
+                You have left the exam window. This is warning {warnings} of 3. If you reach 3 warnings, your exam will be automatically terminated.
+              </p>
+              <button
+                onClick={() => setCheatWarning(false)}
+                className="mt-4 bg-red-500 text-white px-6 py-2 rounded-md font-bold hover:bg-red-600 transition-colors"
+              >
+                I Understand, Return to Exam
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
