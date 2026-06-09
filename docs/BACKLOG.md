@@ -18,5 +18,5 @@
 | L1-1 | High | [DONE] | Security | Update vulnerable dependencies (PostCSS) to resolve XSS vulnerability. (Expect: 0 vulnerabilities) |
 | L1-2 | High | [DONE] | Code Quality | Fix unused variable warning in `src/app/result/page.tsx`. (Expect: 0 lint warnings) |
 | L1-3 | High | [DONE] | Anti-Cheat Enforcement | Implement focus-tracking and fullscreen enforcement hooks in `src/app/exam/page.tsx`. (Expect: Cheating prevention active in UI) |
-| L1-4 | Medium | [IN-PROGRESS] | Telemetry & Observability Completeness | Enhance OpenTelemetry spans for the exam session to match enterprise patterns. (Expect: Richer observability data) |
-| L1-5 | Medium | [TODO] | Performance / Build | Optimize Next.js bundle and configuration to reduce build time. (Expect: Reduced build time towards 2.0s) |
+| L1-4 | Medium | [DONE] | Telemetry & Observability Completeness | Enhance OpenTelemetry spans for the exam session to match enterprise patterns. (Expect: Richer observability data) |
+| L1-5 | Medium | [IN-PROGRESS] | Performance / Build | Optimize Next.js bundle and configuration to reduce build time. (Expect: Reduced build time towards 2.0s) |
