@@ -14,7 +14,12 @@ export const syncQueue = {
     queue.push(payload);
     localStorage.setItem('ccaf-sync-queue', JSON.stringify(queue));
   },
-  async sync(supabaseRpc: (name: 'submit_exam_result', payload: SubmitExamArgs) => Promise<{ error: unknown }>) {
+  async sync(
+    supabaseRpc: (
+      name: 'submit_exam_result',
+      payload: SubmitExamArgs
+    ) => Promise<{ error: unknown }>
+  ) {
     if (typeof window === 'undefined') return;
     const queue = JSON.parse(localStorage.getItem('ccaf-sync-queue') || '[]');
     if (queue.length === 0) return;

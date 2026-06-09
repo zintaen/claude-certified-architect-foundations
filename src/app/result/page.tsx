@@ -154,7 +154,10 @@ export default function ResultPage() {
                     </div>
                   </div>
 
-                  <div className="text-lg" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(it.text) }} />
+                  <div
+                    className="text-lg"
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(it.text) }}
+                  />
 
                   <div className="flex flex-col gap-3 mt-4">
                     {it.options.map((opt) => {
@@ -185,7 +188,9 @@ export default function ResultPage() {
                             >
                               {opt.letter}
                             </div>
-                            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opt.text) }} />
+                            <div
+                              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opt.text) }}
+                            />
                           </div>
 
                           {store.reviewEnabled && opt.explain && (
