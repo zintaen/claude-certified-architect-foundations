@@ -1,5 +1,5 @@
 import { useExamStore, Question } from '@/store/examStore';
-import { supabase } from '../lib/supabase';
+
 import { useCallback } from 'react';
 import { syncQueue } from '../lib/offlineQueue';
 
@@ -96,13 +96,18 @@ export function useExamEngine() {
         };
 
         try {
-          const { error } = await supabase.rpc('submit_exam_result', payload);
-          if (error) {
-            console.error(error);
+          const res = await fetch('/api/exam/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+          if (!res.ok || data.error) {
+            console.error(data.error);
             syncQueue.add(payload);
           }
         } catch (err: unknown) {
-          console.warn('Could not save to supabase (maybe local/offline). Queuing offline.', err);
+          console.warn('Could not save to API (maybe local/offline). Queuing offline.', err);
           syncQueue.add(payload);
         }
       }
