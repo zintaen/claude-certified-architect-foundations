@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useExamStore } from '@/store/examStore';
 import { CheckCircle2, XCircle, ArrowLeft, Share2, Award, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { questions } from '@/data/questions';
 import DOMPurify from 'isomorphic-dompurify';
 
 export default function ResultPage() {
