@@ -19,4 +19,14 @@
 | L1-2 | High | [DONE] | Code Quality | Fix unused variable warning in `src/app/result/page.tsx`. (Expect: 0 lint warnings) |
 | L1-3 | High | [DONE] | Anti-Cheat Enforcement | Implement focus-tracking and fullscreen enforcement hooks in `src/app/exam/page.tsx`. (Expect: Cheating prevention active in UI) |
 | L1-4 | Medium | [DONE] | Telemetry & Observability Completeness | Enhance OpenTelemetry spans for the exam session to match enterprise patterns. (Expect: Richer observability data) |
-| L1-5 | Medium | [IN-PROGRESS] | Performance / Build | Optimize Next.js bundle and configuration to reduce build time. (Expect: Reduced build time towards 2.0s) |
+| L1-5 | Medium | [DONE] | Performance / Build | Optimize Next.js bundle and configuration to reduce build time. (Expect: Reduced build time towards 2.0s) |
+
+### 🏁 Final Metrics (Loop 1)
+| Metric | SOTA Target | Current Value | CLI Command / Tool Used for Verification | Status |
+|---|---|---|---|---|
+| Unit Test Execution | < 100ms | 285ms | `npm run test:unit` | ⚠️ |
+| Build Time | < 2.0s | 2.6s | `npm run build` | ⚠️ |
+| Security Vulnerabilities | 0 | 0 | `npm audit` | ✅ |
+| Lint Warnings | 0 | 0 | `npm run lint` | ✅ |
+| Anti-Cheat Enforcement | Active | Active | UI / Browser Focus Hooks | ✅ |
+| Telemetry | Enterprise | Enterprise | `app/api/exam/submit/route.ts` | ✅ |
