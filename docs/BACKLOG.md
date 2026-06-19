@@ -7,18 +7,20 @@ command that produced it.
 ## Loop 1 — 2026-06-12
 
 ### Scope & method
+
 - Protocol: v1.3.0 | Mode: gated | Depth: standard | Severity floor: High | Vectors: Architecture, Performance, Security, Maintainability, Testing
 - Benchmark basis: BENCHMARK_MODE=auto, but **No external benchmark applicable** — there is no credible, relevant public benchmark for mock-exam-app code quality (R2: auto does not license inventing a comparator). Internal targets only.
 - Protected (untouched this loop): src/data/ (question banks), src/core/ (only `database.types.ts` present)
 
 ### Benchmark table
-| Metric | Baseline | Target | Verify command |
-|---|---|---|---|
-| Lint | 0 errors (clean) | INTERNAL TARGET — stay 0 | `npm run lint` |
-| Unit tests | 1 passed (1) | INTERNAL TARGET — 0 failures, cover scoring/submit | `npm run test:unit` |
-| Production build | exits 0 (Next.js, 7 routes) | INTERNAL TARGET — build exits 0 (met) | `npm run build` |
-| Test files in repo | 2 (1 vitest unit + 1 playwright journey) | INTERNAL TARGET — scoring + submit paths covered | `find tests -name '*.test.*' -o -name '*.spec.*'` |
-| Secrets in tracked files | 0 | INTERNAL TARGET — stay 0 | `git ls-files -z \| xargs -0 grep -lE "AKIA[0-9A-Z]{16}\|sk_live_\|sk-ant-\|AIza[0-9A-Za-z_-]{35}"` |
+
+| Metric                   | Baseline                                 | Target                                             | Verify command                                                                                      |
+| ------------------------ | ---------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Lint                     | 0 errors (clean)                         | INTERNAL TARGET — stay 0                           | `npm run lint`                                                                                      |
+| Unit tests               | 1 passed (1)                             | INTERNAL TARGET — 0 failures, cover scoring/submit | `npm run test:unit`                                                                                 |
+| Production build         | exits 0 (Next.js, 7 routes)              | INTERNAL TARGET — build exits 0 (met)              | `npm run build`                                                                                     |
+| Test files in repo       | 2 (1 vitest unit + 1 playwright journey) | INTERNAL TARGET — scoring + submit paths covered   | `find tests -name '*.test.*' -o -name '*.spec.*'`                                                   |
+| Secrets in tracked files | 0                                        | INTERNAL TARGET — stay 0                           | `git ls-files -z \| xargs -0 grep -lE "AKIA[0-9A-Z]{16}\|sk_live_\|sk-ant-\|AIza[0-9A-Za-z_-]{35}"` |
 
 ```
 $ npm run lint
@@ -51,8 +53,9 @@ $ git ls-files -z | xargs -0 grep -lE "AKIA[0-9A-Z]{16}|sk_live_|sk-ant-|AIza[0-
 ```
 
 ### Task table
-| ID | Sev | Status | Vector | Description + expected delta | Verify command |
-|---|---|---|---|---|---|
+
+| ID    | Sev  | Status  | Vector   | Description + expected delta                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Verify command                                                                                                                       |
+| ----- | ---- | ------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | L1-T1 | High | BLOCKED | Security | `src/app/api/exam/submit/route.ts` forwards client-supplied `payload.p_score` straight to `supabase.rpc('submit_exam_result', payload)` with **no in-repo server-side validation or recomputation** (the score is computed client-side). If the `submit_exam_result` RPC does not re-derive the score from submitted answers, any client can POST an arbitrary score to the leaderboard — an exam-integrity break (DOMAIN_NOTES: scoring defines exam integrity). → Recompute/validate the score server-side (in the RPC or the route) against the submitted answers. Δ: a POST with an inflated `p_score` is rejected or corrected to the recomputed value. **Root cause (BLOCKED):** verified by inspection 2026-06-12 — the route (`src/app/api/exam/submit/route.ts`) forwards `payload` unchanged to the RPC; the score is computed client-side in `src/hooks/useExamEngine.ts` (`score1000 = round(correct/total*1000)`) and the submit carries only `p_score` + `p_wrong_answers` (no per-question chosen answers), so the route cannot faithfully recompute. The authoritative fix belongs in the un-versioned Supabase RPC `submit_exam_result` (no `supabase/` dir in this repo) — recompute server-side from stored answers — which only the maintainer can provide/version. An in-route `p_score` vs `p_wrong_answers` consistency check is weak (client can fake both) and would give false assurance, so not applied. | inspect `submit_exam_result` definition + POST `/api/exam/submit` with a tampered `p_score`, assert stored score = server-recomputed |
 
 ### Phase 3 execution results (2026-06-12)
@@ -68,14 +71,17 @@ than a cosmetic patch. Recommended fix: recompute server-side in the RPC from
 stored answers (maintainer-provided), then verify with a tampered-`p_score` POST.
 
 ### Below SEVERITY_FLOOR (recorded, not scheduled this loop)
+
 - **M — Testing**: only 2 test files (1 vitest unit asserting 1 case + 1 playwright journey) for an exam app whose scoring and submit flow are the product. Thin coverage on exactly the integrity-bearing paths. Pairs with L1-T1.
 - **M — Architecture**: scoring logic is not in the repo's `src/core/` (only `database.types.ts`); it lives client-side and/or in the un-versioned Supabase RPC. Centralizing the authoritative score computation (server-side, versioned) would make L1-T1 closeable and testable.
 
 ### Notes
+
 - No significant findings under Performance at depth standard — Next.js build is clean (7 routes, exit 0); no measured runtime regression claimed without a load/Lighthouse harness (would be UNMEASURED).
 - R2 note (BENCHMARK_MODE=auto): researched for a relevant public comparator; none exists for mock-exam-app code quality, so targets are INTERNAL — recorded honestly rather than benchmarked against an irrelevant product.
 
 ### Approval (gate)
+
 > Mode is **gated** — Phase 3 (execution) will not start until this line is filled.
 > Record approved task IDs here, e.g. `Approved: L1-T1` (or `Approved: none`).
 

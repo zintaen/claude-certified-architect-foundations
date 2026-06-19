@@ -6,7 +6,7 @@ built or deployed. Validate with a Vercel preview before promoting to production
 ## What was wrong
 
 1. Production served a stale build. `vercel.json` still had Vite-era settings (`outputDirectory:
-   "dist"`, a catch-all rewrite to `/index.html`, Vite asset headers), so Vercel served the old,
+"dist"`, a catch-all rewrite to `/index.html`, Vite asset headers), so Vercel served the old,
    tracked `dist/` Vite SPA instead of this Next.js app. The Next `/api/exam/submit` route never ran
    in production, which also left the leaderboard and global stats empty.
 2. The Submit button navigated to `/result` even when `finishExam` bailed (unanswered questions or a

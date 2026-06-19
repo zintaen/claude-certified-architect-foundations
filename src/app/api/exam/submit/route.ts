@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     async (span) => {
       try {
         const payload = await request.json();
-        
+
         span.setAttribute('exam.score', payload.p_score);
         span.setAttribute('exam.time_taken', payload.p_time_taken);
         if (payload.p_nickname) {

@@ -246,7 +246,8 @@ export default function ExamPage() {
               </div>
               <h2 className="text-2xl font-bold text-red-500">Focus Lost</h2>
               <p className="text-foreground/80">
-                You have left the exam window. This is warning {warnings} of 3. If you reach 3 warnings, your exam will be automatically terminated.
+                You have left the exam window. This is warning {warnings} of 3. If you reach 3
+                warnings, your exam will be automatically terminated.
               </p>
               <button
                 onClick={() => setCheatWarning(false)}
