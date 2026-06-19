@@ -104,7 +104,10 @@ export async function fetchGlobalStats(): Promise<GlobalStats | null> {
   };
 }
 
-export async function fetchUserHistory(email: string, pinHash: string): Promise<UserHistory | null> {
+export async function fetchUserHistory(
+  email: string,
+  pinHash: string
+): Promise<UserHistory | null> {
   const { data, error } = await supabase.rpc('get_user_history', {
     p_email: email,
     p_pin_hash: pinHash,
