@@ -10,14 +10,23 @@ import DOMPurify from 'isomorphic-dompurify';
 export default function ResultPage() {
   const store = useExamStore();
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  // zustand persist may finish rehydrating from localStorage AFTER this component mounts. Decide
+  // whether to redirect only once hydration is done - otherwise a cold load of /result (refresh,
+  // shared link, restored tab) bounces the user home before the finished session is restored.
+  useEffect(() => {
+    const unsub = useExamStore.persist.onFinishHydration(() => setHydrated(true));
+    if (useExamStore.persist.hasHydrated()) setHydrated(true);
+    return unsub;
+  }, []);
 
   useEffect(() => {
-    setMounted(true);
+    if (!hydrated) return;
     if (!store.finished || store.items.length === 0) {
       router.push('/');
     }
-  }, [store.finished, store.items.length, router]);
+  }, [hydrated, store.finished, store.items.length, router]);
 
   const stats = useMemo(() => {
     if (store.items.length === 0) return null;
@@ -42,7 +51,7 @@ export default function ResultPage() {
     return { correct, incorrect, skipped, score1000, passed, timeSec, total: store.items.length };
   }, [store.items, store.endsAt, store.startedAt]);
 
-  if (!mounted || !stats) return null;
+  if (!hydrated || !stats) return null;
 
   return (
     <div className="flex-1 max-w-4xl w-full mx-auto p-6 md:p-12 flex flex-col gap-8">

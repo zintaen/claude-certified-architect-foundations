@@ -38,16 +38,20 @@ export function useExamEngine() {
   );
 
   const finishExam = useCallback(
-    async (force: boolean) => {
-      if (store.finished) return;
+    async (force: boolean): Promise<boolean> => {
+      // Returns true when the exam is actually finished (so the caller may navigate to /result),
+      // false when the user bailed (unanswered questions, or declined the confirm). The submit
+      // button previously navigated regardless, landing on /result with finished=false, which the
+      // result page then redirected home - so the user "could not see their results".
+      if (store.finished) return true;
 
       const unanswered = store.items.filter((x) => !x.chosenLetter).length;
       if (!force && unanswered > 0) {
         alert(`You must answer all ${store.items.length} questions before submitting.`);
-        return;
+        return false;
       }
 
-      if (!force && !window.confirm(`Submit now? You'll see your score and review.`)) return;
+      if (!force && !window.confirm(`Submit now? You'll see your score and review.`)) return false;
 
       let correct = 0;
       store.items.forEach((it) => {
@@ -76,7 +80,10 @@ export function useExamEngine() {
         reviewLockReason,
       });
 
-      // submit to supabase
+      // Persist to Supabase in the BACKGROUND. Navigation to /result must not wait on the
+      // network: the score is computed and stored locally above, and a failed save is retried via
+      // the offline queue. Awaiting the round-trip here previously coupled showing the user their
+      // result to the (un-versioned) scoring RPC succeeding.
       if (!store.untimed) {
         const wrongIdxs: number[] = [];
         store.items.forEach((it, idx) => {
@@ -95,22 +102,26 @@ export function useExamEngine() {
           p_nickname: localStorage.getItem('ccaf-nickname') || undefined,
         };
 
-        try {
-          const res = await fetch('/api/exam/submit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
-          const data = await res.json();
-          if (!res.ok || data.error) {
-            console.error(data.error);
+        void (async () => {
+          try {
+            const res = await fetch('/api/exam/submit', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (!res.ok || data.error) {
+              console.error(data.error);
+              syncQueue.add(payload);
+            }
+          } catch (err: unknown) {
+            console.warn('Could not save to API (maybe local/offline). Queuing offline.', err);
             syncQueue.add(payload);
           }
-        } catch (err: unknown) {
-          console.warn('Could not save to API (maybe local/offline). Queuing offline.', err);
-          syncQueue.add(payload);
-        }
+        })();
       }
+
+      return true;
     },
     [store]
   );

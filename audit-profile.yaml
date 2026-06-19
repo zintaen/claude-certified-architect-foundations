@@ -1,0 +1,12 @@
+# Audit identity — runner mode (protocol stays in code-audit-framework).
+config:
+  TECH_STACK: TypeScript / Next.js / React / Vitest / Playwright
+  PROJECT_PURPOSE: Mock-exam practice app for Claude Certified Architect preparation
+  MODE: gated
+  LOOP_BUDGET: 2
+  DEPTH: standard
+  SEVERITY_FLOOR: High
+  PROTECTED_AREAS: src/data/, src/core/
+  RUN_COMMANDS: npm run lint; npm run test:unit; npm run build
+  DOMAIN_NOTES: Question banks (src/data/) and scoring logic (src/core/) define exam integrity — behavior-preserving only. e2e (npm run test:e2e) runs on demand, not in the health gate (needs a browser).
+  BENCHMARK_MODE: auto

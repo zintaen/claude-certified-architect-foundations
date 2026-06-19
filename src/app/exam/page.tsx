@@ -38,8 +38,7 @@ export default function ExamPage() {
 
       if (left <= 0) {
         clearInterval(interval);
-        engine.finishExam(true);
-        router.push('/result');
+        void engine.finishExam(true).then(() => router.push('/result'));
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -57,8 +56,7 @@ export default function ExamPage() {
         setWarnings((w) => {
           const newW = w + 1;
           if (newW >= 3) {
-            engine.finishExam(true);
-            router.push('/result');
+            void engine.finishExam(true).then(() => router.push('/result'));
           } else {
             setCheatWarning(true);
           }
@@ -221,9 +219,9 @@ export default function ExamPage() {
             </button>
           ) : (
             <button
-              onClick={() => {
-                engine.finishExam(false);
-                router.push('/result');
+              onClick={async () => {
+                const finished = await engine.finishExam(false);
+                if (finished) router.push('/result');
               }}
               className="bg-primary text-primary-foreground px-6 py-2 rounded-md font-bold hover:bg-primary/90 transition-colors shadow-[0_0_15px_rgba(251,191,36,0.3)]"
             >
