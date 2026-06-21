@@ -8,6 +8,7 @@ import { useExamEngine } from '@/hooks/useExamEngine';
 import { questions } from '@/data/questions';
 import { Clock, Flag, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import DOMPurify from 'isomorphic-dompurify';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function ExamPage() {
   const router = useRouter();
@@ -81,7 +82,7 @@ export default function ExamPage() {
     <div className="flex-1 flex flex-col md:flex-row h-[calc(100vh-73px)]">
       {/* Sidebar: Navigation Palette */}
       <aside className="w-full md:w-64 glass-panel border-y-0 border-l-0 overflow-y-auto p-4 flex flex-col gap-4 order-2 md:order-1 h-48 md:h-full shrink-0">
-        <div className="flex items-center justify-between pb-4 border-b border-white/5">
+        <div className="flex items-center justify-between pb-4 border-b border-border">
           <div className="text-sm font-semibold">Questions</div>
           <div className="text-xs text-foreground/60">
             {totalAnswered}/{store.items.length}
@@ -104,7 +105,7 @@ export default function ExamPage() {
               >
                 {i + 1}
                 {isFlagged && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-background" />
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full border border-background" />
                 )}
               </button>
             );
@@ -122,7 +123,7 @@ export default function ExamPage() {
           <div className="flex items-center gap-4">
             {!store.untimed && (
               <div
-                className={`flex items-center gap-2 font-mono text-lg font-bold px-3 py-1 rounded-md border ${isDanger ? 'bg-red-500/10 text-red-500 border-red-500/30' : 'bg-primary/10 text-primary border-primary/20'}`}
+                className={`flex items-center gap-2 font-mono text-lg font-bold px-3 py-1 rounded-md border ${isDanger ? 'bg-destructive/10 text-destructive border-destructive/30' : 'bg-primary/10 text-primary border-primary/20'}`}
               >
                 <Clock className="w-4 h-4" />
                 {timeLeft || '...'}
@@ -130,11 +131,12 @@ export default function ExamPage() {
             )}
             <button
               onClick={() => store.flagQuestion(store.idx, !currentQ.flagged)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border ${currentQ.flagged ? 'bg-red-500/20 text-red-500 border-red-500/30' : 'glass-panel text-foreground/70'}`}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border ${currentQ.flagged ? 'bg-destructive/20 text-destructive border-destructive/30' : 'glass-panel text-foreground/70'}`}
             >
               <Flag className="w-4 h-4" />
               <span className="hidden sm:inline">Flag for Review</span>
             </button>
+            <ThemeToggle />
           </div>
         </div>
 
@@ -165,8 +167,8 @@ export default function ExamPage() {
                         relative flex items-start gap-4 p-4 rounded-xl cursor-pointer transition-all border
                         ${
                           isSelected
-                            ? 'bg-primary/10 border-primary shadow-[0_0_15px_rgba(251,191,36,0.15)]'
-                            : 'glass-panel border-white/5 hover:border-white/20'
+                            ? 'bg-primary/10 border-primary shadow-[0_0_15px_var(--glow)]'
+                            : 'glass-panel border-border hover:border-border'
                         }
                       `}
                     >
@@ -180,7 +182,7 @@ export default function ExamPage() {
                       <div
                         className={`
                         shrink-0 w-8 h-8 flex items-center justify-center rounded-lg font-mono text-sm font-bold border
-                        ${isSelected ? 'bg-primary text-primary-foreground border-primary' : 'bg-white/5 border-white/10'}
+                        ${isSelected ? 'bg-primary text-primary-foreground border-primary' : 'bg-[var(--overlay-subtle)] border-border'}
                       `}
                       >
                         {letter}
@@ -223,7 +225,7 @@ export default function ExamPage() {
                 const finished = await engine.finishExam(false);
                 if (finished) router.push('/result');
               }}
-              className="bg-primary text-primary-foreground px-6 py-2 rounded-md font-bold hover:bg-primary/90 transition-colors shadow-[0_0_15px_rgba(251,191,36,0.3)]"
+              className="bg-primary text-primary-foreground px-6 py-2 rounded-md font-bold hover:bg-primary/90 transition-colors shadow-[0_0_15px_var(--glow)]"
             >
               Submit Exam
             </button>
@@ -239,19 +241,19 @@ export default function ExamPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="glass-panel max-w-md p-8 flex flex-col gap-4 rounded-xl border-red-500/50 items-center text-center"
+              className="glass-panel max-w-md p-8 flex flex-col gap-4 rounded-xl border-destructive/50 items-center text-center"
             >
-              <div className="w-16 h-16 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center mb-2">
+              <div className="w-16 h-16 rounded-full bg-destructive/20 text-destructive flex items-center justify-center mb-2">
                 <Flag className="w-8 h-8" />
               </div>
-              <h2 className="text-2xl font-bold text-red-500">Focus Lost</h2>
+              <h2 className="text-2xl font-bold text-destructive">Focus Lost</h2>
               <p className="text-foreground/80">
                 You have left the exam window. This is warning {warnings} of 3. If you reach 3
                 warnings, your exam will be automatically terminated.
               </p>
               <button
                 onClick={() => setCheatWarning(false)}
-                className="mt-4 bg-red-500 text-white px-6 py-2 rounded-md font-bold hover:bg-red-600 transition-colors"
+                className="mt-4 bg-destructive text-destructive-foreground px-6 py-2 rounded-md font-bold hover:bg-destructive transition-colors"
               >
                 I Understand, Return to Exam
               </button>

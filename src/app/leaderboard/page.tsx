@@ -75,15 +75,15 @@ export default function LeaderboardPage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05 }}
                   key={i}
-                  className={`flex items-center justify-between p-4 border-b border-white/5 last:border-0 ${
-                    i === 0 ? 'bg-primary/10' : i === 1 ? 'bg-white/5' : i === 2 ? 'bg-white/5' : ''
+                  className={`flex items-center justify-between p-4 border-b border-border last:border-0 ${
+                    i === 0 ? 'bg-primary/10' : i === 1 ? 'bg-[var(--overlay-subtle)]' : i === 2 ? 'bg-[var(--overlay-subtle)]' : ''
                   }`}
                 >
                   <div className="flex items-center gap-4">
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
                         i === 0
-                          ? 'bg-primary text-black'
+                          ? 'bg-primary text-primary-foreground'
                           : i === 1
                             ? 'bg-gray-300 text-black'
                             : i === 2
@@ -149,7 +149,7 @@ export default function LeaderboardPage() {
                       className="glass-panel p-3 rounded-lg text-sm flex items-center justify-between"
                     >
                       <span className="font-medium">{p.nickname || 'Anonymous'}</span>
-                      <span className="font-mono text-green-500">{p.score}</span>
+                      <span className="font-mono text-success">{p.score}</span>
                     </div>
                   ))}
                 </div>

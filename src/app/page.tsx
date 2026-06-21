@@ -2,8 +2,77 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { PlayCircle, ShieldCheck, Zap, BarChart, X } from 'lucide-react';
+import {
+  PlayCircle,
+  ShieldCheck,
+  Zap,
+  BarChart,
+  X,
+  Workflow,
+  FileText,
+  MessageSquare,
+  Code2,
+  UserPlus,
+  Timer,
+  ListChecks,
+  ArrowRight,
+  Sparkles,
+} from 'lucide-react';
+import DonateButton from '@/components/DonateButton';
+
+const DOMAINS = [
+  {
+    icon: Workflow,
+    name: 'Research pipelines',
+    count: 15,
+    desc: 'Multi-agent orchestration, state recovery after failures, and context-efficient hand-offs between a coordinator and its sub-agents.',
+  },
+  {
+    icon: FileText,
+    name: 'Extraction pipelines',
+    count: 15,
+    desc: 'Tool contract design, structured output, and reliable data extraction when instructions and inputs are ambiguous.',
+  },
+  {
+    icon: MessageSquare,
+    name: 'Customer support agents',
+    count: 15,
+    desc: 'Graceful degradation, escalation judgment, conversation state, and honest handling of backend failures.',
+  },
+  {
+    icon: Code2,
+    name: 'Code exploration',
+    count: 15,
+    desc: 'Navigating unfamiliar codebases, scoping searches, and reasoning about large repositories with agents.',
+  },
+];
+
+const STEPS = [
+  {
+    icon: UserPlus,
+    title: 'Set up, or stay a guest',
+    desc: 'Add a nickname to join the leaderboard, or an email and PIN to save your history across attempts. Guest mode needs nothing.',
+  },
+  {
+    icon: Timer,
+    title: 'Take the timed mock',
+    desc: '60 scenario questions in one 120-minute session, with question flagging, focus tracking, and a score on the 1,000-point scale.',
+  },
+  {
+    icon: ListChecks,
+    title: 'Review every answer',
+    desc: 'See which options were right or wrong and read the reasoning behind each one, so you learn from the questions you miss.',
+  },
+];
+
+const STATS = [
+  { value: '60', label: 'Scenario questions' },
+  { value: '120', label: 'Minutes, timed' },
+  { value: '4', label: 'Domains covered' },
+  { value: '1,000', label: 'Point scale' },
+];
 
 export default function Home() {
   const router = useRouter();
@@ -26,77 +95,76 @@ export default function Home() {
 
   return (
     <div className="flex-1 flex flex-col relative overflow-hidden">
-      {/* Abstract Background Elements */}
+      {/* Abstract background glows */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-gold/5 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-gold/5 blur-[120px]" />
       </div>
 
-      <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-12 md:py-24 grid md:grid-cols-2 gap-12 items-center">
-        {/* Left Side: Hero Copy */}
+      {/* HERO */}
+      <section className="w-full max-w-6xl mx-auto px-6 py-12 md:py-20 grid md:grid-cols-2 gap-12 items-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="flex flex-col items-start gap-6"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-panel border-primary/30 text-xs font-mono text-primary">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-panel text-xs font-mono text-primary">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </span>
-            V2.0: Next.js Rewrite Live
+            Free practice exam - by CyberSkill
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
             Master the <br />
             <span className="text-gradient">Claude Architect</span> <br />
-            Certification.
+            certification.
           </h1>
 
-          <p className="text-lg text-foreground/70 max-w-md">
-            Simulate the exact conditions of the official Anthropic exam. Test your knowledge in
-            prompt engineering, security, model orchestration, and system design.
+          <p className="text-lg text-muted max-w-md">
+            A faithful simulation of the Anthropic Claude Certified Architect exam. Practice agent
+            design, orchestration, tool contracts, and failure handling under real exam conditions.
           </p>
 
-          <div className="flex flex-wrap items-center gap-4 mt-4">
+          <div className="flex flex-wrap items-center gap-4 mt-2">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setShowSetup(true)}
-              className="bg-primary text-primary-foreground px-6 py-3 rounded-md font-semibold flex items-center gap-2 shadow-[0_0_20px_rgba(251,191,36,0.3)] hover:shadow-[0_0_30px_rgba(251,191,36,0.5)] transition-all"
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-md font-semibold flex items-center gap-2 shadow-[0_0_20px_var(--glow)] hover:shadow-[0_0_30px_var(--glow)] transition-all"
             >
               <PlayCircle className="w-5 h-5" />
-              Start Mock Exam
+              Start mock exam
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => router.push('/leaderboard')}
-              className="glass-panel px-6 py-3 rounded-md font-medium hover:bg-white/5 transition-colors"
+              className="glass-panel px-6 py-3 rounded-md font-medium hover:bg-[var(--overlay-strong)] transition-colors"
             >
-              View Leaderboard
+              View leaderboard
             </motion.button>
           </div>
         </motion.div>
 
-        {/* Right Side: Feature Cards */}
+        {/* Feature cards */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative"
         >
-          {/* Connecting Lines */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full border border-primary/10 rounded-full blur-[2px] -z-10" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full border border-border rounded-full blur-[2px] -z-10" />
 
           <div className="glass-panel p-6 rounded-xl flex flex-col gap-3 glass-panel-hover transition-all">
             <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
               <Zap className="w-5 h-5" />
             </div>
-            <h3 className="font-semibold">Timed Simulation</h3>
-            <p className="text-sm text-foreground/60">
-              Practice under the real 120-minute time constraint to build your pacing strategy.
+            <h3 className="font-semibold">Timed simulation</h3>
+            <p className="text-sm text-muted">
+              Practice under the real 120-minute constraint to build your pacing strategy.
             </p>
           </div>
 
@@ -104,10 +172,9 @@ export default function Home() {
             <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="font-semibold">Anti-Cheat Mode</h3>
-            <p className="text-sm text-foreground/60">
-              Experience strict focus-tracking and fullscreen enforcement just like the real
-              proctoring system.
+            <h3 className="font-semibold">Focus tracking</h3>
+            <p className="text-sm text-muted">
+              Strict focus and visibility checks mirror the discipline of a proctored sitting.
             </p>
           </div>
 
@@ -115,28 +182,167 @@ export default function Home() {
             <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
               <BarChart className="w-5 h-5" />
             </div>
-            <h3 className="font-semibold">Domain Breakdown</h3>
-            <p className="text-sm text-foreground/60">
-              Identify your weak points with a comprehensive radar chart analysis post-exam.
+            <h3 className="font-semibold">Scored feedback</h3>
+            <p className="text-sm text-muted">
+              Get a 1,000-point score and per-question explanations to find your weak spots.
             </p>
           </div>
 
           <div className="glass-panel p-6 rounded-xl flex flex-col gap-3 glass-panel-hover transition-all translate-y-0 sm:translate-y-6">
             <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-              <div className="font-bold">60</div>
+              <div className="font-bold font-mono">60</div>
             </div>
-            <h3 className="font-semibold">Curated Scenarios</h3>
-            <p className="text-sm text-foreground/60">
-              Tackle complex, multi-part scenario questions matching the official blueprint.
+            <h3 className="font-semibold">Curated scenarios</h3>
+            <p className="text-sm text-muted">
+              Complex, multi-part questions drawn from real agent-engineering decisions.
             </p>
           </div>
         </motion.div>
-      </main>
+      </section>
 
-      {/* Setup Modal */}
+      {/* STATS STRIP */}
+      <section className="w-full max-w-6xl mx-auto px-6 pb-8">
+        <div className="surface-panel rounded-2xl grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-border overflow-hidden">
+          {STATS.map((s) => (
+            <div key={s.label} className="p-6 flex flex-col items-center text-center gap-1">
+              <div className="text-3xl md:text-4xl font-bold font-mono">{s.value}</div>
+              <div className="text-xs uppercase tracking-widest text-muted">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* DOMAINS */}
+      <section className="w-full max-w-6xl mx-auto px-6 py-12 md:py-16 flex flex-col gap-10">
+        <div className="flex flex-col gap-3 max-w-2xl">
+          <span className="text-xs font-bold uppercase tracking-widest text-primary">
+            What this mock covers
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+            Four domains, sixty scenarios
+          </h2>
+          <p className="text-muted">
+            Every question is a realistic agent-engineering decision, evenly split across the four
+            areas that define the architect role. No trivia, no memorization - judgment under
+            constraints.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-5">
+          {DOMAINS.map((d) => {
+            const Icon = d.icon;
+            return (
+              <div
+                key={d.name}
+                className="surface-panel rounded-2xl p-6 flex flex-col gap-4 glass-panel-hover transition-all"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-11 h-11 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="text-xs font-mono surface-raised border border-border rounded-full px-3 py-1 text-muted">
+                    {d.count} questions
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold">{d.name}</h3>
+                <p className="text-sm text-muted leading-relaxed">{d.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="w-full max-w-6xl mx-auto px-6 py-12 md:py-16 flex flex-col gap-10">
+        <div className="flex flex-col gap-3 max-w-2xl">
+          <span className="text-xs font-bold uppercase tracking-widest text-primary">
+            How it works
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">From start to score</h2>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5">
+          {STEPS.map((s, i) => {
+            const Icon = s.icon;
+            return (
+              <div key={s.title} className="surface-panel rounded-2xl p-6 flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold font-mono text-sm">
+                    {i + 1}
+                  </div>
+                  <Icon className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">{s.title}</h3>
+                <p className="text-sm text-muted leading-relaxed">{s.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* BUILT BY CYBERSKILL */}
+      <section className="w-full max-w-6xl mx-auto px-6 py-12 md:py-16">
+        <div className="surface-panel rounded-3xl p-8 md:p-12 grid md:grid-cols-[auto_1fr] gap-8 items-center">
+          <Image
+            src="/cyberskill-logo.svg"
+            alt="CyberSkill"
+            width={96}
+            height={96}
+            className="rounded-2xl w-20 h-20 md:w-24 md:h-24"
+          />
+          <div className="flex flex-col gap-4">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary inline-flex items-center gap-2">
+              <Sparkles className="w-4 h-4" /> Built by CyberSkill
+            </span>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
+              We build software, and we build people who build software.
+            </h2>
+            <p className="text-muted leading-relaxed max-w-2xl">
+              CyberSkill is a software solutions consultancy founded in 2020. We design and ship
+              products, developer tooling, and AI-driven workflows for teams worldwide. We made this
+              mock exam because the fastest way to grow the Claude practitioner community is to give
+              people a real way to practice - for free. Our motto says the rest: turn your will into
+              real.
+            </p>
+            <div className="flex flex-wrap items-center gap-4 mt-1">
+              <a
+                href="https://cyberskill.world"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-primary text-primary-foreground px-5 py-2.5 rounded-md font-semibold inline-flex items-center gap-2 hover:brightness-110 transition-all"
+              >
+                Visit cyberskill.world <ArrowRight className="w-4 h-4" />
+              </a>
+              <DonateButton variant="soft" label="Support this project" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SUPPORT CALLOUT */}
+      <section className="w-full max-w-6xl mx-auto px-6 pb-16">
+        <div className="surface-raised border border-border rounded-3xl p-8 md:p-10 flex flex-col items-center text-center gap-4">
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">This mock is free, always</h2>
+          <p className="text-muted max-w-xl">
+            No paywall, no account required. If it helped you prepare and you would like to keep it
+            running, a coffee goes a long way.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-2">
+            <DonateButton variant="solid" />
+            <button
+              onClick={() => setShowSetup(true)}
+              className="surface-panel border border-border px-5 py-2.5 rounded-md font-semibold inline-flex items-center gap-2 hover:border-ring transition-colors"
+            >
+              <PlayCircle className="w-5 h-5" /> Start the mock
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* SETUP MODAL */}
       <AnimatePresence>
         {showSetup && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--scrim)] backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -145,60 +351,61 @@ export default function Home() {
             >
               <button
                 onClick={() => setShowSetup(false)}
-                className="absolute top-4 right-4 p-1 rounded-md hover:bg-white/10 transition-colors"
+                className="absolute top-4 right-4 p-1 rounded-md hover:bg-[var(--overlay-strong)] transition-colors"
               >
                 <X className="w-5 h-5 opacity-60" />
               </button>
 
               <div>
-                <h2 className="text-xl font-bold mb-1">Exam Setup</h2>
-                <p className="text-sm text-foreground/60">
-                  Enter your details to save your score and receive a copy via email.
+                <h2 className="text-xl font-bold mb-1">Exam setup</h2>
+                <p className="text-sm text-muted">
+                  Enter your details to save your score and receive a copy by email. All fields are
+                  optional.
                 </p>
               </div>
 
               <div className="flex flex-col gap-4">
                 <label className="flex flex-col gap-1.5">
                   <span className="text-sm font-medium opacity-80">
-                    Email (Optional, to get results)
+                    Email (optional, to get results)
                   </span>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-input border border-white/10 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                    className="bg-input border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-ring"
                     placeholder="you@example.com"
                   />
                 </label>
                 <label className="flex flex-col gap-1.5">
-                  <span className="text-sm font-medium opacity-80">Nickname (For leaderboard)</span>
+                  <span className="text-sm font-medium opacity-80">Nickname (for leaderboard)</span>
                   <input
                     type="text"
                     value={nickname}
                     onChange={(e) => setNickname(e.target.value)}
-                    className="bg-input border border-white/10 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
+                    className="bg-input border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-ring"
                     placeholder="CyberNinja99"
                   />
                 </label>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-sm font-medium opacity-80">
-                    Secret PIN (To protect your history)
+                    Secret PIN (to protect your history)
                   </span>
                   <input
                     type="password"
                     value={pin}
                     onChange={(e) => setPin(e.target.value)}
-                    className="bg-input border border-white/10 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-primary/50"
-                    placeholder="••••"
+                    className="bg-input border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-ring"
+                    placeholder="****"
                   />
                 </label>
               </div>
 
               <button
                 onClick={handleStart}
-                className="bg-primary text-primary-foreground w-full py-3 rounded-md font-bold mt-2 shadow-[0_0_15px_rgba(251,191,36,0.2)] hover:bg-primary/90 transition-colors"
+                className="bg-primary text-primary-foreground w-full py-3 rounded-md font-bold mt-2 shadow-[0_0_15px_var(--glow)] hover:brightness-110 transition-all"
               >
-                Begin Exam
+                Begin exam
               </button>
             </motion.div>
           </div>

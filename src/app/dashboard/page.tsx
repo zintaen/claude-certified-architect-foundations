@@ -72,7 +72,7 @@ export default function DashboardPage() {
           <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
         </div>
       ) : error ? (
-        <div className="glass-panel p-8 text-center text-red-400 rounded-2xl">{error}</div>
+        <div className="glass-panel p-8 text-center text-destructive rounded-2xl">{error}</div>
       ) : (
         <div className="grid md:grid-cols-2 gap-12">
           {/* General Stats */}
@@ -113,10 +113,10 @@ export default function DashboardPage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05 }}
                   key={i}
-                  className={`flex items-center justify-between p-4 border-b border-white/5 last:border-0 ${
+                  className={`flex items-center justify-between p-4 border-b border-border last:border-0 ${
                     entry.score >= 700
-                      ? 'border-l-4 border-l-green-500'
-                      : 'border-l-4 border-l-red-500'
+                      ? 'border-l-4 border-l-success'
+                      : 'border-l-4 border-l-destructive'
                   }`}
                 >
                   <div className="flex flex-col">

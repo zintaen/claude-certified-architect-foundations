@@ -1,12 +1,24 @@
 @import 'tailwindcss';
 
+/* ------------------------------------------------------------------ */
+/* CyberSkill Design System (CDS) token bridge.                        */
+/* Light is the default theme; warm-dark is opt-in via                  */
+/* <html data-theme="dark">. Values trace to                            */
+/* @cyberskill/tokens (Umber #45210E / Ochre #F4BA17) and the           */
+/* warm-dark tonal model in DESIGN.md.                                  */
+/* ------------------------------------------------------------------ */
+
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-gold: var(--gold);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-muted: var(--muted);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -16,36 +28,100 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
 
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-be-vietnam-pro);
   --font-mono: var(--font-jetbrains-mono);
+
+  --radius-md: 8px;
 }
 
+/* Light theme (default) ------------------------------------------- */
 :root {
-  --background: #0a0a0c;
-  --foreground: #e4e4e7;
+  color-scheme: light;
 
-  --card: rgba(24, 24, 27, 0.4);
-  --card-foreground: #e4e4e7;
+  --background: #fffdf8; /* surface-page */
+  --foreground: #45210e; /* text-primary (Umber) */
 
-  --primary: #fbbf24; /* Amber/Gold 400 */
-  --primary-foreground: #18181b;
+  --primary: #45210e; /* CTA ground in light (Umber) */
+  --primary-foreground: #ffffff;
+  --gold: #f4ba17; /* Ochre accent */
 
-  --border: rgba(251, 191, 36, 0.15); /* Subtle gold border */
-  --input: rgba(39, 39, 42, 0.5);
-  --ring: rgba(251, 191, 36, 0.5);
+  --card: #ffffff;
+  --card-foreground: #45210e;
+  --panel: #ffffff; /* surface-panel */
+  --raised: #fbf4e9; /* surface-raised */
+  --muted: #6e5a4c; /* text-muted */
 
-  --accent: rgba(39, 39, 42, 0.6);
-  --accent-foreground: #fafafa;
+  --border: #e7d9c6;
+  --input: #ffffff;
+  --ring: rgba(244, 186, 23, 0.55);
 
-  --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
+  --accent: #fbf4e9;
+  --accent-foreground: #45210e;
 
-  --success: #10b981;
-  --success-foreground: #fafafa;
+  --destructive: #b42318;
+  --destructive-foreground: #ffffff;
+  --success: #166534;
+  --success-foreground: #ffffff;
+  --warning: #92400e;
 
-  --font-inter: 'Inter', sans-serif;
-  --font-jetbrains-mono: 'JetBrains Mono', monospace;
+  /* Theme-adaptive helpers (consumed via arbitrary values) */
+  --hairline: rgba(69, 33, 14, 0.1);
+  --overlay-subtle: rgba(69, 33, 14, 0.04);
+  --overlay-strong: rgba(69, 33, 14, 0.08);
+  --scrim: rgba(69, 33, 14, 0.45);
+  --glow: rgba(244, 186, 23, 0.28);
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(69, 33, 14, 0.1);
+  --gradient-text: linear-gradient(135deg, #c9921a 0%, #6e3b0e 100%);
+  --hero-glow-a: rgba(244, 186, 23, 0.1);
+  --hero-glow-b: rgba(69, 33, 14, 0.06);
+
+  --font-be-vietnam-pro: 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
+  --font-jetbrains-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Warm-dark theme (opt-in) ---------------------------------------- */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --background: #1a1108; /* warm-dark surface-page */
+  --foreground: #f5ead9;
+
+  --primary: #f4ba17; /* CTA ground in dark (Ochre) */
+  --primary-foreground: #1a1108;
+  --gold: #f4ba17;
+
+  --card: #221710;
+  --card-foreground: #f5ead9;
+  --panel: #221710;
+  --raised: #2b1e14;
+  --muted: #c9b7a3;
+
+  --border: #5a4636;
+  --input: #2b1e14;
+  --ring: rgba(244, 186, 23, 0.5);
+
+  --accent: #2b1e14;
+  --accent-foreground: #f5ead9;
+
+  --destructive: #f87171;
+  --destructive-foreground: #1a1108;
+  --success: #4ade80;
+  --success-foreground: #1a1108;
+  --warning: #fbbf24;
+
+  --hairline: rgba(245, 234, 217, 0.1);
+  --overlay-subtle: rgba(245, 234, 217, 0.04);
+  --overlay-strong: rgba(245, 234, 217, 0.08);
+  --scrim: rgba(10, 7, 4, 0.6);
+  --glow: rgba(244, 186, 23, 0.32);
+  --glass-bg: rgba(34, 23, 16, 0.55);
+  --glass-border: rgba(245, 234, 217, 0.1);
+  --gradient-text: linear-gradient(135deg, #f4ba17 0%, #d97706 100%);
+  --hero-glow-a: rgba(244, 186, 23, 0.07);
+  --hero-glow-b: rgba(244, 186, 23, 0.05);
 }
 
 @layer base {
@@ -54,39 +130,61 @@
     color: var(--foreground);
     font-family: var(--font-sans);
     background-image:
-      radial-gradient(circle at 15% 50%, rgba(251, 191, 36, 0.03), transparent 25%),
-      radial-gradient(circle at 85% 30%, rgba(251, 191, 36, 0.04), transparent 25%);
+      radial-gradient(circle at 15% 0%, var(--hero-glow-a), transparent 30%),
+      radial-gradient(circle at 85% 10%, var(--hero-glow-b), transparent 30%);
     background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--gold);
+    color: #1a1108;
   }
 }
 
-.glass-panel {
-  background: var(--card);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+/* Component classes live in the components layer so Tailwind utility classes
+   (e.g. bg-[var(--overlay-subtle)], border-t-primary/40) reliably override them. */
+@layer components {
+  /* Glass panel — adapts to the active theme via tokens. */
+  .glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
 }
 
 .glass-panel-hover:hover {
-  background: rgba(39, 39, 42, 0.6);
-  border-color: rgba(251, 191, 36, 0.3);
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.1);
+  background: var(--raised);
+  border-color: var(--ring);
+  box-shadow: 0 0 24px var(--glow);
 }
 
-/* Stress Mode specific styling */
+/* Solid surface helpers */
+.surface-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+.surface-raised {
+  background: var(--raised);
+}
+
+/* Gold accent gradient text (theme-aware for contrast). */
+.text-gradient {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+}
+
+/* Stress Mode (exam focus lock) — force pure black regardless of theme. */
 .stress-mode-active {
   background-color: #000000 !important;
   background-image: none !important;
 }
 
 .stress-mode-active * {
-  border-color: rgba(255, 255, 255, 0.05) !important;
-}
-
-/* Typography utilities */
-.text-gradient {
-  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  border-color: rgba(255, 255, 255, 0.06) !important;
 }

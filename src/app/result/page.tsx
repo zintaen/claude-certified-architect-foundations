@@ -6,6 +6,7 @@ import { useExamStore } from '@/store/examStore';
 import { CheckCircle2, XCircle, ArrowLeft, Share2, Award, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DOMPurify from 'isomorphic-dompurify';
+import DonateButton from '@/components/DonateButton';
 
 export default function ResultPage() {
   const store = useExamStore();
@@ -83,11 +84,11 @@ export default function ResultPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`glass-panel p-8 rounded-2xl border-t-4 ${stats.passed ? 'border-t-green-500' : 'border-t-red-500'} flex flex-col md:flex-row items-center gap-8`}
+        className={`glass-panel p-8 rounded-2xl border-t-4 ${stats.passed ? 'border-t-success' : 'border-t-destructive'} flex flex-col md:flex-row items-center gap-8`}
       >
         <div className="flex-1 flex flex-col items-center md:items-start">
           <div
-            className={`text-sm font-bold uppercase tracking-widest ${stats.passed ? 'text-green-500' : 'text-red-500'}`}
+            className={`text-sm font-bold uppercase tracking-widest ${stats.passed ? 'text-success' : 'text-destructive'}`}
           >
             {stats.passed ? '✓ Passed (Mock Threshold)' : '✗ Below Threshold'}
           </div>
@@ -102,30 +103,41 @@ export default function ResultPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
-          <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-black/20">
-            <CheckCircle2 className="w-6 h-6 text-green-500 mb-1" />
+          <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-[var(--overlay-subtle)]">
+            <CheckCircle2 className="w-6 h-6 text-success mb-1" />
             <div className="text-2xl font-bold">{stats.correct}</div>
             <div className="text-xs text-foreground/50 uppercase tracking-wider">Correct</div>
           </div>
-          <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-black/20">
-            <XCircle className="w-6 h-6 text-red-500 mb-1" />
+          <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-[var(--overlay-subtle)]">
+            <XCircle className="w-6 h-6 text-destructive mb-1" />
             <div className="text-2xl font-bold">{stats.incorrect}</div>
             <div className="text-xs text-foreground/50 uppercase tracking-wider">Incorrect</div>
           </div>
-          <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-black/20">
+          <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-[var(--overlay-subtle)]">
             <div className="w-6 h-6 rounded-full border-2 border-foreground/30 flex items-center justify-center text-xs mb-1 font-bold">
               -
             </div>
             <div className="text-2xl font-bold">{stats.skipped}</div>
             <div className="text-xs text-foreground/50 uppercase tracking-wider">Skipped</div>
           </div>
-          <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-black/20">
+          <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-[var(--overlay-subtle)]">
             <Clock className="w-6 h-6 text-primary mb-1" />
             <div className="text-2xl font-bold">{Math.floor(stats.timeSec / 60)}m</div>
             <div className="text-xs text-foreground/50 uppercase tracking-wider">Time Taken</div>
           </div>
         </div>
       </motion.div>
+
+      {/* Support prompt */}
+      <div className="surface-raised border border-border rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-4 justify-between">
+        <div className="text-center sm:text-left">
+          <h3 className="font-bold">Found this useful?</h3>
+          <p className="text-sm text-muted">
+            This mock is free and built by CyberSkill. A coffee keeps it running.
+          </p>
+        </div>
+        <DonateButton variant="solid" className="shrink-0" />
+      </div>
 
       {/* Question Review Section */}
       <div className="flex flex-col gap-6 mt-8">
@@ -135,8 +147,8 @@ export default function ResultPage() {
         </h2>
 
         {!store.reviewEnabled ? (
-          <div className="glass-panel p-6 rounded-xl border-red-500/30 bg-red-500/5">
-            <h3 className="text-red-500 font-bold mb-2">Review Locked</h3>
+          <div className="glass-panel p-6 rounded-xl border-destructive/30 bg-destructive/5">
+            <h3 className="text-destructive font-bold mb-2">Review Locked</h3>
             <p className="text-foreground/80">{store.reviewLockReason}</p>
           </div>
         ) : (
@@ -147,15 +159,15 @@ export default function ResultPage() {
 
               return (
                 <div key={it.id} className="glass-panel p-6 rounded-xl flex flex-col gap-4">
-                  <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                  <div className="flex items-center justify-between pb-4 border-b border-border">
                     <div className="font-bold">Question {i + 1}</div>
                     <div
                       className={`px-3 py-1 rounded-full text-xs font-bold ${
                         !it.chosenLetter
                           ? 'bg-foreground/10 text-foreground/60'
                           : isCorrect
-                            ? 'bg-green-500/20 text-green-500'
-                            : 'bg-red-500/20 text-red-500'
+                            ? 'bg-success/20 text-success'
+                            : 'bg-destructive/20 text-destructive'
                       }`}
                     >
                       {!it.chosenLetter ? 'Skipped' : isCorrect ? 'Correct' : 'Incorrect'}
@@ -172,12 +184,12 @@ export default function ResultPage() {
                       const isChosen = it.chosenLetter === opt.letter;
                       const isThisCorrect = opt.correct;
 
-                      let bgClass = 'bg-white/5 border-white/5';
+                      let bgClass = 'bg-[var(--overlay-subtle)] border-border';
                       if (isThisCorrect)
                         bgClass =
-                          'bg-green-500/10 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.15)]';
+                          'bg-success/10 border-success/50 shadow-[0_0_15px_rgba(34,197,94,0.15)]';
                       else if (isChosen && !isThisCorrect)
-                        bgClass = 'bg-red-500/10 border-red-500/50';
+                        bgClass = 'bg-destructive/10 border-destructive/50';
 
                       return (
                         <div
@@ -188,10 +200,10 @@ export default function ResultPage() {
                             <div
                               className={`shrink-0 w-6 h-6 rounded flex items-center justify-center font-mono text-xs font-bold ${
                                 isThisCorrect
-                                  ? 'bg-green-500 text-black'
+                                  ? 'bg-success text-success-foreground'
                                   : isChosen
-                                    ? 'bg-red-500 text-white'
-                                    : 'bg-white/10'
+                                    ? 'bg-destructive text-destructive-foreground'
+                                    : 'bg-[var(--overlay-strong)]'
                               }`}
                             >
                               {opt.letter}
@@ -202,7 +214,7 @@ export default function ResultPage() {
                           </div>
 
                           {store.reviewEnabled && opt.explain && (
-                            <div className="mt-3 text-sm text-foreground/70 pl-9 border-l-2 border-white/10 ml-3 py-1">
+                            <div className="mt-3 text-sm text-foreground/70 pl-9 border-l-2 border-border ml-3 py-1">
                               {opt.explain}
                             </div>
                           )}

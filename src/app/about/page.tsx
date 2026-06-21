@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import { ArrowLeft, Info, Clock, ShieldCheck, Trophy } from 'lucide-react';
+import { ArrowLeft, Info, Clock, ShieldCheck, Trophy, Layers, Sparkles } from 'lucide-react';
+import DonateButton from '@/components/DonateButton';
 
 export const metadata = {
-  title: 'About - Claude Certified Architect Mock Exam',
+  title: 'About - Claude Certified Architect Mock Exam | CyberSkill',
   description:
-    'About the unofficial CyberSkill practice exam for Claude Certified Architect - Foundations: format, scoring, privacy, and disclaimer.',
+    'About the unofficial CyberSkill practice exam for Claude Certified Architect - Foundations: format, domains, scoring, privacy, and the team behind it.',
 };
 
 export default function AboutPage() {
@@ -22,8 +23,9 @@ export default function AboutPage() {
           <Info className="w-8 h-8 text-primary" />
           About this mock exam
         </h1>
-        <p className="text-foreground/60 mt-2">
-          An unofficial, community-built practice exam for Claude Certified Architect - Foundations.
+        <p className="text-muted mt-2">
+          An unofficial, community-built practice exam for Claude Certified Architect - Foundations,
+          made and maintained by CyberSkill.
         </p>
       </div>
 
@@ -36,6 +38,19 @@ export default function AboutPage() {
           session, scored on a 1,000-point scale. This mock flags 700 / 1000 as a working pass
           benchmark; the official pass mark is not public. You can flag and revisit questions, and
           submitting early or running out of time both end the session.
+        </p>
+      </section>
+
+      <section className="glass-panel p-6 rounded-2xl flex flex-col gap-3">
+        <h2 className="text-xl font-bold flex items-center gap-2">
+          <Layers className="w-5 h-5 text-primary" /> What it covers
+        </h2>
+        <p className="text-foreground/80 leading-relaxed">
+          The 60 questions are split evenly across four domains, 15 each: research pipelines
+          (multi-agent orchestration and state recovery), extraction pipelines (tool contracts and
+          structured output), customer support agents (graceful degradation and escalation), and
+          code exploration (navigating large codebases with agents). Every item is a scenario with a
+          best answer and an explanation for each option.
         </p>
       </section>
 
@@ -58,6 +73,30 @@ export default function AboutPage() {
           Your email and PIN are used only to save and retrieve your own exam history. You can take
           the exam as a guest without providing either.
         </p>
+      </section>
+
+      <section className="surface-panel p-6 md:p-8 rounded-2xl flex flex-col gap-4">
+        <h2 className="text-xl font-bold flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-primary" /> Built by CyberSkill
+        </h2>
+        <p className="text-foreground/80 leading-relaxed">
+          CyberSkill (CyberSkill Software Solutions Consultancy and Development JSC) is a software
+          consultancy founded in 2020 in Ho Chi Minh City, Vietnam. We design and ship products,
+          developer tooling, and AI-driven workflows for teams worldwide. We built this exam as a
+          free resource for people preparing to work seriously with Claude. Our motto is simple:
+          turn your will into real.
+        </p>
+        <div className="flex flex-wrap items-center gap-4 mt-1">
+          <a
+            href="https://cyberskill.world"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-primary text-primary-foreground px-5 py-2.5 rounded-md font-semibold hover:brightness-110 transition-all"
+          >
+            Visit cyberskill.world
+          </a>
+          <DonateButton variant="soft" label="Support this project" />
+        </div>
       </section>
 
       <section className="glass-panel p-6 rounded-2xl flex flex-col gap-3 border-t-2 border-t-primary/40">
