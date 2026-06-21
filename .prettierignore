@@ -1,2 +1,16 @@
 playwright-report/
 test-results/
+
+# build output and temporary verification dirs
+node_modules/
+.next/
+out/
+build/
+.next-verify/
+.vbuild/
+.wbuild/
+.audit1/
+.auditdev/
+.auditdev3/
+_mkicons.mjs
+_pw*.mjs

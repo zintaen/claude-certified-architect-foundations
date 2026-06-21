@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "precommit": "eslint src",
+    "format": "npx --yes prettier@3.8.4 --write .",
+    "format:check": "npx --yes prettier@3.8.4 --check .",
+    "precommit": "eslint src && npx --yes prettier@3.8.4 --check .",
     "test:unit": "vitest run",
     "test:e2e": "playwright test"
   },

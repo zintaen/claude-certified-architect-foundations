@@ -322,7 +322,9 @@ export default function Home() {
       {/* SUPPORT CALLOUT */}
       <section className="w-full max-w-6xl mx-auto px-6 pb-16">
         <div className="surface-raised border border-border rounded-3xl p-8 md:p-10 flex flex-col items-center text-center gap-4">
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">This mock is free, always</h2>
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
+            This mock is free, always
+          </h2>
           <p className="text-muted max-w-xl">
             No paywall, no account required. If it helped you prepare and you would like to keep it
             running, a coffee goes a long way.

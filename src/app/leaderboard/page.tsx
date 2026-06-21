@@ -76,7 +76,13 @@ export default function LeaderboardPage() {
                   transition={{ delay: i * 0.05 }}
                   key={i}
                   className={`flex items-center justify-between p-4 border-b border-border last:border-0 ${
-                    i === 0 ? 'bg-primary/10' : i === 1 ? 'bg-[var(--overlay-subtle)]' : i === 2 ? 'bg-[var(--overlay-subtle)]' : ''
+                    i === 0
+                      ? 'bg-primary/10'
+                      : i === 1
+                        ? 'bg-[var(--overlay-subtle)]'
+                        : i === 2
+                          ? 'bg-[var(--overlay-subtle)]'
+                          : ''
                   }`}
                 >
                   <div className="flex items-center gap-4">

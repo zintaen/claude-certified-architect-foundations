@@ -28,7 +28,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Run Prettier formatting check
-        run: npx prettier --check .
+        run: npx --yes prettier@3.8.4 --check .
 
       - name: Run Unit Tests
         run: npm run test:unit

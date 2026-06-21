@@ -34,7 +34,10 @@ export default function Footer() {
         {/* Mock exam links */}
         <div className="flex flex-col gap-3">
           <h3 className="text-xs font-bold uppercase tracking-widest text-muted">Mock exam</h3>
-          <Link href="/" className="text-sm text-foreground/80 hover:text-primary transition-colors">
+          <Link
+            href="/"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+          >
             Practice
           </Link>
           <Link
