@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Layers } from 'lucide-react';
 import { DOMAIN_ORDER, DOMAINS } from '@/lib/domains';
 
-const SITE_URL = 'https://claude-certified-architect-mock-exam-cyberskill.vercel.app';
+const SITE_URL = 'https://ccaf.cyberskill.world';
 
 export const metadata = {
   title: 'Exam domains - Claude Certified Architect practice | CyberSkill',

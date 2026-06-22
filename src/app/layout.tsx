@@ -12,7 +12,7 @@ import MotionProvider from '@/components/MotionProvider';
 import Analytics from '@/components/Analytics';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
-const SITE_URL = 'https://claude-certified-architect-mock-exam-cyberskill.vercel.app';
+const SITE_URL = 'https://ccaf.cyberskill.world';
 
 const beVietnamPro = Be_Vietnam_Pro({
   variable: '--font-be-vietnam-pro',
@@ -58,6 +58,9 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  verification: {
+    google: 'sJ1sSGCn7S1YC4ePZo0knsWwD6fIw3FCmCXRE0E9yfE',
   },
 };
 

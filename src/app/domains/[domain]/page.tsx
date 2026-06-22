@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Layers } from 'lucide-react';
 import { DOMAIN_ORDER, DOMAINS, isGroupId, type GroupId } from '@/lib/domains';
 
-const SITE_URL = 'https://claude-certified-architect-mock-exam-cyberskill.vercel.app';
+const SITE_URL = 'https://ccaf.cyberskill.world';
 
 type DomainContent = {
   covers: string;

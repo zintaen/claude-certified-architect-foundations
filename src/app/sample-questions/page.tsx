@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, ListChecks, CheckCircle2, Circle } from 'lucide-react';
 
-const SITE_URL = 'https://claude-certified-architect-mock-exam-cyberskill.vercel.app';
+const SITE_URL = 'https://ccaf.cyberskill.world';
 
 export const metadata = {
   title: 'Claude Certified Architect sample questions | Free examples with answers',

@@ -2,7 +2,7 @@
 
 import { Download, Share2 } from 'lucide-react';
 
-const SITE_URL = 'https://claude-certified-architect-mock-exam-cyberskill.vercel.app';
+const SITE_URL = 'https://ccaf.cyberskill.world';
 
 // Brand colors are literals here on purpose: a <canvas> 2D context cannot read CSS
 // custom properties, and the PNG must render the same regardless of the page theme.

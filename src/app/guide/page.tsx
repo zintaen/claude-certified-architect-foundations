@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { DOMAIN_ORDER, DOMAINS } from '@/lib/domains';
 
-const SITE_URL = 'https://claude-certified-architect-mock-exam-cyberskill.vercel.app';
+const SITE_URL = 'https://ccaf.cyberskill.world';
 
 export const metadata = {
   title: 'How to pass the Claude Certified Architect Foundations exam | Study guide',

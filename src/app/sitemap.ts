@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { DOMAIN_ORDER } from '@/lib/domains';
 
-const SITE_URL = 'https://claude-certified-architect-mock-exam-cyberskill.vercel.app';
+const SITE_URL = 'https://ccaf.cyberskill.world';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
