@@ -8,7 +8,7 @@ const YEAR = new Date().getFullYear();
 export default function Footer() {
   return (
     <footer className="mt-auto border-t border-border bg-panel/60">
-      <div className="max-w-6xl mx-auto px-6 py-12 grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div className="max-w-6xl mx-auto px-6 py-12 grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         {/* Brand */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
@@ -57,6 +57,29 @@ export default function Footer() {
             className="text-sm text-foreground/80 hover:text-primary transition-colors"
           >
             About
+          </Link>
+        </div>
+
+        {/* Learn links */}
+        <div className="flex flex-col gap-3">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted">Learn</h3>
+          <Link
+            href="/guide"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+          >
+            Study guide
+          </Link>
+          <Link
+            href="/faq"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+          >
+            FAQ
+          </Link>
+          <Link
+            href="/domains"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+          >
+            Domains
           </Link>
         </div>
 

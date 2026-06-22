@@ -119,6 +119,7 @@ export default function Home() {
   const [email, setEmail] = useState('');
   const [nickname, setNickname] = useState('');
   const [pin, setPin] = useState('');
+  const [subscribe, setSubscribe] = useState(false);
   const [live, setLive] = useState<LiveStats | null>(null);
 
   useEffect(() => {
@@ -149,6 +150,14 @@ export default function Home() {
     if (email) localStorage.setItem('ccaf-email', email);
     if (nickname) localStorage.setItem('ccaf-nickname', nickname);
     if (pin) localStorage.setItem('ccaf-pinHash', await sha256Hex(pin));
+    if (subscribe && email) {
+      // Fire-and-forget opt-in; never block starting the exam on it.
+      void fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'exam-setup' }),
+      }).catch(() => {});
+    }
     router.push('/exam');
   };
 
@@ -499,6 +508,18 @@ export default function Home() {
                     className="bg-input border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-ring"
                     placeholder="****"
                   />
+                </label>
+                <label className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={subscribe}
+                    onChange={(e) => setSubscribe(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 accent-primary"
+                  />
+                  <span className="text-sm text-muted">
+                    Send me occasional AI build tips from CyberSkill. No spam, and you can
+                    unsubscribe anytime.
+                  </span>
                 </label>
               </div>
 
