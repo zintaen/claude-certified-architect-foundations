@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, ListChecks, CheckCircle2, Circle } from 'lucide-react';
+import { DOMAIN_ORDER, DOMAINS } from '@/lib/domains';
 
 const SITE_URL = 'https://ccaf.cyberskill.world';
 
@@ -273,6 +274,25 @@ export default function SampleQuestionsPage() {
             </p>
           </article>
         ))}
+      </section>
+
+      <section className="surface-raised border border-border rounded-2xl p-6 md:p-8 flex flex-col gap-3">
+        <h2 className="text-xl font-bold">Five more for each domain</h2>
+        <p className="text-foreground/80 leading-relaxed">
+          Each domain has its own set of five original sample questions with answers, on top of the
+          four above.
+        </p>
+        <div className="flex flex-col gap-2">
+          {DOMAIN_ORDER.map((id) => (
+            <Link
+              key={id}
+              href={`/sample-questions/${id}`}
+              className="text-foreground/80 hover:text-primary transition-colors inline-flex items-center gap-2"
+            >
+              <ArrowRight className="w-4 h-4 text-primary" /> {DOMAINS[id].label} sample questions
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section className="surface-raised border border-border rounded-2xl p-6 md:p-8 flex flex-col gap-4 border-t-2 border-t-primary/40">

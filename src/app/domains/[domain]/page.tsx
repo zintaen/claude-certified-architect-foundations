@@ -129,6 +129,12 @@ export default async function DomainPage({ params }: { params: Promise<{ domain:
             Drill this domain (15 questions) <ArrowRight className="w-4 h-4" />
           </Link>
           <Link
+            href={`/sample-questions/${domain}`}
+            className="text-sm text-foreground/80 hover:text-primary transition-colors inline-flex items-center gap-2"
+          >
+            See 5 sample questions <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link
             href="/"
             className="text-sm text-foreground/80 hover:text-primary transition-colors inline-flex items-center gap-2"
           >
