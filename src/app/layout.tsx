@@ -10,6 +10,7 @@ import DonateButton from '@/components/DonateButton';
 import MobileNav from '@/components/MobileNav';
 import MotionProvider from '@/components/MotionProvider';
 import Analytics from '@/components/Analytics';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const SITE_URL = 'https://claude-certified-architect-mock-exam-cyberskill.vercel.app';
 
@@ -141,6 +142,7 @@ export default function RootLayout({
         <Footer />
         <BugReporter />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
