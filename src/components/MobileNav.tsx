@@ -3,7 +3,17 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X, BookOpen, Trophy, Info, Coffee, GraduationCap, HelpCircle } from 'lucide-react';
+import {
+  Menu,
+  X,
+  BookOpen,
+  Trophy,
+  Info,
+  Coffee,
+  GraduationCap,
+  HelpCircle,
+  ListChecks,
+} from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 
 type NavItem = {
@@ -17,6 +27,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/', label: 'Practice', icon: BookOpen },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/guide', label: 'Guide', icon: GraduationCap },
+  { href: '/sample-questions', label: 'Sample questions', icon: ListChecks },
   { href: '/faq', label: 'FAQ', icon: HelpCircle },
   { href: '/about', label: 'About', icon: Info },
   { href: 'https://buymeacoffee.com/zintaen', label: 'Support', icon: Coffee, external: true },

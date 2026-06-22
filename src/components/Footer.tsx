@@ -70,6 +70,12 @@ export default function Footer() {
             Study guide
           </Link>
           <Link
+            href="/sample-questions"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+          >
+            Sample questions
+          </Link>
+          <Link
             href="/faq"
             className="text-sm text-foreground/80 hover:text-primary transition-colors"
           >

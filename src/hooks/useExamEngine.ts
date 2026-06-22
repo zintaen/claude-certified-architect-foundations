@@ -1,6 +1,7 @@
 import { useExamStore, type Question, type GradedResult } from '@/store/examStore';
 import type { PublicQuestion } from '@/data/questions';
 import type { GroupId } from '@/lib/domains';
+import { track } from '@/lib/track';
 
 import { useCallback } from 'react';
 
@@ -43,6 +44,11 @@ export function useExamEngine() {
         startedAt,
         durationSec,
         endsAt,
+      });
+
+      track('session_started', {
+        mode: flashcard ? 'flashcards' : opts?.group ? 'drill' : untimed ? 'practice' : 'timed',
+        count: pool.length,
       });
     },
     [store]
@@ -90,6 +96,11 @@ export function useExamEngine() {
         }
 
         store.setResult(data);
+        track('exam_graded', {
+          score: data.score,
+          passed: data.passed,
+          mode: store.untimed ? 'practice' : 'timed',
+        });
         store.endExam({
           timedOut,
           focusLoss: store.focusLoss,

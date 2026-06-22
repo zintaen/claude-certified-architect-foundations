@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useExamStore } from '@/store/examStore';
-import { CheckCircle2, XCircle, ArrowLeft, Share2, Award, Clock } from 'lucide-react';
+import { CheckCircle2, XCircle, ArrowLeft, Share2, Swords, Award, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DOMPurify from 'isomorphic-dompurify';
 import DonateButton from '@/components/DonateButton';
 import DomainBreakdown from '@/components/DomainBreakdown';
 import Certificate from '@/components/Certificate';
 import { archetypeFor } from '@/lib/domains';
+import { track } from '@/lib/track';
 
 export default function ResultPage() {
   const store = useExamStore();
@@ -56,7 +57,23 @@ export default function ResultPage() {
     });
     return `${origin}/score?${params.toString()}`;
   };
+  const handleChallenge = () => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const url = `${origin}/?ref=challenge`;
+    track('challenge_shared');
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      navigator
+        .share({ title: 'Beat my Claude Architect mock score', text: shareText, url })
+        .catch(() => {
+          /* user dismissed the share sheet */
+        });
+      return;
+    }
+    navigator.clipboard.writeText(`Think you can beat my score? ${url}`);
+    alert('Challenge link copied to clipboard!');
+  };
   const handleShare = () => {
+    track('result_shared');
     const url = buildShareUrl();
     if (typeof navigator !== 'undefined' && navigator.share) {
       navigator
@@ -84,12 +101,20 @@ export default function ResultPage() {
           <h1 className="text-3xl font-bold">Exam Results</h1>
           <p className="text-foreground/60 mt-1">Session ID: {store.sessionId}</p>
         </div>
-        <button
-          onClick={handleShare}
-          className="glass-panel px-4 py-2 flex items-center gap-2 rounded-md hover:border-primary/50 transition-colors"
-        >
-          <Share2 className="w-4 h-4" /> Share Result
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleShare}
+            className="glass-panel px-4 py-2 flex items-center gap-2 rounded-md hover:border-primary/50 transition-colors"
+          >
+            <Share2 className="w-4 h-4" /> Share
+          </button>
+          <button
+            onClick={handleChallenge}
+            className="glass-panel px-4 py-2 flex items-center gap-2 rounded-md hover:border-primary/50 transition-colors"
+          >
+            <Swords className="w-4 h-4" /> Challenge a friend
+          </button>
+        </div>
       </div>
 
       <motion.div
@@ -177,12 +202,14 @@ export default function ResultPage() {
             href="https://cyberskill.world"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => track('cta_cyberskill', { action: 'work' })}
             className="bg-primary text-primary-foreground px-4 py-2 rounded-md font-semibold hover:brightness-110 transition-all"
           >
             See our work
           </a>
           <a
             href="mailto:info@cyberskill.world?subject=Working%20with%20CyberSkill"
+            onClick={() => track('cta_cyberskill', { action: 'talk' })}
             className="surface-raised border border-border px-4 py-2 rounded-md font-semibold hover:border-ring transition-colors"
           >
             Talk to us

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { track } from '@/lib/track';
 import {
   PlayCircle,
   ShieldCheck,
@@ -127,6 +128,16 @@ export default function Home() {
     setNickname(localStorage.getItem('ccaf-nickname') || '');
   }, []);
 
+  // Attribute referral / challenge visits so the share loop is measurable.
+  useEffect(() => {
+    try {
+      const ref = new URLSearchParams(window.location.search).get('ref');
+      if (ref) track('referred_visit', { ref: ref.slice(0, 40) });
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   // Live community numbers double as social proof; fail quietly if the API is unavailable.
   useEffect(() => {
     let active = true;
@@ -151,6 +162,7 @@ export default function Home() {
     if (nickname) localStorage.setItem('ccaf-nickname', nickname);
     if (pin) localStorage.setItem('ccaf-pinHash', await sha256Hex(pin));
     if (subscribe && email) {
+      track('subscribe_optin');
       // Fire-and-forget opt-in; never block starting the exam on it.
       void fetch('/api/subscribe', {
         method: 'POST',

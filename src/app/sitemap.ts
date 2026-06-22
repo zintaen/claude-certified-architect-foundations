@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/leaderboard',
     '/dashboard',
     '/guide',
+    '/sample-questions',
     '/faq',
     '/domains',
     ...DOMAIN_ORDER.map((id) => `/domains/${id}`),
