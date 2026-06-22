@@ -19,8 +19,10 @@ import {
   ListChecks,
   ArrowRight,
   Sparkles,
+  Layers,
 } from 'lucide-react';
 import DonateButton from '@/components/DonateButton';
+import { fetchGlobalStats } from '@/lib/api';
 
 const DOMAINS = [
   {
@@ -74,22 +76,79 @@ const STATS = [
   { value: '1,000', label: 'Point scale' },
 ];
 
+const FAQ = [
+  {
+    q: 'Is this the official exam?',
+    a: 'No. This is an unofficial practice mock built by CyberSkill. It is not affiliated with, endorsed by, or sponsored by Anthropic.',
+  },
+  {
+    q: 'Is it free?',
+    a: 'Yes, completely free, and you can take it as a guest with no account.',
+  },
+  {
+    q: 'How is it scored?',
+    a: 'Sixty questions on a 1,000-point scale. This mock flags 720, the published pass mark, as a pass.',
+  },
+  {
+    q: 'Do I need to sign up?',
+    a: 'No. A nickname puts you on the leaderboard, and an optional PIN lets you restore your history later. Both are optional.',
+  },
+  {
+    q: 'Can I practice without the timer?',
+    a: 'Yes. The practice modes include an untimed full mock, single-domain drills, and flashcards.',
+  },
+];
+
+// Hash the PIN before it touches storage so the history lock is never kept in plain text.
+async function sha256Hex(text: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+interface LiveStats {
+  totalAttempts: number;
+  averageScore: number;
+  passRate: number;
+}
+
 export default function Home() {
   const router = useRouter();
   const [showSetup, setShowSetup] = useState(false);
   const [email, setEmail] = useState('');
   const [nickname, setNickname] = useState('');
   const [pin, setPin] = useState('');
+  const [live, setLive] = useState<LiveStats | null>(null);
 
   useEffect(() => {
     setEmail(localStorage.getItem('ccaf-email') || '');
     setNickname(localStorage.getItem('ccaf-nickname') || '');
   }, []);
 
-  const handleStart = () => {
+  // Live community numbers double as social proof; fail quietly if the API is unavailable.
+  useEffect(() => {
+    let active = true;
+    fetchGlobalStats()
+      .then((s) => {
+        if (active && s && s.totalAttempts > 0) {
+          setLive({
+            totalAttempts: s.totalAttempts,
+            averageScore: s.averageScore,
+            passRate: s.passRate,
+          });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleStart = async () => {
     if (email) localStorage.setItem('ccaf-email', email);
     if (nickname) localStorage.setItem('ccaf-nickname', nickname);
-    if (pin) localStorage.setItem('ccaf-pinHash', pin); // Note: Should ideally be hashed
+    if (pin) localStorage.setItem('ccaf-pinHash', await sha256Hex(pin));
     router.push('/exam');
   };
 
@@ -141,12 +200,32 @@ export default function Home() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              onClick={() => router.push('/practice')}
+              className="glass-panel px-6 py-3 rounded-md font-medium hover:bg-[var(--overlay-strong)] transition-colors inline-flex items-center gap-2"
+            >
+              <Layers className="w-4 h-4" /> Practice modes
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => router.push('/leaderboard')}
               className="glass-panel px-6 py-3 rounded-md font-medium hover:bg-[var(--overlay-strong)] transition-colors"
             >
               View leaderboard
             </motion.button>
           </div>
+
+          {live && (
+            <p className="text-sm text-muted">
+              <span className="font-semibold text-foreground">
+                {live.totalAttempts.toLocaleString()}
+              </span>{' '}
+              exams taken so far -{' '}
+              <span className="font-semibold text-foreground">{live.passRate}%</span> pass rate -{' '}
+              <span className="font-semibold text-foreground">{live.averageScore}</span> average
+              score
+            </p>
+          )}
         </motion.div>
 
         {/* Feature cards */}
@@ -319,6 +398,26 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="w-full max-w-3xl mx-auto px-6 py-12 md:py-16 flex flex-col gap-8">
+        <div className="flex flex-col gap-3">
+          <span className="text-xs font-bold uppercase tracking-widest text-primary">
+            Questions
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Good to know</h2>
+        </div>
+        <div className="flex flex-col gap-3">
+          {FAQ.map((f) => (
+            <details key={f.q} className="surface-panel rounded-xl px-5 py-4">
+              <summary className="font-medium flex cursor-pointer items-center justify-between gap-4">
+                {f.q}
+              </summary>
+              <p className="text-sm text-muted leading-relaxed mt-3">{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
       {/* SUPPORT CALLOUT */}
       <section className="w-full max-w-6xl mx-auto px-6 pb-16">
         <div className="surface-raised border border-border rounded-3xl p-8 md:p-10 flex flex-col items-center text-center gap-4">
@@ -361,15 +460,15 @@ export default function Home() {
               <div>
                 <h2 className="text-xl font-bold mb-1">Exam setup</h2>
                 <p className="text-sm text-muted">
-                  Enter your details to save your score and receive a copy by email. All fields are
-                  optional.
+                  Enter your details to save your progress on this device. Your email is used only
+                  to restore your history; nothing is sent to you. All fields are optional.
                 </p>
               </div>
 
               <div className="flex flex-col gap-4">
                 <label className="flex flex-col gap-1.5">
                   <span className="text-sm font-medium opacity-80">
-                    Email (optional, to get results)
+                    Email (optional, to restore your history)
                   </span>
                   <input
                     type="email"

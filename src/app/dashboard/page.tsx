@@ -5,6 +5,7 @@ import { fetchUserHistory } from '@/lib/api';
 import { ArrowLeft, User, Activity } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { Skeleton, SkeletonRow } from '@/components/Skeleton';
 
 interface Attempt {
   score: number;
@@ -68,8 +69,29 @@ export default function DashboardPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+        <div className="grid md:grid-cols-2 gap-12">
+          {/* Overview placeholder */}
+          <div className="flex flex-col gap-4">
+            <Skeleton className="h-7 w-32" />
+            <div className="grid grid-cols-2 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="glass-panel p-6 rounded-xl flex flex-col gap-3">
+                  <Skeleton className="h-9 w-20" />
+                  <Skeleton className="h-4 w-28" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* History placeholder */}
+          <div className="flex flex-col gap-4">
+            <Skeleton className="h-7 w-28" />
+            <div className="glass-panel rounded-2xl overflow-hidden">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <SkeletonRow key={i} />
+              ))}
+            </div>
+          </div>
         </div>
       ) : error ? (
         <div className="glass-panel p-8 text-center text-destructive rounded-2xl">{error}</div>

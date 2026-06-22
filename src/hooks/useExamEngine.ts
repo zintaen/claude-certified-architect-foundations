@@ -1,16 +1,26 @@
 import { useExamStore, Question } from '@/store/examStore';
+import type { GroupId } from '@/lib/domains';
 
 import { useCallback } from 'react';
 import { syncQueue } from '../lib/offlineQueue';
+
+interface BuildOptions {
+  group?: GroupId; // restrict the pool to a single domain (targeted drill)
+  flashcard?: boolean; // flashcard review: always untimed, never submitted to the leaderboard
+}
 
 // We can mock this if it's missing, or build a real queue later
 export function useExamEngine() {
   const store = useExamStore();
 
   const buildSession = useCallback(
-    (qs: Question[], count: number, untimed: boolean) => {
-      // Basic shuffle
-      const shuffledQs = [...qs].sort(() => Math.random() - 0.5);
+    (qs: Question[], count: number, untimed: boolean, opts?: BuildOptions) => {
+      const flashcard = !!opts?.flashcard;
+      const relaxed = untimed || flashcard; // no timer for practice or flashcards
+
+      // Optionally narrow to a single domain, then shuffle and take `count`.
+      const source = opts?.group ? qs.filter((q) => q.group === opts.group) : qs;
+      const shuffledQs = [...source].sort(() => Math.random() - 0.5);
       const pool = shuffledQs.slice(0, Math.max(1, count));
 
       const items: Question[] = pool.map((q) => ({
@@ -20,14 +30,14 @@ export function useExamEngine() {
         flagged: false,
       }));
 
-      const durationSec = untimed ? 0 : Math.max(60, count * 120); // 2 mins per question
+      const durationSec = relaxed ? 0 : Math.max(60, pool.length * 120); // 2 mins per question
       const startedAt = Date.now();
       const endsAt = durationSec ? startedAt + durationSec * 1000 : 0;
 
       store.startExam({
         items,
-        untimed,
-        isFlashcardMode: false,
+        untimed: relaxed,
+        isFlashcardMode: flashcard,
         sessionId: Math.random().toString(36).substring(2, 9),
         startedAt,
         durationSec,

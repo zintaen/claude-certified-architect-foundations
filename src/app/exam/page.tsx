@@ -6,7 +6,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useExamStore } from '@/store/examStore';
 import { useExamEngine } from '@/hooks/useExamEngine';
 import { questions } from '@/data/questions';
-import { Clock, Flag, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import {
+  Clock,
+  Flag,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle2,
+  Maximize2,
+  Minimize2,
+} from 'lucide-react';
 import DOMPurify from 'isomorphic-dompurify';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -15,6 +23,21 @@ export default function ExamPage() {
   const store = useExamStore();
   const engine = useExamEngine();
   const [mounted, setMounted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const sync = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', sync);
+    return () => document.removeEventListener('fullscreenchange', sync);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+      void document.exitFullscreen().catch(() => {});
+    } else {
+      void document.documentElement.requestFullscreen().catch(() => {});
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -120,13 +143,17 @@ export default function ExamPage() {
           <div className="font-mono text-sm opacity-60">
             Question {store.idx + 1} of {store.items.length}
           </div>
-          <div className="flex items-center gap-4">
-            {!store.untimed && (
+          <div className="flex items-center gap-2 sm:gap-4">
+            {!store.untimed ? (
               <div
                 className={`flex items-center gap-2 font-mono text-lg font-bold px-3 py-1 rounded-md border ${isDanger ? 'bg-destructive/10 text-destructive border-destructive/30' : 'bg-primary/10 text-primary border-primary/20'}`}
               >
                 <Clock className="w-4 h-4" />
                 {timeLeft || '...'}
+              </div>
+            ) : (
+              <div className="font-mono text-xs font-bold px-3 py-1.5 rounded-md border border-border text-muted bg-[var(--overlay-subtle)]">
+                Practice - untimed
               </div>
             )}
             <button
@@ -135,6 +162,14 @@ export default function ExamPage() {
             >
               <Flag className="w-4 h-4" />
               <span className="hidden sm:inline">Flag for Review</span>
+            </button>
+            <button
+              onClick={toggleFullscreen}
+              title={isFullscreen ? 'Exit focus mode' : 'Focus mode'}
+              aria-label={isFullscreen ? 'Exit focus mode' : 'Focus mode'}
+              className="w-9 h-9 inline-flex items-center justify-center rounded-md border border-border text-foreground/70 hover:text-primary hover:border-ring transition-colors"
+            >
+              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </button>
             <ThemeToggle />
           </div>
@@ -164,11 +199,11 @@ export default function ExamPage() {
                     <label
                       key={opt.letter}
                       className={`
-                        relative flex items-start gap-4 p-4 rounded-xl cursor-pointer transition-all border
+                        relative flex items-start gap-4 p-4 rounded-xl cursor-pointer transition-all border focus-within:outline-none focus-within:ring-2 focus-within:ring-ring
                         ${
                           isSelected
                             ? 'bg-primary/10 border-primary shadow-[0_0_15px_var(--glow)]'
-                            : 'glass-panel border-border hover:border-border'
+                            : 'glass-panel border-border hover:border-ring'
                         }
                       `}
                     >

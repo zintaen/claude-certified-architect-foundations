@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { PASS_SCORE } from '@/lib/domains';
 
 // This module is the single adapter boundary between the Supabase RPCs and the V2 UI.
 // The (un-versioned) database functions return snake_case JSON - get_global_stats returns
@@ -62,7 +63,7 @@ export interface UserHistory {
   averageTime: number;
 }
 
-const PASS_MARK = 700;
+const PASS_MARK = PASS_SCORE; // official CCA-F pass mark (720 / 1000)
 const num = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
 
 export async function fetchGlobalStats(): Promise<GlobalStats | null> {

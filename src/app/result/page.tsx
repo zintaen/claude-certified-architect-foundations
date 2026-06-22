@@ -7,6 +7,9 @@ import { CheckCircle2, XCircle, ArrowLeft, Share2, Award, Clock } from 'lucide-r
 import { motion } from 'framer-motion';
 import DOMPurify from 'isomorphic-dompurify';
 import DonateButton from '@/components/DonateButton';
+import DomainBreakdown from '@/components/DomainBreakdown';
+import Certificate from '@/components/Certificate';
+import { computeDomainScores, archetypeFor, PASS_SCORE } from '@/lib/domains';
 
 export default function ResultPage() {
   const store = useExamStore();
@@ -46,13 +49,39 @@ export default function ResultPage() {
     });
 
     const score1000 = Math.round((correct / store.items.length) * 1000);
-    const passed = score1000 >= 700;
+    const passed = score1000 >= PASS_SCORE;
     const timeSec = Math.max(0, Math.floor((store.endsAt - store.startedAt) / 1000));
 
     return { correct, incorrect, skipped, score1000, passed, timeSec, total: store.items.length };
   }, [store.items, store.endsAt, store.startedAt]);
 
+  const domainScores = useMemo(() => computeDomainScores(store.items), [store.items]);
+
+  // Nickname lives in localStorage; read it after mount to stay SSR-safe.
+  const [nickname, setNickname] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    setNickname(localStorage.getItem('ccaf-nickname') || undefined);
+  }, []);
+
   if (!hydrated || !stats) return null;
+
+  const shareText = `I scored ${stats.score1000}/1000 on the Claude Certified Architect mock exam!`;
+  const handleShare = () => {
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      navigator
+        .share({
+          title: 'Claude Certified Architect mock exam',
+          text: shareText,
+          url: window.location.href,
+        })
+        .catch(() => {
+          /* user dismissed the share sheet */
+        });
+      return;
+    }
+    navigator.clipboard.writeText(shareText);
+    alert('Copied to clipboard!');
+  };
 
   return (
     <div className="flex-1 max-w-4xl w-full mx-auto p-6 md:p-12 flex flex-col gap-8">
@@ -69,12 +98,7 @@ export default function ResultPage() {
           <p className="text-foreground/60 mt-1">Session ID: {store.sessionId}</p>
         </div>
         <button
-          onClick={() => {
-            navigator.clipboard.writeText(
-              `I scored ${stats.score1000}/1000 on the Claude Certified Architect mock exam!`
-            );
-            alert('Copied to clipboard!');
-          }}
+          onClick={handleShare}
           className="glass-panel px-4 py-2 flex items-center gap-2 rounded-md hover:border-primary/50 transition-colors"
         >
           <Share2 className="w-4 h-4" /> Share Result
@@ -95,11 +119,24 @@ export default function ResultPage() {
           <div className="text-6xl font-bold mt-2 font-mono tracking-tight">
             {stats.score1000} <span className="text-2xl text-foreground/40">/ 1000</span>
           </div>
+          {domainScores.length > 0 && (
+            <div className="mt-3 surface-raised border border-border text-primary text-xs font-medium px-3 py-1 rounded-full">
+              Archetype: {archetypeFor(domainScores)}
+            </div>
+          )}
           <p className="text-foreground/70 mt-4 text-center md:text-left max-w-sm">
             {stats.passed
               ? "Excellent work! You've demonstrated a solid understanding of the architect blueprint."
               : 'Keep practicing. Review the explanations below to identify your weak spots.'}
           </p>
+          <div className="mt-5">
+            <Certificate
+              nickname={nickname}
+              score={stats.score1000}
+              passed={stats.passed}
+              dateISO={new Date().toISOString()}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
@@ -138,6 +175,9 @@ export default function ResultPage() {
         </div>
         <DonateButton variant="solid" className="shrink-0" />
       </div>
+
+      {/* Per-domain performance */}
+      <DomainBreakdown scores={domainScores} />
 
       {/* Question Review Section */}
       <div className="flex flex-col gap-6 mt-8">

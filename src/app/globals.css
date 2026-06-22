@@ -140,6 +140,12 @@
     background: var(--gold);
     color: #1a1108;
   }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 
 /* Component classes live in the components layer so Tailwind utility classes
@@ -187,4 +193,17 @@
 
 .stress-mode-active * {
   border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Respect users who request reduced motion: neutralize the CSS pulse,
+   transitions, and animated scrolling without removing existing rules. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

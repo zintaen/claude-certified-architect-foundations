@@ -15,6 +15,11 @@ export default function BugReporter() {
 
   const pathname = usePathname();
 
+  // Keep the feedback affordance off the marketing pages.
+  if (pathname === '/' || pathname === '/about') {
+    return null;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
@@ -60,10 +65,10 @@ export default function BugReporter() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 bg-destructive/80 hover:bg-destructive text-destructive-foreground p-3 rounded-full shadow-lg shadow-red-900/20 backdrop-blur-sm transition-all hover:scale-110 active:scale-95"
+        className="surface-panel fixed bottom-6 right-6 z-50 p-2.5 rounded-full text-muted shadow-sm backdrop-blur-sm transition-all hover:border-ring hover:text-primary hover:scale-105 active:scale-95"
         title="Report a bug"
       >
-        <Bug className="w-6 h-6" />
+        <Bug className="w-5 h-5" />
       </button>
 
       <AnimatePresence>

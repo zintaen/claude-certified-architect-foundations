@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { fetchGlobalStats } from '@/lib/api';
-import { Trophy, Medal, Star, ArrowLeft } from 'lucide-react';
+import { Trophy, Medal, Star, ArrowLeft, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { Skeleton, SkeletonRow } from '@/components/Skeleton';
 
 interface TopScore {
   nickname: string;
@@ -30,6 +31,8 @@ export default function LeaderboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<GlobalStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'score' | 'recent'>('score');
 
   useEffect(() => {
     async function load() {
@@ -39,6 +42,36 @@ export default function LeaderboardPage() {
     }
     load();
   }, []);
+
+  // Client-side filter and sort over the already-loaded scores. This only
+  // controls the rendered order; the rank chip and gold/silver/bronze styling
+  // come from rankByEntry below, so they stay tied to true score standing.
+  const visibleScores = useMemo(() => {
+    const all = stats?.topScores ?? [];
+    const sorted = [...all].sort((a, b) =>
+      sortBy === 'recent'
+        ? new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime()
+        : b.score - a.score
+    );
+    const q = query.trim().toLowerCase();
+    if (!q) return sorted;
+    return sorted.filter((entry) => (entry.nickname || 'Anonymous').toLowerCase().includes(q));
+  }, [stats, query, sortBy]);
+
+  const hasAnyScores = (stats?.topScores?.length ?? 0) > 0;
+
+  // True standing by score, so the rank chip and gold/silver/bronze styling
+  // stay tied to a player's real rank even when the list is filtered or
+  // re-sorted by recency. Keyed by the row's identity (nickname + timestamp).
+  const rankByEntry = useMemo(() => {
+    const map = new Map<string, number>();
+    [...(stats?.topScores ?? [])]
+      .sort((a, b) => b.score - a.score)
+      .forEach((entry, i) => {
+        map.set(`${entry.nickname}|${entry.completed_at}|${entry.score}`, i);
+      });
+    return map;
+  }, [stats]);
 
   return (
     <div className="flex-1 max-w-5xl mx-auto w-full p-6 md:p-12 flex flex-col gap-8">
@@ -58,8 +91,30 @@ export default function LeaderboardPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+        <div className="grid md:grid-cols-2 gap-12">
+          {/* Top 10 High Scores placeholder */}
+          <div className="flex flex-col gap-4">
+            <Skeleton className="h-7 w-48" />
+            <Skeleton className="h-11 w-full rounded-xl" />
+            <div className="glass-panel rounded-2xl overflow-hidden">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <SkeletonRow key={i} />
+              ))}
+            </div>
+          </div>
+
+          {/* Overview placeholder */}
+          <div className="flex flex-col gap-4">
+            <Skeleton className="h-7 w-32" />
+            <div className="grid grid-cols-2 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="glass-panel p-6 rounded-xl flex flex-col gap-3">
+                  <Skeleton className="h-9 w-20" />
+                  <Skeleton className="h-4 w-28" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-12">
@@ -68,50 +123,88 @@ export default function LeaderboardPage() {
             <h2 className="text-xl font-bold flex items-center gap-2">
               <Star className="w-5 h-5 text-primary" /> Top 10 High Scores
             </h2>
-            <div className="glass-panel rounded-2xl overflow-hidden">
-              {stats?.topScores?.map((entry: TopScore, i: number) => (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  key={i}
-                  className={`flex items-center justify-between p-4 border-b border-border last:border-0 ${
-                    i === 0
-                      ? 'bg-primary/10'
-                      : i === 1
-                        ? 'bg-[var(--overlay-subtle)]'
-                        : i === 2
-                          ? 'bg-[var(--overlay-subtle)]'
-                          : ''
-                  }`}
+
+            {hasAnyScores && (
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-foreground/50 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search by nickname..."
+                    aria-label="Search scores by nickname"
+                    className="surface-panel w-full rounded-xl pl-10 pr-3 py-2.5 text-sm text-foreground placeholder:text-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                </div>
+                <label className="sr-only" htmlFor="leaderboard-sort">
+                  Sort scores
+                </label>
+                <select
+                  id="leaderboard-sort"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'score' | 'recent')}
+                  className="surface-panel rounded-xl px-3 py-2.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                        i === 0
-                          ? 'bg-primary text-primary-foreground'
-                          : i === 1
-                            ? 'bg-gray-300 text-black'
-                            : i === 2
-                              ? 'bg-[#cd7f32] text-black'
-                              : 'glass-panel'
-                      }`}
-                    >
-                      {i + 1}
-                    </div>
-                    <div>
-                      <div className="font-bold">{entry.nickname || 'Anonymous'}</div>
-                      <div className="text-xs text-foreground/50">
-                        {new Date(entry.completed_at).toLocaleDateString()}
+                  <option value="score">Top score</option>
+                  <option value="recent">Most recent</option>
+                </select>
+              </div>
+            )}
+
+            <div className="glass-panel rounded-2xl overflow-hidden">
+              {visibleScores.map((entry: TopScore, i: number) => {
+                const rank =
+                  rankByEntry.get(`${entry.nickname}|${entry.completed_at}|${entry.score}`) ?? i;
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    key={`${entry.nickname}-${entry.completed_at}-${i}`}
+                    className={`flex items-center justify-between p-4 border-b border-border last:border-0 ${
+                      rank === 0
+                        ? 'bg-primary/10'
+                        : rank === 1
+                          ? 'bg-[var(--overlay-subtle)]'
+                          : rank === 2
+                            ? 'bg-[var(--overlay-subtle)]'
+                            : ''
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                          rank === 0
+                            ? 'bg-primary text-primary-foreground'
+                            : rank === 1
+                              ? 'bg-gray-300 text-black'
+                              : rank === 2
+                                ? 'bg-[#cd7f32] text-black'
+                                : 'glass-panel'
+                        }`}
+                      >
+                        {rank + 1}
+                      </div>
+                      <div>
+                        <div className="font-bold">{entry.nickname || 'Anonymous'}</div>
+                        <div className="text-xs text-foreground/50">
+                          {new Date(entry.completed_at).toLocaleDateString()}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="font-mono font-bold text-lg">{entry.score}</div>
-                </motion.div>
-              ))}
-              {(!stats?.topScores || stats.topScores.length === 0) && (
+                    <div className="font-mono font-bold text-lg">{entry.score}</div>
+                  </motion.div>
+                );
+              })}
+              {!hasAnyScores && (
                 <div className="p-8 text-center text-foreground/50">
                   No scores recorded yet. Be the first!
+                </div>
+              )}
+              {hasAnyScores && visibleScores.length === 0 && (
+                <div className="p-8 text-center text-foreground/50">
+                  No players match that name.
                 </div>
               )}
             </div>

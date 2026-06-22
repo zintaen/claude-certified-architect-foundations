@@ -7,6 +7,10 @@ import BugReporter from '@/components/BugReporter';
 import Footer from '@/components/Footer';
 import ThemeToggle from '@/components/ThemeToggle';
 import DonateButton from '@/components/DonateButton';
+import MobileNav from '@/components/MobileNav';
+import MotionProvider from '@/components/MotionProvider';
+
+const SITE_URL = 'https://claude-certified-architect-mock-exam-cyberskill.vercel.app';
 
 const beVietnamPro = Be_Vietnam_Pro({
   variable: '--font-be-vietnam-pro',
@@ -19,10 +23,14 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
 });
 
+const SITE_TITLE = 'Claude Certified Architect - Mock Exam | CyberSkill';
+const SITE_DESCRIPTION =
+  'A free, unofficial practice exam for the Anthropic Claude Certified Architect certification. Timed simulation, scored feedback, and answer review - built by CyberSkill.';
+
 export const metadata: Metadata = {
-  title: 'Claude Certified Architect - Mock Exam | CyberSkill',
-  description:
-    'A free, unofficial practice exam for the Anthropic Claude Certified Architect certification. Timed simulation, scored feedback, and answer review - built by CyberSkill.',
+  metadataBase: new URL(SITE_URL),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -32,6 +40,23 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   manifest: '/manifest.webmanifest',
+  openGraph: {
+    type: 'website',
+    siteName: 'CyberSkill CCA-F Mock',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    images: ['/opengraph-image'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export const viewport: Viewport = {
@@ -95,12 +120,17 @@ export default function RootLayout({
                 About
               </Link>
               <DonateButton variant="ghost" label="Support" className="hidden sm:inline-flex" />
-              <ThemeToggle />
+              <span className="hidden sm:inline-flex">
+                <ThemeToggle />
+              </span>
+              <MobileNav />
             </nav>
           </div>
         </header>
 
-        <main className="flex-1 flex flex-col">{children}</main>
+        <MotionProvider>
+          <main className="flex-1 flex flex-col">{children}</main>
+        </MotionProvider>
         <Footer />
         <BugReporter />
       </body>

@@ -35,9 +35,9 @@ export default function AboutPage() {
         </h2>
         <p className="text-foreground/80 leading-relaxed">
           The timed mock mirrors the real exam: 60 multiple-choice questions in a single 120-minute
-          session, scored on a 1,000-point scale. This mock flags 700 / 1000 as a working pass
-          benchmark; the official pass mark is not public. You can flag and revisit questions, and
-          submitting early or running out of time both end the session.
+          session, scored on a 1,000-point scale. A pass here is 720 / 1000, the mark Anthropic
+          publishes for the real exam. You can flag and revisit questions, and submitting early or
+          running out of time both end the session.
         </p>
       </section>
 
@@ -50,7 +50,9 @@ export default function AboutPage() {
           (multi-agent orchestration and state recovery), extraction pipelines (tool contracts and
           structured output), customer support agents (graceful degradation and escalation), and
           code exploration (navigating large codebases with agents). Every item is a scenario with a
-          best answer and an explanation for each option.
+          best answer and an explanation for each option. The official exam draws from six scenario
+          types across weighted domains, with agentic architecture and orchestration the largest at
+          27 percent; this mock covers four of those scenario types.
         </p>
       </section>
 
