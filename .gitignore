@@ -16,12 +16,14 @@
 # next.js
 /.next/
 /out/
-# temporary sandbox verification builds (safe to delete: rm -rf .next-verify .vbuild .wbuild .audit* _mkicons.mjs _pw*.mjs)
+# temporary sandbox verification builds (safe to delete: rm -rf .next-verify .vbuild .wbuild .sbuild .audit* _mkicons.mjs _pw*.mjs)
 /.next-verify/
 /.vbuild/
 /.wbuild/
+/.sbuild/
 /.audit*
 /.auditdev*
+/_gen.mjs
 /_mkicons.mjs
 /_pw*.mjs
 

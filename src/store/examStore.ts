@@ -1,11 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { DomainScore } from '@/lib/domains';
 
 export interface Option {
   letter: string;
   text: string;
-  correct: boolean;
-  explain: string;
+  // The answer key is graded on the server, so client-side options carry only the
+  // letter and text. correct/explain are present only on server-graded result items.
+  correct?: boolean;
+  explain?: string;
 }
 
 export interface Question {
@@ -20,6 +23,39 @@ export interface Question {
 export interface LeitnerData {
   box: number;
   nextReview: number;
+}
+
+// Server-graded result produced by /api/exam/grade. The answer key never reaches the
+// browser; the result page renders entirely from this object once grading returns.
+export interface GradedOption {
+  letter: string;
+  text: string;
+  correct: boolean;
+  explain: string;
+}
+
+export interface GradedItem {
+  id: string;
+  group: string;
+  text: string;
+  chosenLetter: string | null;
+  options: GradedOption[];
+}
+
+export interface GradedResult {
+  score: number;
+  correct: number;
+  incorrect: number;
+  skipped: number;
+  total: number;
+  passed: boolean;
+  timeSec: number;
+  reviewEnabled: boolean;
+  reviewLockReason: string;
+  domainScores: DomainScore[];
+  // Empty when review is locked (timed out or unanswered): the key is withheld.
+  items: GradedItem[];
+  untimed: boolean;
 }
 
 export interface ExamState {
@@ -37,6 +73,7 @@ export interface ExamState {
   timedOut: boolean;
   focusLoss: number;
   leitner: Record<string, LeitnerData>;
+  result: GradedResult | null;
 }
 
 interface ExamActions {
@@ -61,6 +98,7 @@ interface ExamActions {
   flagQuestion: (idx: number, flagged: boolean) => void;
   setIndex: (idx: number) => void;
   incrementFocusLoss: () => void;
+  setResult: (result: GradedResult | null) => void;
 }
 
 const initialState: ExamState = {
@@ -78,6 +116,7 @@ const initialState: ExamState = {
   timedOut: false,
   focusLoss: 0,
   leitner: {},
+  result: null,
 };
 
 export const useExamStore = create<ExamState & ExamActions>()(
@@ -94,6 +133,7 @@ export const useExamStore = create<ExamState & ExamActions>()(
           reviewLockReason: '',
           timedOut: false,
           focusLoss: 0,
+          result: null,
         })),
       endExam: (payload) =>
         set((state) => ({
@@ -146,11 +186,13 @@ export const useExamStore = create<ExamState & ExamActions>()(
         }),
       setIndex: (idx) => set({ idx }),
       incrementFocusLoss: () => set((state) => ({ focusLoss: state.focusLoss + 1 })),
+      setResult: (result) => set({ result }),
     }),
     {
       name: 'ccaf-exam-storage',
       partialize: (state) => ({
-        // We only persist the leitner box state and the ongoing exam session if needed
+        // Persist the ongoing session, the Leitner boxes, and the last graded result
+        // so a refresh of /result still shows the score and review.
         items: state.items,
         idx: state.idx,
         startedAt: state.startedAt,
@@ -161,6 +203,7 @@ export const useExamStore = create<ExamState & ExamActions>()(
         sessionId: state.sessionId,
         finished: state.finished,
         leitner: state.leitner,
+        result: state.result,
       }),
     }
   )

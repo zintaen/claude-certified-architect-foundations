@@ -62,7 +62,9 @@ export default function ExamPage() {
 
       if (left <= 0) {
         clearInterval(interval);
-        void engine.finishExam(true).then(() => router.push('/result'));
+        void engine.finishExam(true).then((ok) => {
+          if (ok) router.push('/result');
+        });
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -80,7 +82,9 @@ export default function ExamPage() {
         setWarnings((w) => {
           const newW = w + 1;
           if (newW >= 3) {
-            void engine.finishExam(true).then(() => router.push('/result'));
+            void engine.finishExam(true).then((ok) => {
+              if (ok) router.push('/result');
+            });
           } else {
             setCheatWarning(true);
           }

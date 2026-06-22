@@ -1,20 +1,19 @@
-import { useExamStore, Question } from '@/store/examStore';
+import { useExamStore, type Question, type GradedResult } from '@/store/examStore';
+import type { PublicQuestion } from '@/data/questions';
 import type { GroupId } from '@/lib/domains';
 
 import { useCallback } from 'react';
-import { syncQueue } from '../lib/offlineQueue';
 
 interface BuildOptions {
   group?: GroupId; // restrict the pool to a single domain (targeted drill)
   flashcard?: boolean; // flashcard review: always untimed, never submitted to the leaderboard
 }
 
-// We can mock this if it's missing, or build a real queue later
 export function useExamEngine() {
   const store = useExamStore();
 
   const buildSession = useCallback(
-    (qs: Question[], count: number, untimed: boolean, opts?: BuildOptions) => {
+    (qs: PublicQuestion[], count: number, untimed: boolean, opts?: BuildOptions) => {
       const flashcard = !!opts?.flashcard;
       const relaxed = untimed || flashcard; // no timer for practice or flashcards
 
@@ -24,7 +23,9 @@ export function useExamEngine() {
       const pool = shuffledQs.slice(0, Math.max(1, count));
 
       const items: Question[] = pool.map((q) => ({
-        ...q,
+        id: q.id,
+        group: q.group,
+        text: q.text,
         options: [...q.options].sort(() => Math.random() - 0.5),
         chosenLetter: null,
         flagged: false,
@@ -49,10 +50,10 @@ export function useExamEngine() {
 
   const finishExam = useCallback(
     async (force: boolean): Promise<boolean> => {
-      // Returns true when the exam is actually finished (so the caller may navigate to /result),
-      // false when the user bailed (unanswered questions, or declined the confirm). The submit
-      // button previously navigated regardless, landing on /result with finished=false, which the
-      // result page then redirected home - so the user "could not see their results".
+      // Returns true when the exam is graded (so the caller may navigate to /result), false
+      // when the user bailed or grading failed. Grading happens on the server now: the answer
+      // key never reaches the browser, and the leaderboard score is computed from the answers
+      // server-side, so a client cannot post an arbitrary score.
       if (store.finished) return true;
 
       const unanswered = store.items.filter((x) => !x.chosenLetter).length;
@@ -63,75 +64,44 @@ export function useExamEngine() {
 
       if (!force && !window.confirm(`Submit now? You'll see your score and review.`)) return false;
 
-      let correct = 0;
-      store.items.forEach((it) => {
-        const chosen = it.options.find((o) => o.letter === it.chosenLetter);
-        if (chosen?.correct) correct++;
-      });
+      const timedOut = store.timedOut;
+      const timeTaken = Math.max(0, Math.floor((Date.now() - store.startedAt) / 1000));
+      const answers = store.items.map((it) => ({ id: it.id, letter: it.chosenLetter }));
 
-      const score1000 = Math.round((correct / store.items.length) * 1000);
-      const usedSec = Math.max(0, Math.floor((Date.now() - store.startedAt) / 1000));
-
-      let reviewLockReason = '';
-      let reviewEnabled = true;
-
-      if (unanswered > 0) {
-        reviewEnabled = false;
-        reviewLockReason = `You left ${unanswered} questions unanswered. Finish all questions to unlock explanations.`;
-      } else if (!store.untimed && store.timedOut) {
-        reviewEnabled = false;
-        reviewLockReason = 'The timer ran out before you could submit.';
-      }
-
-      store.endExam({
-        timedOut: store.timedOut,
-        focusLoss: store.focusLoss,
-        reviewEnabled,
-        reviewLockReason,
-      });
-
-      // Persist to Supabase in the BACKGROUND. Navigation to /result must not wait on the
-      // network: the score is computed and stored locally above, and a failed save is retried via
-      // the offline queue. Awaiting the round-trip here previously coupled showing the user their
-      // result to the (un-versioned) scoring RPC succeeding.
-      if (!store.untimed) {
-        const wrongIdxs: number[] = [];
-        store.items.forEach((it, idx) => {
-          const chosen = it.options.find((o) => o.letter === it.chosenLetter);
-          if (!chosen || !chosen.correct) {
-            wrongIdxs.push(idx + 1);
-          }
+      try {
+        const res = await fetch('/api/exam/grade', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            answers,
+            untimed: store.untimed,
+            timedOut,
+            timeTaken,
+            nickname: localStorage.getItem('ccaf-nickname') || undefined,
+            email: localStorage.getItem('ccaf-email') || undefined,
+            pinHash: localStorage.getItem('ccaf-pinHash') || undefined,
+          }),
         });
 
-        const payload = {
-          p_email: localStorage.getItem('ccaf-email') || undefined,
-          p_pin_hash: localStorage.getItem('ccaf-pinHash') || undefined,
-          p_score: score1000,
-          p_wrong_answers: wrongIdxs,
-          p_time_taken: usedSec,
-          p_nickname: localStorage.getItem('ccaf-nickname') || undefined,
-        };
+        const data = (await res.json()) as GradedResult & { error?: string };
+        if (!res.ok || data.error) {
+          alert('Could not grade your exam. Check your connection and try again.');
+          return false;
+        }
 
-        void (async () => {
-          try {
-            const res = await fetch('/api/exam/submit', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload),
-            });
-            const data = await res.json();
-            if (!res.ok || data.error) {
-              console.error(data.error);
-              syncQueue.add(payload);
-            }
-          } catch (err: unknown) {
-            console.warn('Could not save to API (maybe local/offline). Queuing offline.', err);
-            syncQueue.add(payload);
-          }
-        })();
+        store.setResult(data);
+        store.endExam({
+          timedOut,
+          focusLoss: store.focusLoss,
+          reviewEnabled: data.reviewEnabled,
+          reviewLockReason: data.reviewLockReason,
+        });
+        return true;
+      } catch (err) {
+        console.warn('Grading request failed.', err);
+        alert('Could not grade your exam. Check your connection and try again.');
+        return false;
       }
-
-      return true;
     },
     [store]
   );

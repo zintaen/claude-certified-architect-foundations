@@ -9,6 +9,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import DonateButton from '@/components/DonateButton';
 import MobileNav from '@/components/MobileNav';
 import MotionProvider from '@/components/MotionProvider';
+import Analytics from '@/components/Analytics';
 
 const SITE_URL = 'https://claude-certified-architect-mock-exam-cyberskill.vercel.app';
 
@@ -133,6 +134,7 @@ export default function RootLayout({
         </MotionProvider>
         <Footer />
         <BugReporter />
+        <Analytics />
       </body>
     </html>
   );

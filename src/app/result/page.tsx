@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useExamStore } from '@/store/examStore';
 import { CheckCircle2, XCircle, ArrowLeft, Share2, Award, Clock } from 'lucide-react';
@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import DonateButton from '@/components/DonateButton';
 import DomainBreakdown from '@/components/DomainBreakdown';
 import Certificate from '@/components/Certificate';
-import { computeDomainScores, archetypeFor, PASS_SCORE } from '@/lib/domains';
+import { archetypeFor } from '@/lib/domains';
 
 export default function ResultPage() {
   const store = useExamStore();
@@ -25,37 +25,14 @@ export default function ResultPage() {
     return unsub;
   }, []);
 
+  const result = store.result;
+
   useEffect(() => {
     if (!hydrated) return;
-    if (!store.finished || store.items.length === 0) {
+    if (!store.finished || !result) {
       router.push('/');
     }
-  }, [hydrated, store.finished, store.items.length, router]);
-
-  const stats = useMemo(() => {
-    if (store.items.length === 0) return null;
-    let correct = 0;
-    let incorrect = 0;
-    let skipped = 0;
-
-    store.items.forEach((it) => {
-      if (!it.chosenLetter) {
-        skipped++;
-        return;
-      }
-      const chosen = it.options.find((o) => o.letter === it.chosenLetter);
-      if (chosen?.correct) correct++;
-      else incorrect++;
-    });
-
-    const score1000 = Math.round((correct / store.items.length) * 1000);
-    const passed = score1000 >= PASS_SCORE;
-    const timeSec = Math.max(0, Math.floor((store.endsAt - store.startedAt) / 1000));
-
-    return { correct, incorrect, skipped, score1000, passed, timeSec, total: store.items.length };
-  }, [store.items, store.endsAt, store.startedAt]);
-
-  const domainScores = useMemo(() => computeDomainScores(store.items), [store.items]);
+  }, [hydrated, store.finished, result, router]);
 
   // Nickname lives in localStorage; read it after mount to stay SSR-safe.
   const [nickname, setNickname] = useState<string | undefined>(undefined);
@@ -63,9 +40,10 @@ export default function ResultPage() {
     setNickname(localStorage.getItem('ccaf-nickname') || undefined);
   }, []);
 
-  if (!hydrated || !stats) return null;
+  if (!hydrated || !result) return null;
 
-  const shareText = `I scored ${stats.score1000}/1000 on the Claude Certified Architect mock exam!`;
+  const domainScores = result.domainScores;
+  const shareText = `I scored ${result.score}/1000 on the Claude Certified Architect mock exam!`;
   const handleShare = () => {
     if (typeof navigator !== 'undefined' && navigator.share) {
       navigator
@@ -108,16 +86,16 @@ export default function ResultPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`glass-panel p-8 rounded-2xl border-t-4 ${stats.passed ? 'border-t-success' : 'border-t-destructive'} flex flex-col md:flex-row items-center gap-8`}
+        className={`glass-panel p-8 rounded-2xl border-t-4 ${result.passed ? 'border-t-success' : 'border-t-destructive'} flex flex-col md:flex-row items-center gap-8`}
       >
         <div className="flex-1 flex flex-col items-center md:items-start">
           <div
-            className={`text-sm font-bold uppercase tracking-widest ${stats.passed ? 'text-success' : 'text-destructive'}`}
+            className={`text-sm font-bold uppercase tracking-widest ${result.passed ? 'text-success' : 'text-destructive'}`}
           >
-            {stats.passed ? '✓ Passed (Mock Threshold)' : '✗ Below Threshold'}
+            {result.passed ? '✓ Passed (Mock Threshold)' : '✗ Below Threshold'}
           </div>
           <div className="text-6xl font-bold mt-2 font-mono tracking-tight">
-            {stats.score1000} <span className="text-2xl text-foreground/40">/ 1000</span>
+            {result.score} <span className="text-2xl text-foreground/40">/ 1000</span>
           </div>
           {domainScores.length > 0 && (
             <div className="mt-3 surface-raised border border-border text-primary text-xs font-medium px-3 py-1 rounded-full">
@@ -125,15 +103,15 @@ export default function ResultPage() {
             </div>
           )}
           <p className="text-foreground/70 mt-4 text-center md:text-left max-w-sm">
-            {stats.passed
+            {result.passed
               ? "Excellent work! You've demonstrated a solid understanding of the architect blueprint."
               : 'Keep practicing. Review the explanations below to identify your weak spots.'}
           </p>
           <div className="mt-5">
             <Certificate
               nickname={nickname}
-              score={stats.score1000}
-              passed={stats.passed}
+              score={result.score}
+              passed={result.passed}
               dateISO={new Date().toISOString()}
             />
           </div>
@@ -142,24 +120,24 @@ export default function ResultPage() {
         <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
           <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-[var(--overlay-subtle)]">
             <CheckCircle2 className="w-6 h-6 text-success mb-1" />
-            <div className="text-2xl font-bold">{stats.correct}</div>
+            <div className="text-2xl font-bold">{result.correct}</div>
             <div className="text-xs text-foreground/50 uppercase tracking-wider">Correct</div>
           </div>
           <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-[var(--overlay-subtle)]">
             <XCircle className="w-6 h-6 text-destructive mb-1" />
-            <div className="text-2xl font-bold">{stats.incorrect}</div>
+            <div className="text-2xl font-bold">{result.incorrect}</div>
             <div className="text-xs text-foreground/50 uppercase tracking-wider">Incorrect</div>
           </div>
           <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-[var(--overlay-subtle)]">
             <div className="w-6 h-6 rounded-full border-2 border-foreground/30 flex items-center justify-center text-xs mb-1 font-bold">
               -
             </div>
-            <div className="text-2xl font-bold">{stats.skipped}</div>
+            <div className="text-2xl font-bold">{result.skipped}</div>
             <div className="text-xs text-foreground/50 uppercase tracking-wider">Skipped</div>
           </div>
           <div className="glass-panel p-4 rounded-xl flex flex-col gap-1 items-center justify-center bg-[var(--overlay-subtle)]">
             <Clock className="w-6 h-6 text-primary mb-1" />
-            <div className="text-2xl font-bold">{Math.floor(stats.timeSec / 60)}m</div>
+            <div className="text-2xl font-bold">{Math.floor(result.timeSec / 60)}m</div>
             <div className="text-xs text-foreground/50 uppercase tracking-wider">Time Taken</div>
           </div>
         </div>
@@ -186,14 +164,14 @@ export default function ResultPage() {
           Review Questions
         </h2>
 
-        {!store.reviewEnabled ? (
+        {!result.reviewEnabled ? (
           <div className="glass-panel p-6 rounded-xl border-destructive/30 bg-destructive/5">
             <h3 className="text-destructive font-bold mb-2">Review Locked</h3>
-            <p className="text-foreground/80">{store.reviewLockReason}</p>
+            <p className="text-foreground/80">{result.reviewLockReason}</p>
           </div>
         ) : (
           <div className="flex flex-col gap-6">
-            {store.items.map((it, i) => {
+            {result.items.map((it, i) => {
               const chosen = it.options.find((o) => o.letter === it.chosenLetter);
               const isCorrect = chosen?.correct;
 
@@ -253,7 +231,7 @@ export default function ResultPage() {
                             />
                           </div>
 
-                          {store.reviewEnabled && opt.explain && (
+                          {opt.explain && (
                             <div className="mt-3 text-sm text-foreground/70 pl-9 border-l-2 border-border ml-3 py-1">
                               {opt.explain}
                             </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useExamStore } from '@/store/examStore';
+import { useExamStore, type GradedOption } from '@/store/examStore';
 import { useExamEngine } from '@/hooks/useExamEngine';
 import { questions } from '@/data/questions';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,6 +19,8 @@ export default function FlashcardsPage() {
   const [revealed, setRevealed] = useState(false);
   const [done, setDone] = useState(false);
   const [reviewedCount, setReviewedCount] = useState(0);
+  // Answers are fetched from the server (the key is not in the client bundle), keyed by id.
+  const [answerMap, setAnswerMap] = useState<Record<string, GradedOption[]>>({});
 
   useEffect(() => {
     const unsub = useExamStore.persist.onFinishHydration(() => setHydrated(true));
@@ -32,11 +34,40 @@ export default function FlashcardsPage() {
     if (!store.isFlashcardMode || store.items.length === 0) router.push('/practice');
   }, [hydrated, store.isFlashcardMode, store.items.length, router]);
 
+  // Pull the answer key for this session's questions once, so reveal works without shipping
+  // the key in the bundle. Keyed on sessionId so "shuffle and restart" refetches.
+  useEffect(() => {
+    if (!hydrated || !store.isFlashcardMode) return;
+    const ids = useExamStore.getState().items.map((it) => it.id);
+    if (ids.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/answers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids }),
+        });
+        const data = (await res.json()) as { answers?: { id: string; options: GradedOption[] }[] };
+        if (cancelled || !data.answers) return;
+        const map: Record<string, GradedOption[]> = {};
+        for (const a of data.answers) map[a.id] = a.options;
+        setAnswerMap(map);
+      } catch {
+        /* leave answers empty; reveal stays disabled until a successful fetch */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, store.isFlashcardMode, store.sessionId]);
+
   if (!hydrated || !store.isFlashcardMode || store.items.length === 0) return null;
 
   const total = store.items.length;
   const current = store.items[store.idx];
-  const correctOption = current.options.find((o) => o.correct);
+  const answers = answerMap[current.id];
+  const correctOption = answers?.find((o) => o.correct);
 
   const rate = (gotIt: boolean) => {
     if (correctOption) {
@@ -128,14 +159,15 @@ export default function FlashcardsPage() {
           {!revealed ? (
             <button
               onClick={() => setRevealed(true)}
-              className="bg-primary text-primary-foreground px-6 py-3 rounded-md font-semibold self-start hover:brightness-110 transition-all"
+              disabled={!answers}
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-md font-semibold self-start hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Reveal answer
+              {answers ? 'Reveal answer' : 'Loading answer...'}
             </button>
           ) : (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                {current.options.map((opt) => (
+                {(answers ?? []).map((opt) => (
                   <div
                     key={opt.letter}
                     className={`p-4 rounded-xl border flex flex-col gap-2 ${
