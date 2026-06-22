@@ -26,21 +26,27 @@ export default function DashboardPage() {
   const [history, setHistory] = useState<UserHistory | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [signedOut, setSignedOut] = useState(false);
 
   useEffect(() => {
     async function load() {
       const email = localStorage.getItem('ccaf-email');
       const pinHash = localStorage.getItem('ccaf-pinHash');
 
+      // No saved identity: a neutral empty state, not an error.
       if (!email || !pinHash) {
-        setError('You are not logged in. Please start an exam to log in.');
+        setSignedOut(true);
         setLoading(false);
         return;
       }
 
       const data = await fetchUserHistory(email, pinHash);
       if (!data) {
-        setError('Failed to fetch history or invalid credentials.');
+        // A valid account with no attempts returns an empty history object, so a null here
+        // means a wrong PIN for this email or a network problem - not just "no history".
+        setError(
+          'We could not load your history. If you save progress with a PIN, double-check the PIN for this email and try again.'
+        );
       } else {
         setHistory(data as unknown as UserHistory);
       }
@@ -93,8 +99,21 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+      ) : signedOut ? (
+        <div className="glass-panel p-8 rounded-2xl flex flex-col items-center text-center gap-4">
+          <p className="text-foreground/70 max-w-md">
+            No saved history yet. Take a timed mock and add your email and PIN on the start screen,
+            and your past attempts will appear here.
+          </p>
+          <button
+            onClick={() => router.push('/')}
+            className="bg-primary text-primary-foreground px-5 py-2.5 rounded-md font-semibold hover:brightness-110 transition-all"
+          >
+            Start a mock
+          </button>
+        </div>
       ) : error ? (
-        <div className="glass-panel p-8 text-center text-destructive rounded-2xl">{error}</div>
+        <div className="glass-panel p-8 text-center text-foreground/70 rounded-2xl">{error}</div>
       ) : (
         <div className="grid md:grid-cols-2 gap-12">
           {/* General Stats */}
