@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import DonateButton from '@/components/DonateButton';
 import { fetchGlobalStats } from '@/lib/api';
+import { useExamEngine } from '@/hooks/useExamEngine';
+import { questions } from '@/data/questions';
 
 const DOMAINS = [
   {
@@ -116,6 +118,7 @@ interface LiveStats {
 
 export default function Home() {
   const router = useRouter();
+  const { buildSession } = useExamEngine();
   const [showSetup, setShowSetup] = useState(false);
   const [email, setEmail] = useState('');
   const [nickname, setNickname] = useState('');
@@ -158,18 +161,29 @@ export default function Home() {
   }, []);
 
   const handleStart = async () => {
-    if (email) localStorage.setItem('ccaf-email', email);
-    if (nickname) localStorage.setItem('ccaf-nickname', nickname);
-    if (pin) localStorage.setItem('ccaf-pinHash', await sha256Hex(pin));
-    if (subscribe && email) {
+    // Normalize the email once here so the value written with each attempt and the value the
+    // dashboard later queries by always match (trailing spaces or mixed case otherwise miss).
+    const cleanEmail = email.trim().toLowerCase();
+    if (cleanEmail) localStorage.setItem('ccaf-email', cleanEmail);
+    if (nickname.trim()) localStorage.setItem('ccaf-nickname', nickname.trim());
+    if (pin) {
+      try {
+        localStorage.setItem('ccaf-pinHash', await sha256Hex(pin));
+      } catch {
+        // crypto.subtle is unavailable outside a secure context; skip the PIN but still start.
+      }
+    }
+    if (subscribe && cleanEmail) {
       track('subscribe_optin');
       // Fire-and-forget opt-in; never block starting the exam on it.
       void fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'exam-setup' }),
+        body: JSON.stringify({ email: cleanEmail, source: 'exam-setup' }),
       }).catch(() => {});
     }
+    // Always build a fresh timed session so "Begin exam" starts a new sitting, never a replay.
+    buildSession(questions, 60, false);
     router.push('/exam');
   };
 

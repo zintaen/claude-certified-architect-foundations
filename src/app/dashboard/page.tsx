@@ -6,6 +6,13 @@ import { ArrowLeft, User, Activity } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Skeleton, SkeletonRow } from '@/components/Skeleton';
+import { PASS_SCORE } from '@/lib/domains';
+
+// Render a stored ISO timestamp, or a dash when it is missing or unparseable.
+function fmtDateTime(s: string): string {
+  const d = new Date(s);
+  return s && !Number.isNaN(d.getTime()) ? d.toLocaleString() : '-';
+}
 
 interface Attempt {
   score: number;
@@ -30,7 +37,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function load() {
-      const email = localStorage.getItem('ccaf-email');
+      const email = (localStorage.getItem('ccaf-email') || '').trim().toLowerCase();
       const pinHash = localStorage.getItem('ccaf-pinHash');
 
       // No saved identity: a neutral empty state, not an error.
@@ -155,7 +162,7 @@ export default function DashboardPage() {
                   transition={{ delay: i * 0.05 }}
                   key={i}
                   className={`flex items-center justify-between p-4 border-b border-border last:border-0 ${
-                    entry.score >= 700
+                    entry.score >= PASS_SCORE
                       ? 'border-l-4 border-l-success'
                       : 'border-l-4 border-l-destructive'
                   }`}
@@ -163,7 +170,7 @@ export default function DashboardPage() {
                   <div className="flex flex-col">
                     <div className="font-bold">Score: {entry.score}</div>
                     <div className="text-xs text-foreground/50">
-                      {new Date(entry.completed_at).toLocaleString()}
+                      {fmtDateTime(entry.completed_at)}
                     </div>
                   </div>
                   <div className="font-mono text-sm">

@@ -37,6 +37,9 @@ export default function ResultPage() {
 
   // Nickname lives in localStorage; read it after mount to stay SSR-safe.
   const [nickname, setNickname] = useState<string | undefined>(undefined);
+  // A stable "now" captured once at mount, used only as a fallback for older results saved before
+  // the completion timestamp was recorded. Calling Date.now() directly in render is impure.
+  const [fallbackNow] = useState(() => Date.now());
   useEffect(() => {
     setNickname(localStorage.getItem('ccaf-nickname') || undefined);
   }, []);
@@ -57,6 +60,20 @@ export default function ResultPage() {
     });
     return `${origin}/score?${params.toString()}`;
   };
+  // Copy a link with a graceful fallback: navigator.clipboard is undefined on insecure origins and
+  // can reject when permission is denied, so never assume it exists or that it succeeded.
+  const copyLink = async (text: string, okMsg: string) => {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        alert(okMsg);
+        return;
+      }
+    } catch {
+      /* fall through to the manual copy prompt */
+    }
+    if (typeof window !== 'undefined') window.prompt('Copy this link:', text);
+  };
   const handleChallenge = () => {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const url = `${origin}/?ref=challenge`;
@@ -69,8 +86,7 @@ export default function ResultPage() {
         });
       return;
     }
-    navigator.clipboard.writeText(`Think you can beat my score? ${url}`);
-    alert('Challenge link copied to clipboard!');
+    void copyLink(`Think you can beat my score? ${url}`, 'Challenge link copied to clipboard!');
   };
   const handleShare = () => {
     track('result_shared');
@@ -83,8 +99,7 @@ export default function ResultPage() {
         });
       return;
     }
-    navigator.clipboard.writeText(`${shareText} ${url}`);
-    alert('Share link copied to clipboard!');
+    void copyLink(`${shareText} ${url}`, 'Share link copied to clipboard!');
   };
 
   return (
@@ -146,7 +161,7 @@ export default function ResultPage() {
               nickname={nickname}
               score={result.score}
               passed={result.passed}
-              dateISO={new Date().toISOString()}
+              dateISO={new Date(store.completedAt || fallbackNow).toISOString()}
             />
           </div>
         </div>

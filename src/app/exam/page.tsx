@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useExamStore } from '@/store/examStore';
@@ -21,9 +21,23 @@ import ThemeToggle from '@/components/ThemeToggle';
 export default function ExamPage() {
   const router = useRouter();
   const store = useExamStore();
-  const engine = useExamEngine();
+  const { buildSession, finishExam } = useExamEngine();
   const [mounted, setMounted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // A single in-flight guard so a double-click on Submit, or a timer expiry that overlaps a slow
+  // grade request, cannot fire two grade calls (and two leaderboard writes).
+  const submittingRef = useRef(false);
+  const submit = useCallback(
+    async (force: boolean, timedOut = false) => {
+      if (submittingRef.current) return;
+      submittingRef.current = true;
+      const ok = await finishExam(force, timedOut);
+      if (ok) router.push('/result');
+      else submittingRef.current = false;
+    },
+    [finishExam, router]
+  );
 
   useEffect(() => {
     const sync = () => setIsFullscreen(!!document.fullscreenElement);
@@ -41,11 +55,15 @@ export default function ExamPage() {
 
   useEffect(() => {
     setMounted(true);
-    if (store.items.length === 0) {
-      // automatically start an exam with 60 questions if none exists
-      engine.buildSession(questions, 60, false);
+  }, []);
+
+  // Start a fresh timed exam when there is no in-progress session, or when the persisted session
+  // is already finished - so returning to /exam after a sitting does not replay the old one.
+  useEffect(() => {
+    if (store.items.length === 0 || store.finished) {
+      buildSession(questions, 60, false);
     }
-  }, [engine, store.items.length]);
+  }, [buildSession, store.items.length, store.finished]);
 
   // Timer logic
   const [timeLeft, setTimeLeft] = useState('');
@@ -62,13 +80,11 @@ export default function ExamPage() {
 
       if (left <= 0) {
         clearInterval(interval);
-        void engine.finishExam(true).then((ok) => {
-          if (ok) router.push('/result');
-        });
+        void submit(true, true);
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [mounted, store.endsAt, store.finished, store.untimed, engine, router]);
+  }, [mounted, store.endsAt, store.finished, store.untimed, submit]);
 
   // Anti-cheat logic
   const [warnings, setWarnings] = useState(0);
@@ -79,12 +95,11 @@ export default function ExamPage() {
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
+        useExamStore.getState().incrementFocusLoss();
         setWarnings((w) => {
           const newW = w + 1;
           if (newW >= 3) {
-            void engine.finishExam(true).then((ok) => {
-              if (ok) router.push('/result');
-            });
+            void submit(true, false);
           } else {
             setCheatWarning(true);
           }
@@ -95,7 +110,7 @@ export default function ExamPage() {
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [mounted, store.finished, store.untimed, engine, router]);
+  }, [mounted, store.finished, store.untimed, submit]);
 
   if (!mounted || store.items.length === 0) return null;
 
@@ -196,8 +211,8 @@ export default function ExamPage() {
               />
 
               <div className="flex flex-col gap-3">
-                {currentQ.options.map((opt, i) => {
-                  const letter = String.fromCharCode(65 + i);
+                {currentQ.options.map((opt) => {
+                  const letter = opt.letter;
                   const isSelected = currentQ.chosenLetter === opt.letter;
                   return (
                     <label
@@ -260,10 +275,7 @@ export default function ExamPage() {
             </button>
           ) : (
             <button
-              onClick={async () => {
-                const finished = await engine.finishExam(false);
-                if (finished) router.push('/result');
-              }}
+              onClick={() => void submit(false)}
               className="bg-primary text-primary-foreground px-6 py-2 rounded-md font-bold hover:bg-primary/90 transition-colors shadow-[0_0_15px_var(--glow)]"
             >
               Submit Exam

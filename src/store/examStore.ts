@@ -74,6 +74,7 @@ export interface ExamState {
   focusLoss: number;
   leitner: Record<string, LeitnerData>;
   result: GradedResult | null;
+  completedAt: number;
 }
 
 interface ExamActions {
@@ -117,6 +118,7 @@ const initialState: ExamState = {
   focusLoss: 0,
   leitner: {},
   result: null,
+  completedAt: 0,
 };
 
 export const useExamStore = create<ExamState & ExamActions>()(
@@ -143,6 +145,7 @@ export const useExamStore = create<ExamState & ExamActions>()(
           focusLoss: payload.focusLoss,
           reviewEnabled: payload.reviewEnabled,
           reviewLockReason: payload.reviewLockReason,
+          completedAt: Date.now(),
         })),
       answerQuestion: (idx, letter) =>
         set((state) => {
@@ -204,6 +207,7 @@ export const useExamStore = create<ExamState & ExamActions>()(
         finished: state.finished,
         leitner: state.leitner,
         result: state.result,
+        completedAt: state.completedAt,
       }),
     }
   )

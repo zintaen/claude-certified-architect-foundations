@@ -7,6 +7,12 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Skeleton, SkeletonRow } from '@/components/Skeleton';
 
+// Render a stored ISO date, or a dash when it is missing or unparseable.
+function fmtDate(s: string): string {
+  const d = new Date(s);
+  return s && !Number.isNaN(d.getTime()) ? d.toLocaleDateString() : '-';
+}
+
 interface TopScore {
   nickname: string;
   completed_at: string;
@@ -48,14 +54,16 @@ export default function LeaderboardPage() {
   // come from rankByEntry below, so they stay tied to true score standing.
   const visibleScores = useMemo(() => {
     const all = stats?.topScores ?? [];
+    const ts = (s: string) => new Date(s).getTime() || 0; // missing/invalid dates sort last
     const sorted = [...all].sort((a, b) =>
-      sortBy === 'recent'
-        ? new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime()
-        : b.score - a.score
+      sortBy === 'recent' ? ts(b.completed_at) - ts(a.completed_at) : b.score - a.score
     );
     const q = query.trim().toLowerCase();
-    if (!q) return sorted;
-    return sorted.filter((entry) => (entry.nickname || 'Anonymous').toLowerCase().includes(q));
+    const filtered = q
+      ? sorted.filter((entry) => (entry.nickname || 'Anonymous').toLowerCase().includes(q))
+      : sorted;
+    // The heading promises a top 10, so cap the rendered list even if the RPC returns more.
+    return filtered.slice(0, 10);
   }, [stats, query, sortBy]);
 
   const hasAnyScores = (stats?.topScores?.length ?? 0) > 0;
@@ -189,7 +197,7 @@ export default function LeaderboardPage() {
                       <div>
                         <div className="font-bold">{entry.nickname || 'Anonymous'}</div>
                         <div className="text-xs text-foreground/50">
-                          {new Date(entry.completed_at).toLocaleDateString()}
+                          {fmtDate(entry.completed_at)}
                         </div>
                       </div>
                     </div>

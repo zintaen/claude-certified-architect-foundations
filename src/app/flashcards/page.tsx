@@ -21,6 +21,8 @@ export default function FlashcardsPage() {
   const [reviewedCount, setReviewedCount] = useState(0);
   // Answers are fetched from the server (the key is not in the client bundle), keyed by id.
   const [answerMap, setAnswerMap] = useState<Record<string, GradedOption[]>>({});
+  const [answerError, setAnswerError] = useState(false);
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     const unsub = useExamStore.persist.onFinishHydration(() => setHydrated(true));
@@ -41,6 +43,7 @@ export default function FlashcardsPage() {
     const ids = useExamStore.getState().items.map((it) => it.id);
     if (ids.length === 0) return;
     let cancelled = false;
+    setAnswerError(false);
     (async () => {
       try {
         const res = await fetch('/api/answers', {
@@ -48,19 +51,21 @@ export default function FlashcardsPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ids }),
         });
+        if (!res.ok) throw new Error(`answers ${res.status}`);
         const data = (await res.json()) as { answers?: { id: string; options: GradedOption[] }[] };
-        if (cancelled || !data.answers) return;
+        if (cancelled) return;
+        if (!data.answers) throw new Error('no answers');
         const map: Record<string, GradedOption[]> = {};
         for (const a of data.answers) map[a.id] = a.options;
         setAnswerMap(map);
       } catch {
-        /* leave answers empty; reveal stays disabled until a successful fetch */
+        if (!cancelled) setAnswerError(true);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [hydrated, store.isFlashcardMode, store.sessionId]);
+  }, [hydrated, store.isFlashcardMode, store.sessionId, retry]);
 
   if (!hydrated || !store.isFlashcardMode || store.items.length === 0) return null;
 
@@ -157,40 +162,74 @@ export default function FlashcardsPage() {
           />
 
           {!revealed ? (
-            <button
-              onClick={() => setRevealed(true)}
-              disabled={!answers}
-              className="bg-primary text-primary-foreground px-6 py-3 rounded-md font-semibold self-start hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {answers ? 'Reveal answer' : 'Loading answer...'}
-            </button>
-          ) : (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                {(answers ?? []).map((opt) => (
-                  <div
-                    key={opt.letter}
-                    className={`p-4 rounded-xl border flex flex-col gap-2 ${
-                      opt.correct
-                        ? 'bg-success/10 border-success/50'
-                        : 'border-border bg-[var(--overlay-subtle)]'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={`shrink-0 w-6 h-6 rounded flex items-center justify-center font-mono text-xs font-bold ${
-                          opt.correct
-                            ? 'bg-success text-success-foreground'
-                            : 'bg-[var(--overlay-strong)]'
-                        }`}
-                      >
+                {[...current.options]
+                  .sort((a, b) => a.letter.localeCompare(b.letter))
+                  .map((opt) => (
+                    <div
+                      key={opt.letter}
+                      className="p-4 rounded-xl border border-border bg-[var(--overlay-subtle)] flex items-start gap-3"
+                    >
+                      <div className="shrink-0 w-6 h-6 rounded flex items-center justify-center font-mono text-xs font-bold bg-[var(--overlay-strong)]">
                         {opt.letter}
                       </div>
                       <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opt.text) }} />
                     </div>
-                    {opt.explain && <div className="text-sm text-muted pl-9">{opt.explain}</div>}
-                  </div>
-                ))}
+                  ))}
+              </div>
+              {answerError && !answers ? (
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="text-sm text-muted">Could not load the answer.</span>
+                  <button
+                    onClick={() => {
+                      setAnswerError(false);
+                      setRetry((n) => n + 1);
+                    }}
+                    className="surface-raised border border-border px-4 py-2 rounded-md font-medium hover:border-ring transition-colors"
+                  >
+                    Try again
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setRevealed(true)}
+                  disabled={!answers}
+                  className="bg-primary text-primary-foreground px-6 py-3 rounded-md font-semibold self-start hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {answers ? 'Reveal answer' : 'Loading answer...'}
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                {[...(answers ?? [])]
+                  .sort((a, b) => a.letter.localeCompare(b.letter))
+                  .map((opt) => (
+                    <div
+                      key={opt.letter}
+                      className={`p-4 rounded-xl border flex flex-col gap-2 ${
+                        opt.correct
+                          ? 'bg-success/10 border-success/50'
+                          : 'border-border bg-[var(--overlay-subtle)]'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`shrink-0 w-6 h-6 rounded flex items-center justify-center font-mono text-xs font-bold ${
+                            opt.correct
+                              ? 'bg-success text-success-foreground'
+                              : 'bg-[var(--overlay-strong)]'
+                          }`}
+                        >
+                          {opt.letter}
+                        </div>
+                        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(opt.text) }} />
+                      </div>
+                      {opt.explain && <div className="text-sm text-muted pl-9">{opt.explain}</div>}
+                    </div>
+                  ))}
               </div>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
