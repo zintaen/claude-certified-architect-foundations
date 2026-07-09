@@ -266,6 +266,20 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {!loading && breakdownRows.length === 0 && (history?.attempts?.length ?? 0) > 0 && (
+        <div className="flex flex-col gap-4">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <Award className="w-5 h-5 text-primary" /> Detailed breakdowns
+          </h2>
+          <div className="glass-panel p-6 rounded-2xl text-foreground/70 leading-relaxed">
+            Detailed question-by-question breakdowns are saved for exams taken from July 9, 2026
+            onward. Your earlier attempts recorded a score but not the individual answers, so there
+            is no full review to open for those. Take a new mock and your complete breakdown will
+            appear here, and open on any device.
+          </div>
+        </div>
+      )}
     </div>
   );
 }
