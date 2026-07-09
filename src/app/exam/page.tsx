@@ -55,15 +55,17 @@ export default function ExamPage() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
-
-  // Start a fresh timed exam when there is no in-progress session, or when the persisted session
-  // is already finished - so returning to /exam after a sitting does not replay the old one.
-  useEffect(() => {
-    if (store.items.length === 0 || store.finished) {
+    // Decide ONCE, on mount, whether to start a fresh timed exam: when there is no session yet, or
+    // when the persisted one is already finished (opening /exam should not replay an old sitting).
+    // This reads a snapshot via getState and must NOT react to `finished`: a reactive dependency
+    // would rebuild the session the instant an exam is submitted (finished flips to true here while
+    // the page is still mounted), wiping the graded result before /result can read it and bouncing
+    // the user home.
+    const s = useExamStore.getState();
+    if (s.items.length === 0 || s.finished) {
       buildSession(questions, 60, false);
     }
-  }, [buildSession, store.items.length, store.finished]);
+  }, [buildSession]);
 
   // Timer logic
   const [timeLeft, setTimeLeft] = useState('');
