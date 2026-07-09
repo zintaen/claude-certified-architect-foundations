@@ -100,6 +100,7 @@ interface ExamActions {
   setIndex: (idx: number) => void;
   incrementFocusLoss: () => void;
   setResult: (result: GradedResult | null) => void;
+  discardSession: () => void;
 }
 
 const initialState: ExamState = {
@@ -190,6 +191,17 @@ export const useExamStore = create<ExamState & ExamActions>()(
       setIndex: (idx) => set({ idx }),
       incrementFocusLoss: () => set((state) => ({ focusLoss: state.focusLoss + 1 })),
       setResult: (result) => set({ result }),
+      // Throw away an in-progress session (used by the Resume banner's Discard action).
+      discardSession: () =>
+        set((state) => ({
+          ...state,
+          items: [],
+          idx: 0,
+          finished: false,
+          timedOut: false,
+          isFlashcardMode: false,
+          result: null,
+        })),
     }),
     {
       name: 'ccaf-exam-storage',

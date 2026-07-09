@@ -2,6 +2,7 @@ import { useExamStore, type Question, type GradedResult } from '@/store/examStor
 import type { PublicQuestion } from '@/data/questions';
 import type { GroupId } from '@/lib/domains';
 import { track } from '@/lib/track';
+import { clearServerSession } from '@/lib/serverSession';
 
 import { useCallback } from 'react';
 
@@ -114,6 +115,8 @@ export function useExamEngine() {
         reviewEnabled: data.reviewEnabled,
         reviewLockReason: data.reviewLockReason,
       });
+      // The sitting is done: drop any cross-device checkpoint so it never offers a stale resume.
+      void clearServerSession();
       return true;
     } catch (err) {
       console.warn('Grading request failed.', err);

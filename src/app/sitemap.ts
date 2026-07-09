@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/guide',
     '/sample-questions',
     '/faq',
+    '/changelog',
     '/domains',
     ...DOMAIN_ORDER.map((id) => `/domains/${id}`),
     ...DOMAIN_ORDER.map((id) => `/sample-questions/${id}`),

@@ -119,6 +119,12 @@ export default function RootLayout({
                 Leaderboard
               </Link>
               <Link
+                href="/dashboard"
+                className="hidden sm:inline hover:text-primary transition-colors px-2 py-1"
+              >
+                Dashboard
+              </Link>
+              <Link
                 href="/guide"
                 className="hidden sm:inline hover:text-primary transition-colors px-2 py-1"
               >

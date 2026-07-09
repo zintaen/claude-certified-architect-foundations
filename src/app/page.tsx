@@ -26,6 +26,8 @@ import DonateButton from '@/components/DonateButton';
 import { fetchGlobalStats } from '@/lib/api';
 import { useExamEngine } from '@/hooks/useExamEngine';
 import { questions } from '@/data/questions';
+import ResumeBanner from '@/components/ResumeBanner';
+import { confirmDiscardIfInProgress } from '@/lib/session';
 
 const DOMAINS = [
   {
@@ -100,6 +102,10 @@ const FAQ = [
     q: 'Can I practice without the timer?',
     a: 'Yes. The practice modes include an untimed full mock, single-domain drills, and flashcards.',
   },
+  {
+    q: 'Can I pause and come back?',
+    a: 'Yes. Your progress saves on your device as you go, so you can close the tab or lose your connection and resume the same sitting from the home page.',
+  },
 ];
 
 // Hash the PIN before it touches storage so the history lock is never kept in plain text.
@@ -161,6 +167,8 @@ export default function Home() {
   }, []);
 
   const handleStart = async () => {
+    // Do not silently wipe a sitting that is already underway.
+    if (!confirmDiscardIfInProgress()) return;
     // Normalize the email once here so the value written with each attempt and the value the
     // dashboard later queries by always match (trailing spaces or mixed case otherwise miss).
     const cleanEmail = email.trim().toLowerCase();
@@ -194,6 +202,8 @@ export default function Home() {
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-gold/5 blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-gold/5 blur-[120px]" />
       </div>
+
+      <ResumeBanner />
 
       {/* HERO */}
       <section className="w-full max-w-6xl mx-auto px-6 py-12 md:py-20 grid md:grid-cols-2 gap-12 items-center">

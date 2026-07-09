@@ -11,6 +11,7 @@ const paths = [
   '/faq',
   '/domains',
   '/sample-questions',
+  '/changelog',
   '/sample-questions/research_pipeline',
   '/sample-questions/extraction_pipeline',
   '/sample-questions/customer_support',

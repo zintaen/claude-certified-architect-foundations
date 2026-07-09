@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import DOMPurify from 'isomorphic-dompurify';
 import ThemeToggle from '@/components/ThemeToggle';
+import { isIdentified, saveServerSession, beaconSaveServerSession } from '@/lib/serverSession';
 
 export default function ExamPage() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function ExamPage() {
   const { buildSession, finishExam } = useExamEngine();
   const [mounted, setMounted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [online, setOnline] = useState(true);
 
   // A single in-flight guard so a double-click on Submit, or a timer expiry that overlaps a slow
   // grade request, cannot fire two grade calls (and two leaderboard writes).
@@ -43,6 +45,54 @@ export default function ExamPage() {
     const sync = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', sync);
     return () => document.removeEventListener('fullscreenchange', sync);
+  }, []);
+
+  // Track connectivity. The exam itself needs no network (questions are already loaded and answers
+  // persist locally), but grading does, so surface the state and let people keep answering offline.
+  useEffect(() => {
+    const sync = () => setOnline(navigator.onLine);
+    sync();
+    window.addEventListener('online', sync);
+    window.addEventListener('offline', sync);
+    return () => {
+      window.removeEventListener('online', sync);
+      window.removeEventListener('offline', sync);
+    };
+  }, []);
+
+  // Cross-device checkpoint: for identified users only, save a throttled snapshot of the sitting to
+  // the server so it can be resumed on another device. localStorage stays the primary, offline path,
+  // so this is purely additive and best-effort. Fires on answer/navigation, at most once per window.
+  const lastSaveRef = useRef(0);
+  useEffect(() => {
+    if (!mounted || store.finished || store.items.length === 0 || store.isFlashcardMode) return;
+    if (!isIdentified()) return;
+    const THROTTLE = 20000;
+    const since = Date.now() - lastSaveRef.current;
+    if (since >= THROTTLE) {
+      lastSaveRef.current = Date.now();
+      void saveServerSession();
+    } else {
+      const t = setTimeout(() => {
+        lastSaveRef.current = Date.now();
+        void saveServerSession();
+      }, THROTTLE - since);
+      return () => clearTimeout(t);
+    }
+  }, [mounted, store.idx, store.items, store.finished, store.isFlashcardMode]);
+
+  // Flush one last checkpoint when the tab is hidden or closed, via sendBeacon so it survives unload.
+  useEffect(() => {
+    const flush = () => beaconSaveServerSession();
+    const onVis = () => {
+      if (document.hidden) flush();
+    };
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      document.removeEventListener('visibilitychange', onVis);
+    };
   }, []);
 
   const toggleFullscreen = () => {
@@ -159,6 +209,11 @@ export default function ExamPage() {
 
       {/* Main Content: Question View */}
       <main className="flex-1 flex flex-col order-1 md:order-2 overflow-y-auto relative">
+        {!online && (
+          <div className="bg-destructive/10 border-b border-destructive/30 text-destructive text-xs sm:text-sm px-6 py-2 text-center">
+            You are offline. Your answers are saved on this device - reconnect to submit.
+          </div>
+        )}
         {/* Topbar: Timer & Controls */}
         <div className="sticky top-0 z-10 glass-panel border-x-0 border-t-0 p-4 flex items-center justify-between">
           <div className="font-mono text-sm opacity-60">

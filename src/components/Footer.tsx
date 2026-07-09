@@ -53,6 +53,12 @@ export default function Footer() {
             Your dashboard
           </Link>
           <Link
+            href="/changelog"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+          >
+            Changelog
+          </Link>
+          <Link
             href="/about"
             className="text-sm text-foreground/80 hover:text-primary transition-colors"
           >
