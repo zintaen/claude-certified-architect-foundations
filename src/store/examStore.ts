@@ -58,6 +58,19 @@ export interface GradedResult {
   untimed: boolean;
 }
 
+// A finished sitting kept on this device so its full breakdown stays viewable from the dashboard
+// after the user navigates away. The single `result` slot only holds the latest sitting; this
+// archive keeps the last several, keyed by sessionId.
+export interface ArchivedResult {
+  sessionId: string;
+  completedAt: number;
+  score: number;
+  passed: boolean;
+  timeSec: number;
+  untimed: boolean;
+  result: GradedResult;
+}
+
 export interface ExamState {
   items: Question[];
   idx: number;
@@ -75,6 +88,7 @@ export interface ExamState {
   leitner: Record<string, LeitnerData>;
   result: GradedResult | null;
   completedAt: number;
+  resultsArchive: ArchivedResult[];
 }
 
 interface ExamActions {
@@ -101,6 +115,7 @@ interface ExamActions {
   incrementFocusLoss: () => void;
   setResult: (result: GradedResult | null) => void;
   discardSession: () => void;
+  archiveCurrentResult: () => void;
 }
 
 const initialState: ExamState = {
@@ -120,6 +135,7 @@ const initialState: ExamState = {
   leitner: {},
   result: null,
   completedAt: 0,
+  resultsArchive: [],
 };
 
 export const useExamStore = create<ExamState & ExamActions>()(
@@ -202,6 +218,24 @@ export const useExamStore = create<ExamState & ExamActions>()(
           isFlashcardMode: false,
           result: null,
         })),
+      // Keep the just-finished sitting's full breakdown on this device so it stays viewable from
+      // the dashboard. Idempotent: re-archiving the same sessionId refreshes rather than duplicates.
+      archiveCurrentResult: () =>
+        set((state) => {
+          const r = state.result;
+          if (!r || !state.sessionId) return state;
+          const entry: ArchivedResult = {
+            sessionId: state.sessionId,
+            completedAt: state.completedAt || Date.now(),
+            score: r.score,
+            passed: r.passed,
+            timeSec: r.timeSec,
+            untimed: r.untimed,
+            result: r,
+          };
+          const rest = state.resultsArchive.filter((a) => a.sessionId !== entry.sessionId);
+          return { resultsArchive: [entry, ...rest].slice(0, 15) };
+        }),
     }),
     {
       name: 'ccaf-exam-storage',
@@ -220,6 +254,7 @@ export const useExamStore = create<ExamState & ExamActions>()(
         leitner: state.leitner,
         result: state.result,
         completedAt: state.completedAt,
+        resultsArchive: state.resultsArchive,
       }),
     }
   )

@@ -19,6 +19,7 @@ const CHANGELOG: Entry[] = [
       'Your results now appear immediately after you submit an exam.',
       'Flashcards show the four answer choices before you flip the card, then reveal the correct one with the explanation.',
       'Your dashboard is now in the top menu, so your saved history and stats are one tap away.',
+      'Reopen the full breakdown of any past exam from your dashboard on any device, with every question, your answer, and the explanation.',
       'Your progress saves automatically as you go. If you close the tab or lose your connection, you can resume the same sitting from the home page.',
       'Save your progress with an email and PIN to resume an in-progress exam on another device.',
       'A clear offline indicator during the exam, since your answers are kept on your device even without a connection.',

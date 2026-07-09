@@ -30,6 +30,12 @@ export function isIdentified(): boolean {
   return identity() !== null;
 }
 
+// The current identity (email + pinHash), or null. Exposed so sibling modules (e.g. serverResults)
+// key their own server calls to the same user without re-reading localStorage.
+export function getIdentity(): { email: string; pinHash: string } | null {
+  return identity();
+}
+
 // Build a snapshot of the current sitting, or null when there is nothing worth saving.
 function buildPayload(): SavedSession | null {
   const s = useExamStore.getState();

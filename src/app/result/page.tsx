@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useExamStore } from '@/store/examStore';
+import { useExamStore, type GradedResult } from '@/store/examStore';
 import { CheckCircle2, XCircle, ArrowLeft, Share2, Swords, Award, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DOMPurify from 'isomorphic-dompurify';
@@ -11,11 +11,28 @@ import DomainBreakdown from '@/components/DomainBreakdown';
 import Certificate from '@/components/Certificate';
 import { archetypeFor } from '@/lib/domains';
 import { track } from '@/lib/track';
+import { getServerResult } from '@/lib/serverResults';
 
 export default function ResultPage() {
   const store = useExamStore();
   const router = useRouter();
   const [hydrated, setHydrated] = useState(false);
+
+  // A specific past attempt to view, from /result?s=<sessionId>. Read from the URL after mount
+  // (rather than useSearchParams) to stay SSR-safe and avoid a Suspense boundary.
+  const [viewedId, setViewedId] = useState<string | null>(null);
+  const [viewChecked, setViewChecked] = useState(false);
+  useEffect(() => {
+    const s = new URLSearchParams(window.location.search).get('s');
+    setViewedId(s && s.trim() ? s.trim() : null);
+    setViewChecked(true);
+  }, []);
+
+  // A server-stored breakdown fetched for a history link not held on this device (cross-device).
+  const [remote, setRemote] = useState<{ breakdown: GradedResult; completedAt: number } | null>(
+    null
+  );
+  const [remoteChecked, setRemoteChecked] = useState(false);
 
   // zustand persist may finish rehydrating from localStorage AFTER this component mounts. Decide
   // whether to redirect only once hydration is done - otherwise a cold load of /result (refresh,
@@ -26,25 +43,82 @@ export default function ResultPage() {
     return unsub;
   }, []);
 
-  const result = store.result;
+  const isHistoryView = viewChecked && viewedId !== null;
+  const archived = isHistoryView
+    ? store.resultsArchive.find((a) => a.sessionId === viewedId)
+    : undefined;
+  // In history view render the archived breakdown, then fall back to the server copy (so it opens on
+  // any device); otherwise render the live/last graded result.
+  const result = isHistoryView ? (archived?.result ?? remote?.breakdown ?? null) : store.result;
+  const completedAt = isHistoryView
+    ? (archived?.completedAt ?? remote?.completedAt ?? 0)
+    : store.completedAt;
+  const sessionIdShown = isHistoryView ? (viewedId ?? '') : store.sessionId;
 
+  // Only the live view redirects home when there is no finished sitting. The history view shows a
+  // loading then a not-found state below instead of redirecting.
   useEffect(() => {
-    if (!hydrated) return;
-    if (!store.finished || !result) {
-      router.push('/');
-    }
-  }, [hydrated, store.finished, result, router]);
+    if (!hydrated || !viewChecked) return;
+    if (isHistoryView) return;
+    if (!store.finished || !store.result) router.push('/');
+  }, [hydrated, viewChecked, isHistoryView, store.finished, store.result, router]);
+
+  // When the requested breakdown is not in the device-local archive, fetch it from the server
+  // (identified users only). This is what lets a breakdown open on another device.
+  useEffect(() => {
+    if (!hydrated || !viewChecked || !isHistoryView || archived) return;
+    let cancelled = false;
+    setRemoteChecked(false);
+    getServerResult(viewedId as string).then((r) => {
+      if (cancelled) return;
+      setRemote(r);
+      setRemoteChecked(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, viewChecked, isHistoryView, archived, viewedId]);
 
   // Nickname lives in localStorage; read it after mount to stay SSR-safe.
   const [nickname, setNickname] = useState<string | undefined>(undefined);
-  // A stable "now" captured once at mount, used only as a fallback for older results saved before
-  // the completion timestamp was recorded. Calling Date.now() directly in render is impure.
+  // A stable "now" captured once at mount, used only as a fallback for the certificate date when a
+  // completion timestamp is missing. Calling Date.now() directly in render is impure.
   const [fallbackNow] = useState(() => Date.now());
   useEffect(() => {
     setNickname(localStorage.getItem('ccaf-nickname') || undefined);
   }, []);
 
-  if (!hydrated || !result) return null;
+  if (!hydrated || !viewChecked) return null;
+
+  // History view with no local copy: show a light loading state while the server is checked, then a
+  // not-found state if it has nothing (guest, wrong PIN, or a breakdown that was never saved).
+  if (isHistoryView && !archived && !remote) {
+    return (
+      <div className="flex-1 max-w-2xl w-full mx-auto p-6 md:p-12 flex flex-col gap-6">
+        <button
+          onClick={() => router.push('/dashboard')}
+          className="flex items-center gap-2 text-sm text-foreground/60 hover:text-primary transition-colors self-start"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to dashboard
+        </button>
+        {!remoteChecked ? (
+          <div className="glass-panel p-8 rounded-2xl text-center text-foreground/60">
+            Loading your breakdown...
+          </div>
+        ) : (
+          <div className="glass-panel p-8 rounded-2xl text-center flex flex-col gap-3">
+            <h1 className="text-xl font-bold">Breakdown not found</h1>
+            <p className="text-foreground/70">
+              To reopen a past breakdown on a new device, use the same email and PIN you entered
+              when you took the exam. Your score and stats are always on your dashboard.
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (!result) return null;
 
   const domainScores = result.domainScores;
   const shareText = `I scored ${result.score}/1000 on the Claude Certified Architect mock exam!`;
@@ -105,16 +179,21 @@ export default function ResultPage() {
   return (
     <div className="flex-1 max-w-4xl w-full mx-auto p-6 md:p-12 flex flex-col gap-8">
       <button
-        onClick={() => router.push('/')}
+        onClick={() => router.push(isHistoryView ? '/dashboard' : '/')}
         className="flex items-center gap-2 text-sm text-foreground/60 hover:text-primary transition-colors self-start"
       >
-        <ArrowLeft className="w-4 h-4" /> Back to Home
+        <ArrowLeft className="w-4 h-4" /> {isHistoryView ? 'Back to dashboard' : 'Back to Home'}
       </button>
 
       <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
         <div>
+          {isHistoryView && (
+            <div className="text-xs font-semibold uppercase tracking-widest text-primary mb-1">
+              Past attempt
+            </div>
+          )}
           <h1 className="text-3xl font-bold">Exam Results</h1>
-          <p className="text-foreground/60 mt-1">Session ID: {store.sessionId}</p>
+          <p className="text-foreground/60 mt-1">Session ID: {sessionIdShown}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -161,7 +240,7 @@ export default function ResultPage() {
               nickname={nickname}
               score={result.score}
               passed={result.passed}
-              dateISO={new Date(store.completedAt || fallbackNow).toISOString()}
+              dateISO={new Date(completedAt || fallbackNow).toISOString()}
             />
           </div>
         </div>

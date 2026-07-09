@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { trace, metrics } from '@opentelemetry/api';
@@ -150,12 +151,7 @@ export async function POST(request: Request) {
           }
         }
 
-        span.setAttribute('exam.score', score);
-        span.setAttribute('exam.total', total);
-        span.setAttribute('outcome', 'success');
-        gradeCounter.add(1, { outcome: 'success' });
-
-        return NextResponse.json({
+        const graded = {
           score,
           correct,
           incorrect,
@@ -168,8 +164,43 @@ export async function POST(request: Request) {
           domainScores,
           items,
           untimed,
-          saved,
-        });
+        };
+
+        // Persist the full breakdown for identified users so they can reopen it on any device.
+        // Best-effort: a failure here never blocks grading. Keyed by (email, session_id); the stored
+        // object holds only this user's own graded result, never the whole answer key.
+        const rEmail = cleanStr(body?.email, 254)?.toLowerCase();
+        const rPin = cleanStr(body?.pinHash, 128);
+        const rSession = cleanStr(body?.sessionId, 64);
+        if (supabaseAdmin && rEmail && rPin && rSession) {
+          try {
+            const db = supabaseAdmin as unknown as SupabaseClient;
+            const { error: rErr } = await db.from('exam_results').upsert(
+              {
+                email: rEmail,
+                session_id: rSession,
+                pin_hash: rPin,
+                score,
+                passed,
+                time_sec: timeSec,
+                untimed,
+                breakdown: graded,
+                completed_at: new Date().toISOString(),
+              },
+              { onConflict: 'email,session_id' }
+            );
+            if (rErr) span.setAttribute('result.saved', false);
+          } catch (e) {
+            span.recordException(e as Error);
+          }
+        }
+
+        span.setAttribute('exam.score', score);
+        span.setAttribute('exam.total', total);
+        span.setAttribute('outcome', 'success');
+        gradeCounter.add(1, { outcome: 'success' });
+
+        return NextResponse.json({ ...graded, saved });
       } catch (err) {
         span.recordException(err as Error);
         span.setAttribute('outcome', 'fault');

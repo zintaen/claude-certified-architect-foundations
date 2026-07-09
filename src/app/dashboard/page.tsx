@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { fetchUserHistory } from '@/lib/api';
-import { ArrowLeft, User, Activity } from 'lucide-react';
+import { ArrowLeft, User, Activity, Award, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Skeleton, SkeletonRow } from '@/components/Skeleton';
 import { PASS_SCORE } from '@/lib/domains';
+import { useExamStore } from '@/store/examStore';
+import { listServerResults, type ServerResultMeta } from '@/lib/serverResults';
 
 // Render a stored ISO timestamp, or a dash when it is missing or unparseable.
 function fmtDateTime(s: string): string {
@@ -34,6 +37,46 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [signedOut, setSignedOut] = useState(false);
+
+  // The server history holds only scores; full breakdowns are kept on this device. Surface them as
+  // openable rows, and back-fill the latest finished sitting so results taken before this feature
+  // existed still appear (archiveCurrentResult dedupes by sessionId).
+  const archive = useExamStore((s) => s.resultsArchive);
+  const archiveCurrentResult = useExamStore((s) => s.archiveCurrentResult);
+  const finished = useExamStore((s) => s.finished);
+  const currentResult = useExamStore((s) => s.result);
+  useEffect(() => {
+    if (finished && currentResult) archiveCurrentResult();
+  }, [finished, currentResult, archiveCurrentResult]);
+
+  // Merge the server-stored breakdowns (cross-device, for identified users) with the device-local
+  // archive (works offline and for guests), deduped by sessionId, newest first.
+  const [breakdownRows, setBreakdownRows] = useState<ServerResultMeta[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const server = await listServerResults();
+      if (cancelled) return;
+      const map = new Map<string, ServerResultMeta>();
+      for (const s of server) map.set(s.sessionId, s);
+      for (const a of archive) {
+        if (!map.has(a.sessionId)) {
+          map.set(a.sessionId, {
+            sessionId: a.sessionId,
+            score: a.score,
+            passed: a.passed,
+            timeSec: a.timeSec,
+            untimed: a.untimed,
+            completedAt: a.completedAt,
+          });
+        }
+      }
+      setBreakdownRows([...map.values()].sort((x, y) => y.completedAt - x.completedAt));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [archive]);
 
   useEffect(() => {
     async function load() {
@@ -182,6 +225,44 @@ export default function DashboardPage() {
                 <div className="p-8 text-center text-foreground/50">No exam history found.</div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {!loading && breakdownRows.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <Award className="w-5 h-5 text-primary" /> Detailed breakdowns
+          </h2>
+          <p className="text-sm text-foreground/60">
+            Open any past exam to review every question, your answer, and the explanation. Saved to
+            your account when you use an email and PIN, so they open on any device.
+          </p>
+          <div className="glass-panel rounded-2xl overflow-hidden">
+            {breakdownRows.map((a) => (
+              <Link
+                key={a.sessionId}
+                href={`/result?s=${a.sessionId}`}
+                className={`flex items-center justify-between p-4 border-b border-border last:border-0 hover:bg-[var(--overlay-subtle)] transition-colors ${
+                  a.passed ? 'border-l-4 border-l-success' : 'border-l-4 border-l-destructive'
+                }`}
+              >
+                <div className="flex flex-col">
+                  <div className="font-bold">
+                    Score: {a.score}
+                    <span className="ml-2 text-xs font-semibold text-foreground/50">
+                      {a.untimed ? 'Practice' : 'Timed'}
+                    </span>
+                  </div>
+                  <div className="text-xs text-foreground/50">
+                    {fmtDateTime(new Date(a.completedAt).toISOString())}
+                  </div>
+                </div>
+                <div className="text-primary text-sm font-semibold inline-flex items-center gap-1 shrink-0">
+                  View breakdown <ChevronRight className="w-4 h-4" />
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       )}

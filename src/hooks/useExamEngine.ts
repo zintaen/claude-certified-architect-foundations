@@ -90,6 +90,7 @@ export function useExamEngine() {
           untimed: s.untimed,
           timedOut,
           timeTaken,
+          sessionId: s.sessionId,
           nickname: localStorage.getItem('ccaf-nickname') || undefined,
           email: localStorage.getItem('ccaf-email') || undefined,
           pinHash: localStorage.getItem('ccaf-pinHash') || undefined,
@@ -115,6 +116,8 @@ export function useExamEngine() {
         reviewEnabled: data.reviewEnabled,
         reviewLockReason: data.reviewLockReason,
       });
+      // Keep this sitting's breakdown on the device so it stays viewable from the dashboard.
+      store.archiveCurrentResult();
       // The sitting is done: drop any cross-device checkpoint so it never offers a stale resume.
       void clearServerSession();
       return true;
