@@ -14,3 +14,4 @@ build/
 .auditdev3/
 _mkicons.mjs
 _pw*.mjs
+docs/status/
