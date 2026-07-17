@@ -4,12 +4,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import './globals.css';
 import BugReporter from '@/components/BugReporter';
-import Footer from '@/components/Footer';
 import ThemeToggle from '@/components/ThemeToggle';
 import DonateButton from '@/components/DonateButton';
 import MobileNav from '@/components/MobileNav';
 import MotionProvider from '@/components/MotionProvider';
 import Analytics from '@/components/Analytics';
+import AppFooter from '@/components/AppFooter';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const SITE_URL = 'https://ccaf.cyberskill.world';
@@ -65,6 +65,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#FFFDF8' },
     { media: '(prefers-color-scheme: dark)', color: '#1A1108' },
@@ -86,21 +89,23 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body
-        className={`${beVietnamPro.variable} ${jetbrainsMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${beVietnamPro.variable} ${jetbrainsMono.variable} antialiased min-h-dvh flex flex-col`}
       >
-        <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-          <div className="max-w-6xl mx-auto px-6 py-3.5 flex items-center justify-between gap-4">
-            <Link href="/" className="flex items-center gap-3">
+        <header className="sticky top-0 z-50 shrink-0 border-b border-border bg-background/80 backdrop-blur-md">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-3.5 flex items-center justify-between gap-3 sm:gap-4">
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <Image
                 src="/cyberskill-logo.svg"
                 alt="CyberSkill"
                 width={36}
                 height={36}
-                className="rounded-md"
+                className="rounded-md shrink-0"
               />
-              <div className="leading-none">
-                <h1 className="font-bold text-sm tracking-tight">Claude Certified Architect</h1>
-                <p className="text-[10px] text-primary uppercase tracking-widest mt-1">
+              <div className="leading-none min-w-0">
+                <h1 className="font-bold text-sm tracking-tight truncate">
+                  Claude Certified Architect
+                </h1>
+                <p className="text-[10px] text-primary uppercase tracking-widest mt-1 truncate">
                   Mock Exam - by CyberSkill
                 </p>
               </div>
@@ -136,7 +141,9 @@ export default function RootLayout({
               >
                 About
               </Link>
-              <DonateButton variant="ghost" label="Support" className="hidden sm:inline-flex" />
+              <span className="hidden sm:inline-flex">
+                <DonateButton variant="ghost" label="Support" />
+              </span>
               <span className="hidden sm:inline-flex">
                 <ThemeToggle />
               </span>
@@ -146,9 +153,9 @@ export default function RootLayout({
         </header>
 
         <MotionProvider>
-          <main className="flex-1 flex flex-col">{children}</main>
+          <main className="flex-1 flex flex-col min-h-0">{children}</main>
         </MotionProvider>
-        <Footer />
+        <AppFooter />
         <BugReporter />
         <Analytics />
         <SpeedInsights />

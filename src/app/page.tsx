@@ -488,16 +488,21 @@ export default function Home() {
       {/* SETUP MODAL */}
       <AnimatePresence>
         {showSetup && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--scrim)] backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-[var(--scrim)] backdrop-blur-sm">
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Exam setup"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="glass-panel w-full max-w-md p-6 flex flex-col gap-6 rounded-2xl relative"
+              className="glass-panel w-full max-w-md p-6 flex flex-col gap-6 rounded-t-2xl sm:rounded-2xl relative max-h-[92dvh] overflow-y-auto"
             >
               <button
+                type="button"
                 onClick={() => setShowSetup(false)}
-                className="absolute top-4 right-4 p-1 rounded-md hover:bg-[var(--overlay-strong)] transition-colors"
+                aria-label="Close exam setup"
+                className="absolute top-3 right-3 min-h-11 min-w-11 inline-flex items-center justify-center rounded-md hover:bg-[var(--overlay-strong)] transition-colors"
               >
                 <X className="w-5 h-5 opacity-60" />
               </button>
@@ -560,8 +565,9 @@ export default function Home() {
               </div>
 
               <button
+                type="button"
                 onClick={handleStart}
-                className="bg-primary text-primary-foreground w-full py-3 rounded-md font-bold mt-2 shadow-[0_0_15px_var(--glow)] hover:brightness-110 transition-all"
+                className="bg-primary text-primary-foreground w-full min-h-11 py-3 rounded-md font-bold mt-2 shadow-[0_0_15px_var(--glow)] hover:brightness-110 transition-all"
               >
                 Begin exam
               </button>

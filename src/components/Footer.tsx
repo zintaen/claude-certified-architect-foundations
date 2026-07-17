@@ -36,31 +36,31 @@ export default function Footer() {
           <h3 className="text-xs font-bold uppercase tracking-widest text-muted">Mock exam</h3>
           <Link
             href="/"
-            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
           >
             Practice
           </Link>
           <Link
             href="/leaderboard"
-            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
           >
             Leaderboard
           </Link>
           <Link
             href="/dashboard"
-            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
           >
             Your dashboard
           </Link>
           <Link
             href="/changelog"
-            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
           >
             Changelog
           </Link>
           <Link
             href="/about"
-            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
           >
             About
           </Link>
@@ -71,25 +71,25 @@ export default function Footer() {
           <h3 className="text-xs font-bold uppercase tracking-widest text-muted">Learn</h3>
           <Link
             href="/guide"
-            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
           >
             Study guide
           </Link>
           <Link
             href="/sample-questions"
-            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
           >
             Sample questions
           </Link>
           <Link
             href="/faq"
-            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
           >
             FAQ
           </Link>
           <Link
             href="/domains"
-            className="text-sm text-foreground/80 hover:text-primary transition-colors"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
           >
             Domains
           </Link>

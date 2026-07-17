@@ -15,8 +15,14 @@ export default function BugReporter() {
 
   const pathname = usePathname();
 
-  // Keep the feedback affordance off the marketing pages.
-  if (pathname === '/' || pathname === '/about') {
+  // Keep the feedback affordance off marketing pages and immersive exam sittings
+  // (fixed FAB would cover mobile prev/next controls).
+  if (
+    pathname === '/' ||
+    pathname === '/about' ||
+    pathname === '/exam' ||
+    pathname === '/flashcards'
+  ) {
     return null;
   }
 
@@ -65,8 +71,9 @@ export default function BugReporter() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="surface-panel fixed bottom-6 right-6 z-50 p-2.5 rounded-full text-muted shadow-sm backdrop-blur-sm transition-all hover:border-ring hover:text-primary hover:scale-105 active:scale-95"
+        className="surface-panel fixed bottom-6 right-6 z-50 min-h-11 min-w-11 p-2.5 rounded-full text-muted shadow-sm backdrop-blur-sm transition-all hover:border-ring hover:text-primary hover:scale-105 active:scale-95 inline-flex items-center justify-center"
         title="Report a bug"
+        aria-label="Report a bug"
       >
         <Bug className="w-5 h-5" />
       </button>

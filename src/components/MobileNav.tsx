@@ -67,7 +67,7 @@ export default function MobileNav() {
         onClick={() => setOpen(true)}
         aria-label="Open menu"
         aria-expanded={open}
-        className="w-9 h-9 inline-flex items-center justify-center rounded-md border border-border text-foreground/70 hover:text-primary hover:border-ring transition-colors"
+        className="min-h-11 min-w-11 w-11 h-11 inline-flex items-center justify-center rounded-md border border-border text-foreground/70 hover:text-primary hover:border-ring transition-colors"
       >
         <Menu className="w-5 h-5" />
       </button>
@@ -94,25 +94,25 @@ export default function MobileNav() {
               role="dialog"
               aria-modal="true"
               aria-label="Site navigation"
-              className="absolute right-0 top-0 h-full w-[82%] max-w-xs surface-panel border-l border-border shadow-[0_0_40px_var(--glow)] flex flex-col"
+              className="absolute right-0 top-0 h-full w-[82%] max-w-xs surface-panel border-l border-border shadow-[0_0_40px_var(--glow)] flex flex-col overflow-hidden"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
                 <span className="text-xs font-bold uppercase tracking-widest text-muted">Menu</span>
                 <button
                   type="button"
                   onClick={close}
                   aria-label="Close menu"
-                  className="w-9 h-9 inline-flex items-center justify-center rounded-md border border-border text-foreground/70 hover:text-primary hover:border-ring transition-colors"
+                  className="min-h-11 min-w-11 w-11 h-11 inline-flex items-center justify-center rounded-md border border-border text-foreground/70 hover:text-primary hover:border-ring transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <nav className="flex flex-col gap-1 px-3 py-4">
+              <nav className="flex flex-col gap-1 px-3 py-4 flex-1 min-h-0 overflow-y-auto overscroll-contain">
                 {NAV_ITEMS.map(({ href, label, icon: Icon, external }) =>
                   external ? (
                     <a
@@ -121,7 +121,7 @@ export default function MobileNav() {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={close}
-                      className="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-foreground/85 hover:bg-[var(--overlay-subtle)] hover:text-primary transition-colors"
+                      className="flex items-center gap-3 rounded-md px-3 py-3.5 min-h-11 text-sm font-medium text-foreground/85 hover:bg-[var(--overlay-subtle)] hover:text-primary transition-colors"
                     >
                       <Icon className="w-4 h-4" />
                       {label}
@@ -131,7 +131,7 @@ export default function MobileNav() {
                       key={href}
                       href={href}
                       onClick={close}
-                      className="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-foreground/85 hover:bg-[var(--overlay-subtle)] hover:text-primary transition-colors"
+                      className="flex items-center gap-3 rounded-md px-3 py-3.5 min-h-11 text-sm font-medium text-foreground/85 hover:bg-[var(--overlay-subtle)] hover:text-primary transition-colors"
                     >
                       <Icon className="w-4 h-4" />
                       {label}
@@ -140,7 +140,7 @@ export default function MobileNav() {
                 )}
               </nav>
 
-              <div className="mt-auto flex items-center justify-between gap-3 border-t border-border px-5 py-4">
+              <div className="shrink-0 flex items-center justify-between gap-3 border-t border-border px-5 py-4">
                 <span className="text-sm text-muted">Theme</span>
                 <ThemeToggle />
               </div>

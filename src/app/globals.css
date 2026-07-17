@@ -125,6 +125,11 @@
 }
 
 @layer base {
+  html {
+    /* Avoid horizontal rubber-band revealing off-canvas chrome on iOS */
+    overflow-x: clip;
+  }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
@@ -134,6 +139,17 @@
       radial-gradient(circle at 85% 10%, var(--hero-glow-b), transparent 30%);
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+
+  /* Back-nav / quiet text links: larger tap targets on phones */
+  @media (max-width: 639px) {
+    a.self-start.text-sm,
+    button.self-start.text-sm {
+      min-height: 2.75rem;
+      padding-top: 0.35rem;
+      padding-bottom: 0.35rem;
+    }
   }
 
   ::selection {

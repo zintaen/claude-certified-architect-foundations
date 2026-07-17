@@ -122,18 +122,20 @@ export default function Certificate({
   };
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
       <button
+        type="button"
         onClick={handleDownload}
-        className="bg-primary text-primary-foreground font-semibold px-4 py-2.5 rounded-md inline-flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all"
+        className="bg-primary text-primary-foreground font-semibold min-h-11 px-4 py-2.5 rounded-md inline-flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all w-full sm:w-auto"
       >
-        <Download className="w-4 h-4" /> Download certificate
+        <Download className="w-4 h-4 shrink-0" /> Download certificate
       </button>
       <button
+        type="button"
         onClick={handleLinkedIn}
-        className="surface-panel text-foreground hover:border-ring font-medium px-4 py-2.5 rounded-md inline-flex items-center gap-2 transition-colors"
+        className="surface-panel text-foreground hover:border-ring font-medium min-h-11 px-4 py-2.5 rounded-md inline-flex items-center justify-center gap-2 transition-colors w-full sm:w-auto"
       >
-        <Share2 className="w-4 h-4" /> Share on LinkedIn
+        <Share2 className="w-4 h-4 shrink-0" /> Share on LinkedIn
       </button>
     </div>
   );

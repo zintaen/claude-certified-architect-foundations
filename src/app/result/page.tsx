@@ -177,36 +177,46 @@ export default function ResultPage() {
   };
 
   return (
-    <div className="flex-1 max-w-4xl w-full mx-auto p-6 md:p-12 flex flex-col gap-8">
+    <div className="flex-1 max-w-4xl w-full min-w-0 mx-auto p-4 sm:p-6 md:p-12 flex flex-col gap-6 sm:gap-8 overflow-x-clip">
       <button
+        type="button"
         onClick={() => router.push(isHistoryView ? '/dashboard' : '/')}
         className="flex items-center gap-2 text-sm text-foreground/60 hover:text-primary transition-colors self-start"
       >
         <ArrowLeft className="w-4 h-4" /> {isHistoryView ? 'Back to dashboard' : 'Back to Home'}
       </button>
 
-      <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
-        <div>
+      <div className="flex flex-col gap-4 sm:gap-6 md:flex-row md:items-center md:justify-between w-full min-w-0">
+        <div className="min-w-0">
           {isHistoryView && (
             <div className="text-xs font-semibold uppercase tracking-widest text-primary mb-1">
               Past attempt
             </div>
           )}
-          <h1 className="text-3xl font-bold">Exam Results</h1>
-          <p className="text-foreground/60 mt-1">Session ID: {sessionIdShown}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">Exam Results</h1>
+          <p className="text-foreground/60 mt-1 text-sm break-all">Session ID: {sessionIdShown}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           <button
+            type="button"
             onClick={handleShare}
-            className="glass-panel px-4 py-2 flex items-center gap-2 rounded-md hover:border-primary/50 transition-colors"
+            className="glass-panel min-h-11 px-4 py-2.5 flex items-center justify-center gap-2 rounded-md hover:border-primary/50 transition-colors flex-1 sm:flex-initial"
           >
-            <Share2 className="w-4 h-4" /> Share
+            <Share2 className="w-4 h-4 shrink-0" /> Share
           </button>
           <button
+            type="button"
             onClick={handleChallenge}
-            className="glass-panel px-4 py-2 flex items-center gap-2 rounded-md hover:border-primary/50 transition-colors"
+            aria-label="Challenge a friend"
+            className="glass-panel min-h-11 px-4 py-2.5 flex items-center justify-center gap-2 rounded-md hover:border-primary/50 transition-colors flex-1 sm:flex-initial"
           >
-            <Swords className="w-4 h-4" /> Challenge a friend
+            <Swords className="w-4 h-4 shrink-0" aria-hidden="true" />
+            <span className="sm:hidden" aria-hidden="true">
+              Challenge
+            </span>
+            <span className="hidden sm:inline" aria-hidden="true">
+              Challenge a friend
+            </span>
           </button>
         </div>
       </div>
@@ -214,16 +224,16 @@ export default function ResultPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`glass-panel p-8 rounded-2xl border-t-4 ${result.passed ? 'border-t-success' : 'border-t-destructive'} flex flex-col md:flex-row items-center gap-8`}
+        className={`glass-panel p-5 sm:p-8 rounded-2xl border-t-4 ${result.passed ? 'border-t-success' : 'border-t-destructive'} flex flex-col md:flex-row items-center gap-6 sm:gap-8 min-w-0 w-full`}
       >
-        <div className="flex-1 flex flex-col items-center md:items-start">
+        <div className="flex-1 flex flex-col items-center md:items-start min-w-0 w-full">
           <div
-            className={`text-sm font-bold uppercase tracking-widest ${result.passed ? 'text-success' : 'text-destructive'}`}
+            className={`text-xs sm:text-sm font-bold uppercase tracking-widest text-center md:text-left ${result.passed ? 'text-success' : 'text-destructive'}`}
           >
             {result.passed ? '✓ Passed (Mock Threshold)' : '✗ Below Threshold'}
           </div>
-          <div className="text-6xl font-bold mt-2 font-mono tracking-tight">
-            {result.score} <span className="text-2xl text-foreground/40">/ 1000</span>
+          <div className="text-5xl sm:text-6xl font-bold mt-2 font-mono tracking-tight">
+            {result.score} <span className="text-xl sm:text-2xl text-foreground/40">/ 1000</span>
           </div>
           {domainScores.length > 0 && (
             <div className="mt-3 surface-raised border border-border text-primary text-xs font-medium px-3 py-1 rounded-full">
@@ -283,28 +293,28 @@ export default function ResultPage() {
       </div>
 
       {/* Work-with-CyberSkill prompt - the highest-intent moment to introduce the studio. */}
-      <div className="rounded-2xl border border-primary/30 bg-[var(--overlay-subtle)] p-6 flex flex-col sm:flex-row items-center gap-4 justify-between">
-        <div className="text-center sm:text-left">
+      <div className="rounded-2xl border border-primary/30 bg-[var(--overlay-subtle)] p-5 sm:p-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 justify-between min-w-0">
+        <div className="text-center sm:text-left min-w-0">
           <h3 className="font-bold">Building with Claude?</h3>
           <p className="text-sm text-muted">
             CyberSkill designs and ships Claude-powered agents for teams. This mock is one of our
             free resources.
           </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto shrink-0">
           <a
             href="https://cyberskill.world"
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => track('cta_cyberskill', { action: 'work' })}
-            className="bg-primary text-primary-foreground px-4 py-2 rounded-md font-semibold hover:brightness-110 transition-all"
+            className="bg-primary text-primary-foreground min-h-11 px-4 py-2.5 rounded-md font-semibold hover:brightness-110 transition-all inline-flex items-center justify-center"
           >
             See our work
           </a>
           <a
             href="mailto:info@cyberskill.world?subject=Working%20with%20CyberSkill"
             onClick={() => track('cta_cyberskill', { action: 'talk' })}
-            className="surface-raised border border-border px-4 py-2 rounded-md font-semibold hover:border-ring transition-colors"
+            className="surface-raised border border-border min-h-11 px-4 py-2.5 rounded-md font-semibold hover:border-ring transition-colors inline-flex items-center justify-center"
           >
             Talk to us
           </a>
@@ -333,11 +343,14 @@ export default function ResultPage() {
               const isCorrect = chosen?.correct;
 
               return (
-                <div key={it.id} className="glass-panel p-6 rounded-xl flex flex-col gap-4">
-                  <div className="flex items-center justify-between pb-4 border-b border-border">
-                    <div className="font-bold">Question {i + 1}</div>
+                <div
+                  key={it.id}
+                  className="glass-panel p-4 sm:p-6 rounded-xl flex flex-col gap-4 min-w-0 overflow-hidden"
+                >
+                  <div className="flex items-center justify-between gap-3 pb-4 border-b border-border">
+                    <div className="font-bold shrink-0">Question {i + 1}</div>
                     <div
-                      className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      className={`px-3 py-1 rounded-full text-xs font-bold shrink-0 ${
                         !it.chosenLetter
                           ? 'bg-foreground/10 text-foreground/60'
                           : isCorrect
@@ -350,7 +363,7 @@ export default function ResultPage() {
                   </div>
 
                   <div
-                    className="text-lg"
+                    className="text-base sm:text-lg break-words"
                     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(it.text) }}
                   />
 
@@ -369,9 +382,9 @@ export default function ResultPage() {
                       return (
                         <div
                           key={opt.letter}
-                          className={`p-4 rounded-xl border ${bgClass} flex flex-col gap-2`}
+                          className={`p-3 sm:p-4 rounded-xl border ${bgClass} flex flex-col gap-2 min-w-0`}
                         >
-                          <div className="flex items-start gap-3">
+                          <div className="flex items-start gap-3 min-w-0">
                             <div
                               className={`shrink-0 w-6 h-6 rounded flex items-center justify-center font-mono text-xs font-bold ${
                                 isThisCorrect

@@ -180,9 +180,9 @@ export default function LeaderboardPage() {
                             : ''
                     }`}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                        className={`w-9 h-9 sm:w-8 sm:h-8 shrink-0 rounded-full flex items-center justify-center font-bold text-sm ${
                           rank === 0
                             ? 'bg-primary text-primary-foreground'
                             : rank === 1
@@ -194,8 +194,8 @@ export default function LeaderboardPage() {
                       >
                         {rank + 1}
                       </div>
-                      <div>
-                        <div className="font-bold">{entry.nickname || 'Anonymous'}</div>
+                      <div className="min-w-0">
+                        <div className="font-bold truncate">{entry.nickname || 'Anonymous'}</div>
                         <div className="text-xs text-foreground/50">
                           {fmtDate(entry.completed_at)}
                         </div>

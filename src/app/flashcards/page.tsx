@@ -157,7 +157,8 @@ export default function FlashcardsPage() {
           className="surface-panel rounded-2xl p-6 md:p-8 flex flex-col gap-6"
         >
           <div
-            className="text-lg md:text-xl leading-relaxed whitespace-pre-wrap font-medium"
+            data-testid="flashcard-stem"
+            className="text-base sm:text-lg md:text-xl leading-relaxed whitespace-pre-wrap font-medium break-words"
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(current.text) }}
           />
 
@@ -193,9 +194,11 @@ export default function FlashcardsPage() {
                 </div>
               ) : (
                 <button
+                  type="button"
+                  data-testid="flashcard-reveal"
                   onClick={() => setRevealed(true)}
                   disabled={!answers}
-                  className="bg-primary text-primary-foreground px-6 py-3 rounded-md font-semibold self-start hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-primary text-primary-foreground min-h-11 px-6 py-3 rounded-md font-semibold self-stretch sm:self-start hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {answers ? 'Reveal answer' : 'Loading answer...'}
                 </button>
@@ -232,17 +235,21 @@ export default function FlashcardsPage() {
                   ))}
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 pt-2">
                 <span className="text-sm text-muted mr-1">How did you do?</span>
                 <button
+                  type="button"
+                  data-testid="flashcard-got-it"
                   onClick={() => rate(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md font-medium border border-success/40 text-success hover:bg-success/10 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 min-h-11 px-4 py-2.5 rounded-md font-medium border border-success/40 text-success hover:bg-success/10 transition-colors"
                 >
                   <CheckCircle2 className="w-4 h-4" /> Got it
                 </button>
                 <button
+                  type="button"
+                  data-testid="flashcard-review-again"
                   onClick={() => rate(false)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md font-medium border border-border text-foreground/80 hover:border-ring transition-colors"
+                  className="inline-flex items-center justify-center gap-2 min-h-11 px-4 py-2.5 rounded-md font-medium border border-border text-foreground/80 hover:border-ring transition-colors"
                 >
                   <XCircle className="w-4 h-4" /> Review again
                 </button>

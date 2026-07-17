@@ -45,7 +45,7 @@ export default function ThemeToggle() {
       suppressHydrationWarning
       aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
       title={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
-      className="w-9 h-9 inline-flex items-center justify-center rounded-md border border-border text-foreground/70 hover:text-primary hover:border-ring transition-colors"
+      className="min-h-11 min-w-11 w-11 h-11 sm:w-9 sm:h-9 sm:min-h-9 sm:min-w-9 inline-flex items-center justify-center rounded-md border border-border text-foreground/70 hover:text-primary hover:border-ring transition-colors"
     >
       {mounted && isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
     </button>
