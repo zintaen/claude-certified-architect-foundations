@@ -4,7 +4,10 @@
 // the UI stays consistent.
 
 export type GroupId =
-  'research_pipeline' | 'extraction_pipeline' | 'customer_support' | 'code_exploration';
+  | 'research_pipeline'
+  | 'extraction_pipeline'
+  | 'customer_support'
+  | 'code_exploration';
 
 export interface DomainMeta {
   id: GroupId;
