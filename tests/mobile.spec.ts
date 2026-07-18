@@ -251,6 +251,53 @@ test.describe('Mobile viewport — product journeys', () => {
     await expect(page.getByRole('button', { name: /Download certificate/i })).toBeVisible();
     await noSevereHorizontalOverflow(page);
   });
+
+  test('timed exam can be answered through to results via force submit', async ({ page }) => {
+    test.setTimeout(120000);
+    await acceptDialogs(page);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await clearClientSession(page);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    
+    await page.getByRole('button', { name: /Start mock exam/i }).first().click();
+    const begin = page.getByRole('button', { name: /Begin exam/i });
+    await expect(begin).toBeVisible();
+    await page.getByPlaceholder(/CyberNinja|nickname/i).fill('MobileTimed');
+    await begin.click();
+    
+    await page.waitForURL(/\/exam/, { timeout: 30000 });
+    await waitForExamReady(page, { questionOf: 60 });
+
+    for (let i = 0; i < 3; i++) {
+      await page.getByTestId('exam-options').locator('label').first().click();
+      await page.getByRole('button', { name: 'Next', exact: true }).click();
+      await expectQuestionNumber(page, i + 2);
+    }
+    
+    // Jump to the end using the palette
+    await page.getByRole('complementary').getByRole('button', { name: /^Question 60(?:$|,)/ }).click();
+    await expectQuestionNumber(page, 60);
+
+    // Answer the last question
+    await page.getByTestId('exam-options').locator('label').first().click();
+
+    // Submit via force path (3 cheat warnings)
+    for (let i = 0; i < 3; i++) {
+      await page.evaluate(() => {
+        Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+      if (i < 2) {
+        await page.getByRole('button', { name: /I Understand, Return to Exam/i }).click();
+      }
+    }
+    
+    await page.waitForURL(/\/result/, { timeout: 60000 });
+    
+    await expect(page.getByRole('heading', { name: /Exam Results/i })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/\/\s*1000/)).toBeVisible();
+    await noSevereHorizontalOverflow(page);
+  });
 });
 
 test.describe('Mobile viewport — all surfaces', () => {

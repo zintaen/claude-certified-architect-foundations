@@ -42,6 +42,11 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    title: 'CCA-F Mock',
+    statusBarStyle: 'black-translucent',
+  },
   openGraph: {
     type: 'website',
     siteName: 'CyberSkill CCA-F Mock',

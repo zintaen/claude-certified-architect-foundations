@@ -232,29 +232,29 @@ export default function Home() {
             design, orchestration, tool contracts, and failure handling under real exam conditions.
           </p>
 
-          <div className="flex flex-wrap items-center gap-4 mt-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-2 w-full sm:w-auto">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setShowSetup(true)}
-              className="bg-primary text-primary-foreground px-6 py-3 rounded-md font-semibold flex items-center gap-2 shadow-[0_0_20px_var(--glow)] hover:shadow-[0_0_30px_var(--glow)] transition-all"
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-md font-semibold flex items-center justify-center gap-2 shadow-[0_0_20px_var(--glow)] hover:shadow-[0_0_30px_var(--glow)] transition-all w-full sm:w-auto"
             >
-              <PlayCircle className="w-5 h-5" />
+              <PlayCircle className="w-5 h-5 shrink-0" />
               Start mock exam
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => router.push('/practice')}
-              className="glass-panel px-6 py-3 rounded-md font-medium hover:bg-[var(--overlay-strong)] transition-colors inline-flex items-center gap-2"
+              className="glass-panel px-6 py-3 rounded-md font-medium hover:bg-[var(--overlay-strong)] transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto"
             >
-              <Layers className="w-4 h-4" /> Practice modes
+              <Layers className="w-4 h-4 shrink-0" /> Practice modes
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => router.push('/leaderboard')}
-              className="glass-panel px-6 py-3 rounded-md font-medium hover:bg-[var(--overlay-strong)] transition-colors"
+              className="glass-panel px-6 py-3 rounded-md font-medium hover:bg-[var(--overlay-strong)] transition-colors w-full sm:w-auto text-center"
             >
               View leaderboard
             </motion.button>

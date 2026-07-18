@@ -206,8 +206,20 @@ export default function LeaderboardPage() {
                 );
               })}
               {!hasAnyScores && (
-                <div className="p-8 text-center text-foreground/50">
-                  No scores recorded yet. Be the first!
+                <div className="p-12 flex flex-col items-center text-center gap-4 text-foreground/60">
+                  <div className="w-16 h-16 rounded-full bg-[var(--overlay-subtle)] flex items-center justify-center">
+                    <Trophy className="w-8 h-8 opacity-50" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <h3 className="text-lg font-bold text-foreground">No scores yet</h3>
+                    <p className="text-sm">Be the first to get on the leaderboard.</p>
+                  </div>
+                  <button
+                    onClick={() => router.push('/')}
+                    className="mt-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-md font-semibold hover:brightness-110 transition-all text-sm"
+                  >
+                    Take a Mock
+                  </button>
                 </div>
               )}
               {hasAnyScores && visibleScores.length === 0 && (
