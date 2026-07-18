@@ -258,13 +258,16 @@ test.describe('Mobile viewport — product journeys', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await clearClientSession(page);
     await page.reload({ waitUntil: 'domcontentloaded' });
-    
-    await page.getByRole('button', { name: /Start mock exam/i }).first().click();
+
+    await page
+      .getByRole('button', { name: /Start mock exam/i })
+      .first()
+      .click();
     const begin = page.getByRole('button', { name: /Begin exam/i });
     await expect(begin).toBeVisible();
     await page.getByPlaceholder(/CyberNinja|nickname/i).fill('MobileTimed');
     await begin.click();
-    
+
     await page.waitForURL(/\/exam/, { timeout: 30000 });
     await waitForExamReady(page, { questionOf: 60 });
 
@@ -273,9 +276,12 @@ test.describe('Mobile viewport — product journeys', () => {
       await page.getByRole('button', { name: 'Next', exact: true }).click();
       await expectQuestionNumber(page, i + 2);
     }
-    
+
     // Jump to the end using the palette
-    await page.getByRole('complementary').getByRole('button', { name: /^Question 60(?:$|,)/ }).click();
+    await page
+      .getByRole('complementary')
+      .getByRole('button', { name: /^Question 60(?:$|,)/ })
+      .click();
     await expectQuestionNumber(page, 60);
 
     // Answer the last question
@@ -291,10 +297,12 @@ test.describe('Mobile viewport — product journeys', () => {
         await page.getByRole('button', { name: /I Understand, Return to Exam/i }).click();
       }
     }
-    
+
     await page.waitForURL(/\/result/, { timeout: 60000 });
-    
-    await expect(page.getByRole('heading', { name: /Exam Results/i })).toBeVisible({ timeout: 15000 });
+
+    await expect(page.getByRole('heading', { name: /Exam Results/i })).toBeVisible({
+      timeout: 15000,
+    });
     await expect(page.getByText(/\/\s*1000/)).toBeVisible();
     await noSevereHorizontalOverflow(page);
   });
