@@ -124,6 +124,8 @@ export function loadPaddlePriceIdMap(): PaddlePriceIdMap {
   }
   if (
     process.env.PADDLE_USE_FIXTURE_IDS === '1' ||
+    process.env.PADDLE_DEV_MOCK === '1' ||
+    process.env.NEXT_PUBLIC_PADDLE_DEV_MOCK === '1' ||
     process.env.NODE_ENV === 'test' ||
     process.env.VITEST === 'true'
   ) {

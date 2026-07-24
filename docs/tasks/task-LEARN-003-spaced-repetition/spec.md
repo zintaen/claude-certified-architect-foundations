@@ -7,7 +7,7 @@ priority: MUST
 status: done
 verify: T
 phase: P3
-milestone: 'P3 · slice 3'
+milestone: 'P3 ? slice 3'
 slice: 3
 owner: Stephen Cheng
 created: 2026-07-16
@@ -19,14 +19,14 @@ blocks: []
 source_pages:
   - docs/tasks/_sources/expansion-monetization-plan.md
 source_decisions:
-  - '§D premium features: spaced repetition (SM-2/FSRS, the Anki-family algorithms with strong learning-science backing for long-term retention); flashcards round out the kit'
+  - '?D premium features: spaced repetition (SM-2/FSRS, the Anki-family algorithms with strong learning-science backing for long-term retention); flashcards round out the kit'
 language: typescript 5 (next.js 16, react 19) + postgres (supabase)
 service: .
 new_files:
   - src/lib/srs.ts
   - src/app/review/page.tsx
   - src/app/api/review/route.ts
-  - supabase/migrations/20260920000000_review_cards.sql
+  - supabase/migrations/20260920000001_review_cards.sql
   - tests/unit/srs.test.ts
   - tests/integration/review.test.ts
 modified_files:
@@ -44,7 +44,7 @@ risk_if_skipped: "Spaced repetition is the doc's named retention mechanic - both
 
 # task-LEARN-003 - Spaced-repetition review scheduling (FSRS)
 
-## §1 - Description
+## ?1 - Description
 
 1. `src/lib/srs.ts` MUST implement the FSRS scheduler as a pure function: `schedule(card, grade, now) -> nextCard` over card state `{ stability, difficulty, state, due, lastReview }` and grades `again | hard | good | easy`. The implementation MUST be validated against published FSRS reference vectors (fixture file with source citation) so the algorithm is provably the algorithm, not an approximation. SM-2 is the documented fallback only if FSRS reference validation proves impractical - the decision and reason land in the module doc comment (default: FSRS).
 2. A migration MUST add `review_cards`: `user_id`, `card_kind` (`item` | `flashcard`), `card_ref` (item id or flashcard key), `exam_id`, FSRS state fields, `due_at`, `suspended`, timestamps; unique on (user_id, card_kind, card_ref). RLS on, no anon policies (repo pattern); all access via the server layer.
@@ -57,19 +57,19 @@ risk_if_skipped: "Spaced repetition is the doc's named retention mechanic - both
 9. Analytics: `review_session_started` (due count), `review_card_graded` (kind + grade only, no card content), `review_session_completed` extend the OBS-001 map.
 10. This task MUST NOT modify exam-mode assembly or scoring, MUST NOT add LLM calls, and MUST NOT alter the free flashcards content surface beyond the opt-in affordance.
 
-## §2 - Why this design
+## ?2 - Why this design
 
-**Why FSRS with reference-vector validation (§1 #1)?** The doc names the Anki-family algorithms for their learning-science backing; that backing attaches to the actual algorithm, not to "something interval-ish". Reference vectors make correctness testable and keep marketing claims ("FSRS-scheduled review") true. The SM-2 fallback is documented because FSRS's parameters are more intricate - but the default is the better scheduler.
+**Why FSRS with reference-vector validation (?1 #1)?** The doc names the Anki-family algorithms for their learning-science backing; that backing attaches to the actual algorithm, not to "something interval-ish". Reference vectors make correctness testable and keep marketing claims ("FSRS-scheduled review") true. The SM-2 fallback is documented because FSRS's parameters are more intricate - but the default is the better scheduler.
 
-**Why auto-cards from misses plus opt-in flashcards (§1 #3)?** A wrong answer is the highest-signal review candidate and costs the user zero effort to capture; flashcards are curriculum the user chooses. Auto-enrolling everything would flood the queue and make the cap feel arbitrary; this split keeps the queue meaningful.
+**Why auto-cards from misses plus opt-in flashcards (?1 #3)?** A wrong answer is the highest-signal review candidate and costs the user zero effort to capture; flashcards are curriculum the user chooses. Auto-enrolling everything would flood the queue and make the cap feel arbitrary; this split keeps the queue meaningful.
 
-**Why accrue cards for free users (§1 #6)?** The upgrade moment ("you have 214 cards waiting, scheduled and ready") is the honest version of a conversion hook: real value, already theirs, unlocked - not manufactured scarcity. Accrual is rows, not compute.
+**Why accrue cards for free users (?1 #6)?** The upgrade moment ("you have 214 cards waiting, scheduled and ready") is the honest version of a conversion hook: real value, already theirs, unlocked - not manufactured scarcity. Accrual is rows, not compute.
 
-**Why bounded daily queues (§1 #5)?** SRS products die by guilt: a 400-card backlog after a week away makes users quit. Caps with carried overflow keep the habit re-enterable, which is the retention point.
+**Why bounded daily queues (?1 #5)?** SRS products die by guilt: a 400-card backlog after a week away makes users quit. Caps with carried overflow keep the habit re-enterable, which is the retention point.
 
-**Why item reviews write item_responses (§1 #4)?** Review answers are evidence of ability; feeding them to the mastery model (LEARN-001) and calibration stream keeps one truth about the user and the items rather than a parallel SRS-only ledger.
+**Why item reviews write item_responses (?1 #4)?** Review answers are evidence of ability; feeding them to the mastery model (LEARN-001) and calibration stream keeps one truth about the user and the items rather than a parallel SRS-only ledger.
 
-## §3 - Contract
+## ?3 - Contract
 
 ```typescript
 // src/lib/srs.ts (pure)
@@ -86,7 +86,7 @@ POST /api/review/grade { cardId, grade, tzOffset }  -> { next: CardView | null }
 ```
 
 ```sql
--- 20260920000000_review_cards.sql (shape)
+-- 20260920000001_review_cards.sql (shape)
 create table review_cards (id uuid primary key default gen_random_uuid(),
   user_id uuid not null references users, card_kind text not null check (card_kind in ('item','flashcard')),
   card_ref text not null, exam_id uuid references exams,
@@ -98,19 +98,19 @@ create table review_cards (id uuid primary key default gen_random_uuid(),
 -- index (user_id, due_at) where not suspended; RLS on, no anon policies
 ```
 
-## §4 - Acceptance criteria
+## ?4 - Acceptance criteria
 
-1. **FSRS faithful** - `schedule()` reproduces the published reference vectors (fixture cites source); state transitions new->learning->review and lapse->relearning behave per algorithm (traces_to: §1 #1).
-2. **Card lifecycle** - Wrong graded answer upserts exactly one card (re-missing does not duplicate); flashcard opt-in creates its card; canary items never create cards (traces_to: §1 #2, #3).
-3. **Review flow sound** - Due cards serve oldest-first; item cards render through the shaping path with no pre-grade answer leak; grading reschedules per `schedule()`; item reviews write `item_responses` with variant `review` (traces_to: §1 #4).
-4. **Queue bounded** - Due count above the cap serves cap-many today and carries the rest; dashboard shows due count (traces_to: §1 #5).
-5. **Gating matrix** - Premium: full queue; free: locked /review with accrued-count teaser, static flashcards unchanged; enforcement off: open to all; free-user misses still accrue cards (traces_to: §1 #6).
-6. **User control + post-pass retention** - Suspend/remove work per card; passing fixture exam leaves cards intact (traces_to: §1 #7).
-7. **Timezone rollover** - Fixture at UTC+7: cards due "today" locally appear despite server UTC date differing (traces_to: §1 #8).
-8. **Events coarse** - Review events carry kind/grade/counts, never card content or item ids (traces_to: §1 #9).
-9. **Scope fences** - Exam assembly/scoring fixtures byte-identical; no LLM imports; free flashcards content untouched (traces_to: §1 #10).
+1. **FSRS faithful** - `schedule()` reproduces the published reference vectors (fixture cites source); state transitions new->learning->review and lapse->relearning behave per algorithm (traces_to: ?1 #1).
+2. **Card lifecycle** - Wrong graded answer upserts exactly one card (re-missing does not duplicate); flashcard opt-in creates its card; canary items never create cards (traces_to: ?1 #2, #3).
+3. **Review flow sound** - Due cards serve oldest-first; item cards render through the shaping path with no pre-grade answer leak; grading reschedules per `schedule()`; item reviews write `item_responses` with variant `review` (traces_to: ?1 #4).
+4. **Queue bounded** - Due count above the cap serves cap-many today and carries the rest; dashboard shows due count (traces_to: ?1 #5).
+5. **Gating matrix** - Premium: full queue; free: locked /review with accrued-count teaser, static flashcards unchanged; enforcement off: open to all; free-user misses still accrue cards (traces_to: ?1 #6).
+6. **User control + post-pass retention** - Suspend/remove work per card; passing fixture exam leaves cards intact (traces_to: ?1 #7).
+7. **Timezone rollover** - Fixture at UTC+7: cards due "today" locally appear despite server UTC date differing (traces_to: ?1 #8).
+8. **Events coarse** - Review events carry kind/grade/counts, never card content or item ids (traces_to: ?1 #9).
+9. **Scope fences** - Exam assembly/scoring fixtures byte-identical; no LLM imports; free flashcards content untouched (traces_to: ?1 #10).
 
-## §5 - Verification
+## ?5 - Verification
 
 ```typescript
 // tests/unit/srs.test.ts (vitest)
@@ -129,17 +129,17 @@ test('event payload scan: no card content'); // AC 8
 test('assembly/scoring fixtures byte-identical; grep no LLM'); // AC 9
 ```
 
-## §6 - Implementation skeleton
+## ?6 - Implementation skeleton
 
 srs.ts pure scheduler + reference fixtures first (the algorithm is the risk) -> migration -> card lifecycle hooks in the grade path (miss upsert) and flashcards page (opt-in) -> review API + /review UI one-card loop -> dashboard due count -> gating + teaser -> analytics -> tests. Keep the scheduler free of Date.now() (now injected) for determinism.
 
-## §7 - Dependencies
+## ?7 - Dependencies
 
 - Upstream: task-DATA-001 (users, items, responses, shaping path) and task-PAY-001 (gating) - hard.
-- Downstream: none in wave; LEARN-002 interplay (avoid drilling items due for review the same day) is the flagged joint decision in both specs' §9.
+- Downstream: none in wave; LEARN-002 interplay (avoid drilling items due for review the same day) is the flagged joint decision in both specs' ?9.
 - Related: task-LEARN-001 benefits from review-generated responses in mastery.
 
-## §8 - Example payloads
+## ?8 - Example payloads
 
 ```json
 // GET /api/review?exam=ccaf&tzOffset=420
@@ -153,7 +153,7 @@ srs.ts pure scheduler + reference fixtures first (the algorithm is the risk) -> 
 { "cardId": "a7...", "grade": "good", "tzOffset": 420 }
 ```
 
-## §9 - Open questions
+## ?9 - Open questions
 
 Deferred:
 
@@ -161,7 +161,7 @@ Deferred:
 - Drill/review same-day overlap policy is decided jointly with LEARN-002 when both are live (flagged in both specs).
 - Cross-exam card dedup (same knowledge in two certs' items) is future work with the multi-cert journey wave.
 
-## §10 - Failure modes inventory
+## ?10 - Failure modes inventory
 
 | Failure                                  | Detection                                                                                | Outcome                      | Recovery                         |
 | ---------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------- | -------------------------------- |
@@ -178,7 +178,7 @@ Deferred:
 | Queue starves newest cards under cap     | Oldest-due-first is deliberate; overflow carries                                         | New-card latency             | Documented ordering; cap tunable |
 | Event props leak studied content         | AC 8 scan                                                                                | Analytics shadow deck        | Coarse event rule                |
 
-## §11 - Implementation notes
+## ?11 - Implementation notes
 
 - Use the published FSRS parameter set and cite the exact source revision in the fixture file header; if upstream revises parameters, the fixture pins ours until a deliberate bump.
 - The one-card loop UI should preload the next card's payload during grading to feel instant without batching answers client-side.

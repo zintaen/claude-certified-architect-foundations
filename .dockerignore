@@ -1,0 +1,24 @@
+# Keep the image lean — npm ci runs inside the Dockerfile.
+node_modules
+.next
+.next-verify
+.vbuild
+.wbuild
+.sbuild
+.git
+.cyberos
+.vercel
+coverage
+test-results
+playwright-report
+dist
+out
+*.md
+!package.json
+.env*
+!.env.example
+supabase/.temp
+tools/item-pipeline/runs
+**/.DS_Store
+**/*.pem
+**/*.tsbuildinfo

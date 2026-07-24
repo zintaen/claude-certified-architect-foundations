@@ -180,6 +180,7 @@ export function classify(path: string, method = 'GET'): RouteClass | null {
   if (p === '/api/offline/sync' && m === 'POST') return 'write';
   // PAY-002: Paddle webhooks — write class with retry-burst headroom (BUDGETS.write).
   if (p === '/api/webhooks/paddle' && m === 'POST') return 'write';
+  if (p === '/api/dev/paddle-mock-checkout' && m === 'POST') return 'write';
   if (p === '/api/paddle/withdrawal' && m === 'POST') return 'write';
   if (/^\/api\/exams\/[^/]+\/session$/.test(p) && m === 'POST') return 'write';
   if (p === '/api/session' || p === '/api/answers' || p === '/api/result') {

@@ -1,18 +1,22 @@
 ---
 task_id: task-PAY-002
 blocker: paddle_vendor_credentials
-updated: 2026-07-24
-status_note: Implementation landed (adapter, pricing, webhook, reconcile, CSP). Sandbox keys still missing — do not invent keys or mark done without honest sandbox webhook proof. ENTITLEMENTS_ENFORCED stays off.
+updated: 2026-07-25
+status_note: Implementation landed (adapter, pricing, webhook, reconcile, CSP). Local mock (PADDLE_DEV_MOCK) exercises signed webhook→grant without inventing live keys. Sandbox keys still missing for honest Paddle UI proof. ENTITLEMENTS_ENFORCED stays off.
 ---
 
 # PAY-002 credential blocker
 
 Honest integration requires real Paddle Billing credentials (sandbox first, then production). Do **not** invent keys.
 
-## Repo status (2026-07-24)
+## Local without sandbox keys
 
-- Code for PAY-002 is in-tree (env-driven; fixture Paddle price IDs only for CI).
-- `.env.local` has **no** `PADDLE_*` / `NEXT_PUBLIC_PADDLE_*` values.
+See [`docs/ops/local-docker.md`](../../ops/local-docker.md): `PADDLE_DEV_MOCK=1` + `node scripts/paddle-webhook-fixture.mjs` (or `/pricing` mock checkout) posts a **signed** fixture through `/api/webhooks/paddle`. That is not a substitute for sandbox purchase proof at final acceptance.
+
+## Repo status (2026-07-25)
+
+- Code for PAY-002 is in-tree (env-driven; fixture Paddle price IDs only for CI / local mock).
+- `.env.local` may enable `PADDLE_DEV_MOCK` with a local webhook secret — never commit real keys.
 - Operator UI reminder: choose **“No, this is my first integration”** and stay in **sandbox**.
 
 ## Exact asks for the operator
@@ -27,6 +31,7 @@ Honest integration requires real Paddle Billing credentials (sandbox first, then
    - `PADDLE_WEBHOOK_SECRET=`
    - `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=`
    - `PADDLE_PRICE_ID_MAP=` JSON map of `sku → tier → currency → pri_…`
+   - Turn **off** `PADDLE_DEV_MOCK` / `NEXT_PUBLIC_PADDLE_DEV_MOCK` when using real sandbox
 4. Register webhook destination → `/api/webhooks/paddle` (tunnel or preview URL)
 5. Domains allowlist: `localhost` + live host Paddle can reach
 6. Run one sandbox purchase → confirm single grant; replay event → still one grant

@@ -3,14 +3,13 @@ services:
     build: .
     ports:
       - '3000:3000'
+    # Fixed local defaults (override .env.local for container networking).
     environment:
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
       HOST_CUTOVER_REDIRECT: 'off'
       ENTITLEMENTS_ENFORCED: 'off'
-      # Optional: point at local Supabase from `npx supabase start` (host network).
-      # NEXT_PUBLIC_SUPABASE_URL: http://host.docker.internal:54321
-      # NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
-      # SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
+      # Reach host Supabase from the container (npm path keeps 127.0.0.1 in .env.local).
+      NEXT_PUBLIC_SUPABASE_URL: http://host.docker.internal:54321
     env_file:
       - path: .env.local
         required: false
@@ -21,3 +20,15 @@ services:
     # On Linux, host.docker.internal needs this; harmless on Docker Desktop Mac.
     extra_hosts:
       - 'host.docker.internal:host-gateway'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s

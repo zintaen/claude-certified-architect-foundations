@@ -19,7 +19,8 @@
     "pipeline:exec": "PIPELINE_SME_AUTO=1 node tools/item-pipeline/pipeline.mjs --config tools/item-pipeline/config.example.json --execute",
     "seed:catalog": "node scripts/seed-catalog.mjs",
     "seed:multi-exam": "node scripts/seed-multi-exam.mjs",
-    "reconcile:paddle": "node scripts/reconcile-paddle.mjs"
+    "reconcile:paddle": "node scripts/reconcile-paddle.mjs",
+    "paddle:webhook-fixture": "node scripts/paddle-webhook-fixture.mjs"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.1",

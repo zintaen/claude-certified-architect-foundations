@@ -11,7 +11,7 @@ describe('LEARN-003 review integration scaffolding', () => {
 
   it('migration + review page + dashboard badge', () => {
     expect(
-      existsSync(join(process.cwd(), 'supabase/migrations/20260920000000_review_cards.sql'))
+      existsSync(join(process.cwd(), 'supabase/migrations/20260920000001_review_cards.sql'))
     ).toBe(true);
     expect(existsSync(join(process.cwd(), 'src/app/review/page.tsx'))).toBe(true);
     const dash = readFileSync(join(process.cwd(), 'src/app/dashboard/page.tsx'), 'utf8');

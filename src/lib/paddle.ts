@@ -20,8 +20,18 @@ export function paddleEnv(): PaddleEnv {
   return v === 'production' ? 'production' : 'sandbox';
 }
 
+/** Local-only mock checkout / fixture price IDs. Never enable on production. */
+export function paddleDevMockEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_PADDLE_DEV_MOCK === '1' || process.env.PADDLE_DEV_MOCK === '1';
+}
+
 export function paddleClientToken(): string | undefined {
   return process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || undefined;
+}
+
+/** True when Paddle.js sandbox is configured, or local PADDLE_DEV_MOCK is on. */
+export function paddleCheckoutConfigured(): boolean {
+  return Boolean(paddleClientToken()) || paddleDevMockEnabled();
 }
 
 export function paddleWebhookSecret(): string | undefined {
@@ -404,9 +414,45 @@ function loadPaddleJs(): Promise<PaddleCheckoutJs> {
 }
 
 /**
- * Client checkout open. Does NOT grant entitlements — webhook only.
+ * Local mock checkout: POSTs a signed fixture through /api/webhooks/paddle.
+ * Enabled only when NEXT_PUBLIC_PADDLE_DEV_MOCK=1 (server also gates the route).
+ */
+async function openDevMockCheckout(input: OpenCheckoutInput): Promise<void> {
+  const res = await fetch('/api/dev/paddle-mock-checkout', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      sku: input.sku,
+      tier: input.tier,
+      currency: input.currency || 'USD',
+      examCode: input.examCode ?? null,
+      userId: input.userId ?? null,
+      euConsent: input.euConsent ?? null,
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`mock checkout failed: ${res.status} ${text}`);
+  }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent('paddle:checkout_completed', { detail: { sku: input.sku, mock: true } })
+    );
+  }
+}
+
+/**
+ * Client checkout open. Does NOT grant entitlements — webhook only
+ * (or local mock which posts a signed webhook fixture).
  */
 export function openCheckout(input: OpenCheckoutInput): void {
+  if (paddleDevMockEnabled() && !paddleClientToken()) {
+    void openDevMockCheckout(input).catch((err) => {
+      console.error('[paddle] openDevMockCheckout failed', err);
+    });
+    return;
+  }
+
   const token = paddleClientToken();
   if (!token) {
     console.warn('[paddle] NEXT_PUBLIC_PADDLE_CLIENT_TOKEN missing — checkout disabled');

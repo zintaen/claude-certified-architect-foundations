@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import PricingClient, { type PricingSkuCard } from '@/components/PricingClient';
 import { loadTierConfig, provisionalTier, type TierSignal } from '@/lib/geoTier';
-import { paddleClientToken } from '@/lib/paddle';
+import { paddleCheckoutConfigured } from '@/lib/paddle';
 import { priceForSku } from '@/lib/priceCatalog';
 
 export const metadata: Metadata = {
@@ -87,7 +87,7 @@ export default async function PricingPage({
         skus={cards}
         provisionalTier={tier}
         ipCountry={ipCountry}
-        checkoutConfigured={Boolean(paddleClientToken())}
+        checkoutConfigured={paddleCheckoutConfigured()}
         forceEu={forceEu}
       />
     </main>

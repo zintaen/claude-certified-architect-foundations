@@ -74,6 +74,11 @@ export default function PricingClient({
         tier,
         exam_code: card.examCode ?? null,
       });
+      setStatus(
+        process.env.NEXT_PUBLIC_PADDLE_DEV_MOCK === '1'
+          ? 'Opening local mock checkout (signed webhook)…'
+          : 'Opening checkout…'
+      );
       openCheckout({
         sku: card.sku,
         examCode: card.examCode,
