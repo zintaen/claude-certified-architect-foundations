@@ -43,6 +43,19 @@ export default defineConfig({
       // Tight budgets so SEC-001 hammer e2e can trip 429 without 200+ requests.
       RATE_LIMIT_WRITE_MAX: '20',
       RATE_LIMIT_READ_MAX: '100',
+      HOST_CUTOVER_REDIRECT: process.env.HOST_CUTOVER_REDIRECT || 'off',
+      ENTITLEMENTS_ENFORCED: process.env.ENTITLEMENTS_ENFORCED || 'off',
+      PADDLE_ENV: process.env.PADDLE_ENV || 'sandbox',
+      // Local PAY-002 mock defaults — not forced in CI (no Supabase for fulfillment).
+      ...(process.env.CI
+        ? {}
+        : {
+            PADDLE_DEV_MOCK: process.env.PADDLE_DEV_MOCK || '1',
+            NEXT_PUBLIC_PADDLE_DEV_MOCK: process.env.NEXT_PUBLIC_PADDLE_DEV_MOCK || '1',
+            PADDLE_USE_FIXTURE_IDS: process.env.PADDLE_USE_FIXTURE_IDS || '1',
+            PADDLE_WEBHOOK_SECRET:
+              process.env.PADDLE_WEBHOOK_SECRET || 'local_dev_paddle_webhook_secret',
+          }),
     },
   },
 });

@@ -47,16 +47,38 @@ export default function PricingClient({
   );
 
   useEffect(() => {
-    const onDone = () => {
+    const onDone = (ev: Event) => {
+      const detail =
+        ev instanceof CustomEvent && ev.detail && typeof ev.detail === 'object'
+          ? (ev.detail as { sku?: string; mock?: boolean })
+          : {};
       track('checkout_completed', {
-        sku: 'per_exam_pass',
+        sku: (detail.sku as SkuId) || 'per_exam_pass',
         tier,
         exam_code: null,
       });
-      setStatus('Checkout completed — access unlocks after payment confirmation (webhook).');
+      setStatus(
+        detail.mock
+          ? 'Local mock checkout completed — signed webhook fulfilled (no live Paddle).'
+          : 'Checkout completed — access unlocks after payment confirmation (webhook).'
+      );
+    };
+    const onFail = (ev: Event) => {
+      const message =
+        ev instanceof CustomEvent &&
+        ev.detail &&
+        typeof ev.detail === 'object' &&
+        typeof (ev.detail as { message?: unknown }).message === 'string'
+          ? (ev.detail as { message: string }).message
+          : 'unknown error';
+      setStatus(`Mock checkout failed: ${message}`);
     };
     window.addEventListener('paddle:checkout_completed', onDone);
-    return () => window.removeEventListener('paddle:checkout_completed', onDone);
+    window.addEventListener('paddle:checkout_failed', onFail);
+    return () => {
+      window.removeEventListener('paddle:checkout_completed', onDone);
+      window.removeEventListener('paddle:checkout_failed', onFail);
+    };
   }, [tier]);
 
   const buy = useCallback(

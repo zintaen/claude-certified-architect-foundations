@@ -6,43 +6,38 @@ Do **not** set `HOST_CUTOVER_REDIRECT=on` or `ENTITLEMENTS_ENFORCED=on` for loca
 
 ---
 
-## Happy path (clean machine → green local)
+## One command: clean machine → green PAY-002 local proof
 
 ```bash
 cd /path/to/claude-certified-architect-foundations
 
+# 0. Prerequisites: Node 24 (see .nvmrc), Docker Desktop running
+
 # 1. Env
-cp .env.example .env.local
-# Defaults are fine for local: cutover off, entitlements off, PADDLE_DEV_MOCK=1.
-# For Docker Compose, set Supabase URL to the host gateway:
+cp -n .env.example .env.local
+# Defaults are fine: cutover off, entitlements off, PADDLE_DEV_MOCK=1.
+# For Docker Compose only, also set:
 #   NEXT_PUBLIC_SUPABASE_URL=http://host.docker.internal:54321
 
 # 2. Supabase (auth / entitlements / catalog)
 npx supabase start
 npx supabase status          # confirm API URL + keys match .env.local
 npx supabase migration up --include-all   # if status shows pending migrations
+npm run seed:local-dev       # mock user UUID for webhook grants
 
-# Optional: seed the local mock checkout user (UUID matches .env.example)
-# docker exec supabase_db_<project> psql -U postgres -d postgres -c \
-#   "INSERT INTO public.users (id, email, pin_hash) VALUES
-#    ('11111111-1111-1111-1111-111111111111','local-mock@example.com','x')
-#    ON CONFLICT (id) DO NOTHING;"
+# 3. App — pick one (leave running)
+npm ci && npm run dev        # http://localhost:3000
+# OR: docker compose up --build
 
-# 3. App — pick one
-docker compose up --build          # http://localhost:3000
-# OR
-npm ci && npm run dev
-
-# 4. Smoke
-curl -sI http://localhost:3000/ | head -5
-curl -sI http://localhost:3000/pricing | head -5
-curl -sI http://localhost:3000/terms | head -5
-curl -sI http://localhost:3000/privacy | head -5
-curl -sI http://localhost:3000/refunds | head -5
-curl -sI http://localhost:3000/acceptable-use | head -5
+# 4. Smoke + PAY-002 local proofs (separate terminal)
+npm run local:smoke
+# Optional deeper UI:
+npx playwright test tests/e2e/legal-pages.spec.ts tests/e2e/pricing-checkout.spec.ts
 ```
 
-Expect **200** (or Next internal 307/308 — not a host cutover to practice).
+`npm run local:smoke` checks legal/pricing pages, unsigned webhook → 401, signed webhook idempotency (replay → `duplicate: true`), and `/api/dev/paddle-mock-checkout`.
+
+Expect **200** on page HEADs (or Next internal 307/308 — not a host cutover to practice).
 
 Stop:
 
@@ -60,12 +55,14 @@ Honest sandbox purchases need a real Paddle Billing sandbox account — see [`do
 Until then, local mock is enough to exercise webhook signature → fulfillment:
 
 1. Keep `PADDLE_DEV_MOCK=1`, `NEXT_PUBLIC_PADDLE_DEV_MOCK=1`, `PADDLE_USE_FIXTURE_IDS=1`, and `PADDLE_WEBHOOK_SECRET=local_dev_paddle_webhook_secret` in `.env.local`.
-2. Open `/pricing` → buy a SKU → UI posts a **signed** fixture through `/api/webhooks/paddle` (grants for the mock user).
-3. Or from the CLI:
+2. `npm run seed:local-dev` once (user `11111111-1111-1111-1111-111111111111`).
+3. Open `/pricing` → buy a SKU → UI posts a **signed** fixture through `/api/webhooks/paddle`.
+4. Or from the CLI:
 
 ```bash
-node scripts/paddle-webhook-fixture.mjs
-# optional: --url= --secret= --user= --sku= --tier=
+npm run paddle:webhook-fixture
+npm run paddle:webhook-fixture -- --replay=5 --event-id=evt_idem_demo_01
+npm run local:smoke
 ```
 
 When you have sandbox credentials, set `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`, `PADDLE_API_KEY`, `PADDLE_WEBHOOK_SECRET`, `PADDLE_PRICE_ID_MAP`, turn **off** `PADDLE_DEV_MOCK` / `NEXT_PUBLIC_PADDLE_DEV_MOCK`, and leave `ENTITLEMENTS_ENFORCED=off` until LAUNCH.
@@ -98,9 +95,12 @@ Production values until LAUNCH: see [`practice-host-cutover.md`](./practice-host
 ## Tests (optional)
 
 ```bash
-npm run test -- tests/unit/legal.test.ts tests/unit/site-host.test.ts tests/unit/paddle-webhook.test.ts
+npm run test -- tests/unit/legal.test.ts tests/unit/site-host.test.ts tests/unit/paddle-webhook.test.ts tests/unit/geo-tier.test.ts
 npx playwright test tests/e2e/legal-pages.spec.ts tests/e2e/pricing-checkout.spec.ts
+npm run local:smoke
 ```
+
+CI runs unit + Playwright without local Supabase; mock-fulfillment / idempotency e2e **skip** when mock/DB is unavailable. Full PAY-002 local proof is `npm run local:smoke`.
 
 ---
 

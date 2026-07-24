@@ -441,6 +441,14 @@ async function openDevMockCheckout(input: OpenCheckoutInput): Promise<void> {
   }
 }
 
+function dispatchCheckoutFailed(sku: SkuId, err: unknown): void {
+  if (typeof window === 'undefined') return;
+  const message = err instanceof Error ? err.message : String(err);
+  window.dispatchEvent(
+    new CustomEvent('paddle:checkout_failed', { detail: { sku, message, mock: true } })
+  );
+}
+
 /**
  * Client checkout open. Does NOT grant entitlements — webhook only
  * (or local mock which posts a signed webhook fixture).
@@ -449,6 +457,7 @@ export function openCheckout(input: OpenCheckoutInput): void {
   if (paddleDevMockEnabled() && !paddleClientToken()) {
     void openDevMockCheckout(input).catch((err) => {
       console.error('[paddle] openDevMockCheckout failed', err);
+      dispatchCheckoutFailed(input.sku, err);
     });
     return;
   }

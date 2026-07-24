@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { createHmac } from 'node:crypto';
 import { PADDLE_CSP } from '../../src/lib/paddleCsp';
 import { classify, BUDGETS } from '../../src/lib/rateLimit';
 
@@ -26,8 +27,95 @@ test.describe('pricing checkout (PAY-002)', () => {
     await page.getByTestId('checkout-per_exam_pass').click();
     // Without client token / with mock: either keys-pending or checkout proceeds locally
     await expect(page.getByTestId('pricing-status')).toContainText(
-      /not configured|Checkout|Opening|completed|access unlocks/i
+      /not configured|Checkout|Opening|completed|access unlocks|Local mock/i
     );
+  });
+
+  test('local mock checkout fulfills via signed webhook when enabled', async ({
+    page,
+    request,
+  }) => {
+    const probe = await request.post('/api/dev/paddle-mock-checkout', {
+      data: { sku: 'per_exam_pass', tier: 'tier1' },
+    });
+    test.skip(probe.status() === 404, 'PADDLE_DEV_MOCK not enabled');
+    test.skip(probe.status() === 429, 'rate limited — re-run or raise RATE_LIMIT_WRITE_MAX');
+    // If mock is on but DB/user missing, fail loudly so local:smoke can catch it
+    expect(probe.ok()).toBeTruthy();
+    const json = await probe.json();
+    expect(json.status).toBe('mock_ok');
+    expect(json.webhook?.status).toBe('processed');
+
+    await page.goto('/pricing');
+    await page.getByTestId('checkout-lifetime').click();
+    await expect(page.getByTestId('pricing-status')).toContainText(
+      /Local mock checkout completed/i,
+      {
+        timeout: 15_000,
+      }
+    );
+  });
+
+  test('webhook idempotency: same event_id replay is duplicate', async ({ request }) => {
+    const secret = process.env.PADDLE_WEBHOOK_SECRET || 'local_dev_paddle_webhook_secret';
+    // Skip when webhook secret not configured for this server (unsigned always 401)
+    const unsigned = await request.post('/api/webhooks/paddle', {
+      data: { event_id: 'evt_skip_probe', event_type: 'transaction.completed', data: {} },
+    });
+    expect(unsigned.status()).toBe(401);
+
+    const eventId = `evt_e2e_idem_${Date.now()}`;
+    const body = JSON.stringify({
+      event_id: eventId,
+      event_type: 'transaction.completed',
+      occurred_at: new Date().toISOString(),
+      data: {
+        id: `txn_e2e_${Date.now()}`,
+        custom_data: {
+          user_id: process.env.PADDLE_DEV_MOCK_USER_ID || '11111111-1111-1111-1111-111111111111',
+          sku: 'per_exam_pass',
+          tier: 'tier1',
+          exam_code: 'ccaf',
+          payment_country: 'US',
+        },
+        address: { country_code: 'US' },
+      },
+    });
+    const ts = Math.floor(Date.now() / 1000);
+    const h1 = createHmac('sha256', secret).update(`${ts}:${body}`, 'utf8').digest('hex');
+    const signature = `ts=${ts};h1=${h1}`;
+
+    const postOnce = () =>
+      request.post('/api/webhooks/paddle', {
+        headers: {
+          'content-type': 'application/json',
+          'paddle-signature': signature,
+        },
+        data: body,
+      });
+
+    const first = await postOnce();
+    // Without matching secret / supabase: may 401 or 500 — only assert idempotency when grant works
+    if (first.status() === 401) {
+      test.skip(true, 'webhook secret mismatch (set PADDLE_WEBHOOK_SECRET for local proof)');
+      return;
+    }
+    if (first.status() === 429) {
+      test.skip(true, 'rate limited — re-run or raise RATE_LIMIT_WRITE_MAX');
+      return;
+    }
+    if (!first.ok()) {
+      test.skip(true, `fulfillment unavailable (${first.status()}) — run npm run local:smoke`);
+      return;
+    }
+    const firstJson = await first.json();
+    expect(firstJson.status).toBe('processed');
+    expect(firstJson.result?.duplicate).toBeFalsy();
+
+    const second = await postOnce();
+    expect(second.ok()).toBeTruthy();
+    const secondJson = await second.json();
+    expect(secondJson.result?.duplicate).toBe(true);
   });
 
   test('withdrawal flow reachable from pricing/refunds', async ({ page }) => {
