@@ -1,0 +1,27 @@
+{
+  "examCode": "aws-aif-c01",
+  "vendor": { "key": "aws", "ai_generation_policy": "permitted" },
+  "blueprintDoc": "docs/blueprints/aws-aif-c01-blueprint.md",
+  "corpusRef": "corpus-aws-aif-v1",
+  "_policy_finding": "docs/legal/vendor-guidelines.md#aws-ai-content-policy",
+  "targets": { "totalItems": 8 },
+  "cognitiveMix": { "recall": 0.25, "application": 0.5, "analysis": 0.25 },
+  "model": { "generate": "mock-frontier", "explain": "mock-frontier" },
+  "betaMixRatio": 1,
+  "maxUsd": 25,
+  "maxReviserIterations": 2,
+  "promotion": {
+    "minResponses": 30,
+    "pValueMin": 0.2,
+    "pValueMax": 0.85,
+    "pointBiserialMin": 0.15
+  },
+  "official": {
+    "price_usd": null,
+    "delivery": "AWS Certification (verify at registration)",
+    "validity_months": null,
+    "source_url": "https://docs.aws.amazon.com/pdfs/aws-certification/latest/ai-practitioner-01/ai-practitioner-01.pdf",
+    "retrieved": "2026-07-24"
+  },
+  "pass_threshold": { "value": 70, "basis": "site_default" }
+}

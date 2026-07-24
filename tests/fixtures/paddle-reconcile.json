@@ -1,0 +1,20 @@
+{
+  "transactions": [
+    {
+      "transaction_id": "txn_seed_ok",
+      "user_id": "u1",
+      "sku": "per_exam_pass",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "txn_missing_grant",
+      "user_id": "u2",
+      "sku": "lifetime",
+      "status": "completed"
+    }
+  ],
+  "entitlement_grants": [
+    { "transaction_id": "txn_seed_ok", "entitlement_id": "ent_1" },
+    { "transaction_id": "txn_orphan", "entitlement_id": "ent_orphan", "expect_orphan": true }
+  ]
+}

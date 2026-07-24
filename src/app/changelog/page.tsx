@@ -1,10 +1,13 @@
+import { MARK_CCAF_NAME } from '@/lib/legal';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 
 export const metadata = {
   title: 'Changelog - Claude Certified Architect mock exam | CyberSkill',
   description:
-    'Recent updates to the free Claude Certified Architect - Foundations (CCA-F) practice exam: fixes, new features, and improvements.',
+    'Recent updates to the free ' +
+    MARK_CCAF_NAME +
+    ' (CCA-F) practice exam: fixes, new features, and improvements.',
   alternates: { canonical: '/changelog' },
 };
 
@@ -46,8 +49,8 @@ export default function ChangelogPage() {
           Changelog
         </h1>
         <p className="text-foreground/70 leading-relaxed">
-          What is new in the free Claude Certified Architect - Foundations mock exam. Found a bug or
-          have a suggestion? Use the feedback button on any page, or email info@cyberskill.world.
+          What is new in the free {MARK_CCAF_NAME} mock exam. Found a bug or have a suggestion? Use
+          the feedback button on any page, or email info@cyberskill.world.
         </p>
       </header>
 

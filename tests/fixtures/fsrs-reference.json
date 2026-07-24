@@ -1,0 +1,9 @@
+{
+  "source": "FSRS-4.5 default weights from open-spaced-repetition (fsrs4anki wiki The Algorithm); vectors assert this module's schedule() with those w[]",
+  "vectors": [
+    { "grade": "again", "expectStabilityMin": 0.1 },
+    { "grade": "hard", "expectStabilityMin": 0.5 },
+    { "grade": "good", "expectStabilityMin": 2.0 },
+    { "grade": "easy", "expectStabilityMin": 5.0 }
+  ]
+}

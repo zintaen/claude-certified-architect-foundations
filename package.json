@@ -9,9 +9,17 @@
     "lint": "eslint",
     "format": "npx --yes prettier@3.8.4 --write .",
     "format:check": "npx --yes prettier@3.8.4 --check .",
-    "precommit": "eslint src && npx --yes prettier@3.8.4 --check .",
+    "precommit": "node scripts/check-provenance.mjs && node scripts/check-brand-terms.mjs && eslint src && npx --yes prettier@3.8.4 --check .",
+    "check:provenance": "node scripts/check-provenance.mjs",
+    "check:similarity": "node scripts/similarity-check.mjs",
+    "test": "vitest run",
     "test:unit": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "pipeline:dry": "node tools/item-pipeline/pipeline.mjs --config tools/item-pipeline/config.example.json",
+    "pipeline:exec": "PIPELINE_SME_AUTO=1 node tools/item-pipeline/pipeline.mjs --config tools/item-pipeline/config.example.json --execute",
+    "seed:catalog": "node scripts/seed-catalog.mjs",
+    "seed:multi-exam": "node scripts/seed-multi-exam.mjs",
+    "reconcile:paddle": "node scripts/reconcile-paddle.mjs"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.1",
@@ -28,8 +36,10 @@
     "isomorphic-dompurify": "^3.16.0",
     "lucide-react": "^1.17.0",
     "next": "16.2.7",
+    "posthog-js": "^1.407.2",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "server-only": "^0.0.1",
     "zustand": "^5.0.14"
   },
   "overrides": {
@@ -41,6 +51,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.10",
     "@vitest/ui": "^4.1.8",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",

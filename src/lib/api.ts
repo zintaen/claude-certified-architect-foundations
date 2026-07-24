@@ -63,10 +63,21 @@ export interface UserHistory {
   averageTime: number;
 }
 
-const PASS_MARK = PASS_SCORE; // official CCA-F pass mark (720 / 1000)
+const PASS_MARK = PASS_SCORE; // published CCA-F pass mark (720 / 1000)
 const num = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
 
 export async function fetchGlobalStats(): Promise<GlobalStats | null> {
+  // DATA-002: prefer /api/leaderboard so LEADERBOARD_FROM_DB can flip without a deploy.
+  try {
+    const res = await fetch('/api/leaderboard', { cache: 'no-store' });
+    if (res.ok) {
+      const body = (await res.json()) as { stats?: GlobalStats | null };
+      if (body.stats) return body.stats;
+    }
+  } catch (err) {
+    console.error('leaderboard API failed, falling back to RPC:', err);
+  }
+
   const { data, error } = await supabase.rpc('get_global_stats');
   if (error || !data) {
     console.error('Failed to fetch global stats:', error);

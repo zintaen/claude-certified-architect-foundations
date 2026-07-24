@@ -1,6 +1,7 @@
+import { MARK_CCAF_NAME, INDEPENDENCE_DISCLAIMER_SHORT } from '@/lib/legal';
 import { ImageResponse } from 'next/og';
 
-export const alt = 'Claude Certified Architect mock exam score';
+export const alt = `${MARK_CCAF_NAME} mock exam score`;
 export const contentType = 'image/png';
 
 // Dynamic, score-specific social card. Driven by query params so a shared result shows the
@@ -95,8 +96,10 @@ export async function GET(req: Request) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', color: '#f5ead9', fontSize: 30, fontWeight: 600 }}>
-        Claude Certified Architect mock - take it free at CyberSkill
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, color: '#f5ead9' }}>
+        <div style={{ fontSize: 36, fontWeight: 700 }}>CyberSkill</div>
+        <div style={{ fontSize: 28, fontWeight: 600 }}>{`${MARK_CCAF_NAME} mock`}</div>
+        <div style={{ fontSize: 22, fontWeight: 500 }}>{INDEPENDENCE_DISCLAIMER_SHORT}</div>
       </div>
     </div>,
     { width: 1200, height: 630 }

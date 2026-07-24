@@ -1,0 +1,35 @@
+{
+  "artefact": "batch-selection@1",
+  "batch": ["task-CONTENT-001"],
+  "eligible": [
+    "task-CONTENT-001",
+    "task-DATA-001",
+    "task-LEGAL-001",
+    "task-LEGAL-002",
+    "task-SEC-001"
+  ],
+  "excluded": [
+    {
+      "blocked_by": "task-CONTENT-001",
+      "conflict": ".",
+      "id": "task-DATA-001"
+    },
+    {
+      "blocked_by": "task-CONTENT-001",
+      "conflict": "package.json",
+      "id": "task-LEGAL-001"
+    },
+    {
+      "blocked_by": "task-CONTENT-001",
+      "conflict": ".",
+      "id": "task-LEGAL-002"
+    },
+    {
+      "blocked_by": "task-CONTENT-001",
+      "conflict": ".",
+      "id": "task-SEC-001"
+    }
+  ],
+  "reason": "queue: picked task-CONTENT-001 (priority=MUST, created=2026-07-16) \u2014 sole batch member; other eligible tasks cone-overlap",
+  "swarm_required": false
+}

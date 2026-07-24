@@ -1,0 +1,33 @@
+{
+  "_review": {
+    "reviewer": "Stephen Cheng",
+    "date": "2026-07-24",
+    "source_hash": "094f64d165abf601",
+    "legal_pages": "english_with_notice"
+  },
+  "nav.home": "Trang chủ",
+  "nav.practice": "Luyện tập",
+  "nav.exams": "Tất cả kỳ thi",
+  "nav.about": "Giới thiệu",
+  "nav.guide": "Hướng dẫn",
+  "nav.faq": "Câu hỏi thường gặp",
+  "locale.switcherLabel": "Ngôn ngữ",
+  "locale.bannerSuggest": "Trang này cũng có bản tiếng Việt. Đổi ngôn ngữ?",
+  "locale.bannerAccept": "Dùng tiếng Việt",
+  "locale.bannerDismiss": "Giữ tiếng Anh",
+  "locale.questionsInEnglish": "Câu hỏi luyện tập vẫn bằng tiếng Anh trên giao diện đã địa phương hóa này.",
+  "home.eyebrow": "Chế độ luyện tập",
+  "home.title": "Chuẩn bị cho chứng chỉ Claude",
+  "home.subtitle": "Bài thi thử có thời gian, luyện tập và ôn tập — công cụ học độc lập từ CyberSkill.",
+  "home.ctaPractice": "Bắt đầu luyện tập",
+  "home.ctaExams": "Xem kỳ thi",
+  "about.title": "Giới thiệu bài thi thử này",
+  "about.body": "Tài nguyên luyện tập độc lập để chuẩn bị chứng chỉ Claude, do CyberSkill duy trì.",
+  "practice.title": "Luyện tập theo cách của bạn",
+  "practice.subtitle": "Chế độ thư thái giúp bạn học mà không bị đồng hồ thúc ép.",
+  "legal.englishNotice": "Các trang pháp lý cho ngôn ngữ này vẫn bằng tiếng Anh cho đến khi có bản dịch đã được luật sư xem xét.",
+  "disclaimer.independence": "CyberSkill is an independent practice-exam resource and is neither affiliated with, nor authorized, sponsored, or approved by, Anthropic, PBC.",
+  "disclaimer.short": "Independent practice resource — not affiliated with Anthropic, PBC.",
+  "disclaimer.trademark": "Claude and related marks are trademarks of Anthropic, PBC. Used here for nominative identification only.",
+  "format.priceUnavailable": "Chưa có giá"
+}

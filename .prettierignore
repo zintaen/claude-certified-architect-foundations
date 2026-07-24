@@ -15,3 +15,6 @@ build/
 _mkicons.mjs
 _pw*.mjs
 docs/status/
+
+# provenance must stay deterministically ordered (check-provenance.mjs)
+src/data/provenance.ccaf.json

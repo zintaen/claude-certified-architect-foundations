@@ -1,0 +1,27 @@
+{
+  "examCode": "azure-ai-900",
+  "vendor": { "key": "microsoft", "ai_generation_policy": "permitted" },
+  "blueprintDoc": "docs/blueprints/azure-ai-900-blueprint.md",
+  "corpusRef": "corpus-azure-ai-900-v1",
+  "_policy_finding": "docs/legal/vendor-guidelines.md#microsoft-ai-content-policy",
+  "targets": { "totalItems": 8 },
+  "cognitiveMix": { "recall": 0.25, "application": 0.5, "analysis": 0.25 },
+  "model": { "generate": "mock-frontier", "explain": "mock-frontier" },
+  "betaMixRatio": 1,
+  "maxUsd": 25,
+  "maxReviserIterations": 2,
+  "promotion": {
+    "minResponses": 30,
+    "pValueMin": 0.2,
+    "pValueMax": 0.85,
+    "pointBiserialMin": 0.15
+  },
+  "official": {
+    "price_usd": null,
+    "delivery": "Microsoft / Pearson VUE (verify on Learn)",
+    "validity_months": null,
+    "source_url": "https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-900/",
+    "retrieved": "2026-07-24"
+  },
+  "pass_threshold": { "value": 70, "basis": "site_default" }
+}

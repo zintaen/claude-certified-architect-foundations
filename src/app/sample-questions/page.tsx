@@ -1,13 +1,16 @@
+import { MARK_CCAF_NAME } from '@/lib/legal';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, ListChecks, CheckCircle2, Circle } from 'lucide-react';
 import { DOMAIN_ORDER, DOMAINS } from '@/lib/domains';
 
-const SITE_URL = 'https://ccaf.cyberskill.world';
+import { SITE_URL } from '@/lib/site';
 
 export const metadata = {
   title: 'Claude Certified Architect sample questions | Free examples with answers',
   description:
-    'Four free sample questions with answers and explanations for the Claude Certified Architect - Foundations exam, across research pipelines, extraction pipelines, customer support agents, and code exploration. Unofficial, by CyberSkill.',
+    'Four free sample questions with answers and explanations for the ' +
+    MARK_CCAF_NAME +
+    ' exam, across research pipelines, extraction pipelines, customer support agents, and code exploration. Unofficial, by CyberSkill.',
   alternates: { canonical: '/sample-questions' },
 };
 
@@ -158,7 +161,7 @@ const articleLd = {
   '@type': 'Article',
   headline: 'Claude Certified Architect sample questions with answers and explanations',
   description:
-    'Four free sample questions with answers and explanations for the Claude Certified Architect - Foundations exam, across research pipelines, extraction pipelines, customer support agents, and code exploration.',
+    'Four free sample questions with answers and explanations for the {MARK_CCAF_NAME} exam, across research pipelines, extraction pipelines, customer support agents, and code exploration.',
   author: { '@type': 'Organization', name: 'CyberSkill' },
   publisher: {
     '@type': 'Organization',
@@ -214,7 +217,7 @@ export default function SampleQuestionsPage() {
           free mock has 60 scenario questions split across four domains, with 720 out of 1,000 to
           pass. The four below are original samples written by CyberSkill, separate from the
           mock&apos;s question bank, so their answers are shown here. This is an unofficial study
-          aid and is not affiliated with or endorsed by Anthropic.
+          aid and is not affiliated with or affiliated with Anthropic.
         </p>
       </header>
 

@@ -10,6 +10,10 @@ import { Skeleton, SkeletonRow } from '@/components/Skeleton';
 import { PASS_SCORE } from '@/lib/domains';
 import { useExamStore } from '@/store/examStore';
 import { listServerResults, type ServerResultMeta } from '@/lib/serverResults';
+import { ReferralShareCard } from '@/components/ReferralShareCard';
+import { CommunityContributionCard } from '@/components/CommunityContributionCard';
+import { ReadinessPanel } from '@/components/ReadinessPanel';
+import { ReviewDueBadge } from '@/components/ReviewDueBadge';
 
 // Render a stored ISO timestamp, or a dash when it is missing or unparseable.
 function fmtDateTime(s: string): string {
@@ -123,6 +127,16 @@ export default function DashboardPage() {
           Review your past performance and track your growth.
         </p>
       </div>
+
+      <ReferralShareCard />
+      <CommunityContributionCard />
+      <ReadinessPanel examCode="ccaf" />
+      <ReviewDueBadge />
+      <p className="text-sm">
+        <Link href="/plan" className="underline underline-offset-2">
+          Study plan
+        </Link>
+      </p>
 
       {loading ? (
         <div className="grid md:grid-cols-2 gap-12">

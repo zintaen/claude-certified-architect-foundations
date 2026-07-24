@@ -1,0 +1,24 @@
+{
+  "artefact": "batch-selection@1",
+  "eligible": ["task-DATA-001", "task-LEGAL-001", "task-LEGAL-002", "task-SEC-001"],
+  "batch": ["task-DATA-001"],
+  "swarm_required": false,
+  "excluded": [
+    {
+      "id": "task-LEGAL-001",
+      "blocked_by": "task-DATA-001",
+      "conflict": "."
+    },
+    {
+      "id": "task-LEGAL-002",
+      "blocked_by": "task-DATA-001",
+      "conflict": "."
+    },
+    {
+      "id": "task-SEC-001",
+      "blocked_by": "task-DATA-001",
+      "conflict": "src/lib/rateLimit.ts"
+    }
+  ],
+  "note": "All eligible share service=. ; maximal parallel batch size is 1. CONTENT-002 still blocked on DATA-001."
+}

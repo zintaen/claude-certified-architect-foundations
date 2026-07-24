@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useExamEngine } from '@/hooks/useExamEngine';
 import { questions } from '@/data/questions';
 import { DOMAINS, DOMAIN_ORDER } from '@/lib/domains';
 import ResumeBanner from '@/components/ResumeBanner';
 import { confirmDiscardIfInProgress } from '@/lib/session';
+import { track } from '@/lib/analytics';
 import {
   ArrowLeft,
   Timer,
@@ -17,7 +19,9 @@ import {
   MessageSquare,
   Code2,
   ArrowRight,
+  Sparkles,
 } from 'lucide-react';
+import { CustomExamBuilder } from '@/components/CustomExamBuilder';
 
 const DOMAIN_ICON = {
   research_pipeline: Workflow,
@@ -29,6 +33,10 @@ const DOMAIN_ICON = {
 export default function PracticePage() {
   const router = useRouter();
   const engine = useExamEngine();
+  const [adaptiveMsg, setAdaptiveMsg] = useState<string | null>(null);
+  const [adaptiveLocked, setAdaptiveLocked] = useState(false);
+  const [adaptiveFocus, setAdaptiveFocus] = useState<string | null>(null);
+  const [drillLen, setDrillLen] = useState(15);
 
   const startUntimed = () => {
     if (!confirmDiscardIfInProgress()) return;
@@ -46,6 +54,46 @@ export default function PracticePage() {
     if (!confirmDiscardIfInProgress()) return;
     engine.buildSession(questions, 60, true, { flashcard: true });
     router.push('/flashcards');
+  };
+
+  const startAdaptiveDrill = async () => {
+    if (!confirmDiscardIfInProgress()) return;
+    try {
+      const email = localStorage.getItem('ccaf-email');
+      const pinHash = localStorage.getItem('ccaf-pinHash');
+      if (!email || !pinHash) {
+        setAdaptiveMsg('Save email + PIN first so we can use your practice history.');
+        return;
+      }
+      const res = await fetch('/api/drill/plan', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ exam: 'ccaf', length: drillLen, email, pinHash }),
+      });
+      if (res.status === 403) {
+        setAdaptiveLocked(true);
+        return;
+      }
+      if (!res.ok) {
+        setAdaptiveMsg('Could not build a drill plan.');
+        return;
+      }
+      const plan = (await res.json()) as {
+        itemIds: string[];
+        focusedOn: string;
+        targetDomains: { domainKey: string }[];
+      };
+      setAdaptiveFocus(plan.focusedOn);
+      track('drill_started', {
+        exam_code: 'ccaf',
+        length: plan.itemIds.length,
+        domains: plan.targetDomains.map((d) => d.domainKey).join(','),
+      });
+      engine.buildSession(questions, plan.itemIds.length, true, { itemIds: plan.itemIds });
+      router.push('/exam');
+    } catch {
+      setAdaptiveMsg('Could not start adaptive drill.');
+    }
   };
 
   return (
@@ -70,7 +118,57 @@ export default function PracticePage() {
           </p>
         </div>
 
-        {/* Untimed full mock */}
+        <div
+          className="surface-panel rounded-2xl p-6 flex flex-col gap-4"
+          data-testid="adaptive-drill"
+        >
+          <div className="flex items-start gap-4">
+            <div className="w-11 h-11 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-lg font-semibold">Drill my weak areas</h2>
+              <p className="text-sm text-muted mt-1 max-w-md">
+                Adaptive practice weighted toward domains where your practice performance is
+                weakest. Untimed; updates mastery through answers. Premium when entitlements are
+                enforced.
+              </p>
+              {adaptiveFocus && (
+                <p className="text-xs text-foreground/60 mt-2">Focused on: {adaptiveFocus}</p>
+              )}
+              {adaptiveLocked && (
+                <p className="text-sm text-foreground/70 mt-2" data-testid="adaptive-drill-locked">
+                  Adaptive drilling unlocks with premium. Single-domain drills below stay available.
+                </p>
+              )}
+              {adaptiveMsg && <p className="text-sm text-foreground/60 mt-2">{adaptiveMsg}</p>}
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="text-sm text-foreground/60">
+              Length{' '}
+              <select
+                className="ml-1 rounded border border-border bg-background px-2 py-1"
+                value={drillLen}
+                onChange={(e) => setDrillLen(Number(e.target.value))}
+              >
+                <option value={10}>10</option>
+                <option value={15}>15</option>
+                <option value={20}>20</option>
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={() => void startAdaptiveDrill()}
+              className="bg-primary text-primary-foreground px-5 py-2.5 rounded-md font-semibold inline-flex items-center gap-2 hover:brightness-110 transition-all"
+            >
+              Start adaptive drill <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        <CustomExamBuilder />
+
         <div className="surface-panel rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 justify-between">
           <div className="flex items-start gap-4">
             <div className="w-11 h-11 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
@@ -92,7 +190,6 @@ export default function PracticePage() {
           </button>
         </div>
 
-        {/* Targeted drill by domain */}
         <div className="surface-panel rounded-2xl p-6 flex flex-col gap-5">
           <div className="flex items-start gap-4">
             <div className="w-11 h-11 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
@@ -127,7 +224,6 @@ export default function PracticePage() {
           </div>
         </div>
 
-        {/* Flashcards */}
         <div className="surface-panel rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 justify-between">
           <div className="flex items-start gap-4">
             <div className="w-11 h-11 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">

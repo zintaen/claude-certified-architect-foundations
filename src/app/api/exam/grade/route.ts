@@ -5,7 +5,12 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { trace, metrics } from '@opentelemetry/api';
 import { withSpan } from '@superlog/otel-helpers';
 import { answerKey } from '@/data/questions.server';
+import { isCanary } from '@/data/canary.server';
 import { computeDomainScores, PASS_SCORE, SCORE_MAX, type ScoredItem } from '@/lib/domains';
+import { enforcementOn, resolveAccess } from '@/lib/entitlements';
+import { onActivation } from '@/lib/referrals';
+import { clientIpFromHeaders } from '@/lib/rateLimit';
+import { upsertMissCard } from '@/lib/review';
 
 const tracer = trace.getTracer('ccaf.exam');
 const meter = metrics.getMeter('ccaf.exam');
@@ -68,13 +73,15 @@ export async function POST(request: Request) {
             ? Math.min(MAX_TIME_SEC, Math.max(0, Math.round(body.timeTaken)))
             : 0;
 
-        // Grade against the server-only answer key.
+        // Grade against the server-only answer key. Canaries (SEC-001) never count.
         let correct = 0;
         let skipped = 0;
         const wrongPositions: number[] = [];
         const scored: ScoredItem[] = [];
 
-        answers.forEach((a, i) => {
+        const gradable = answers.filter((a) => !isCanary(a.id) && answerKey[a.id]);
+
+        gradable.forEach((a, i) => {
           const q = answerKey[a.id];
           const correctLetter = q.options.find((o) => o.correct)?.letter ?? null;
           const isCorrect = a.letter !== null && a.letter === correctLetter;
@@ -88,7 +95,7 @@ export async function POST(request: Request) {
           });
         });
 
-        const total = answers.length;
+        const total = Math.max(1, gradable.length);
         const incorrect = total - correct - skipped;
         const score = Math.round((correct / total) * SCORE_MAX);
         const passed = score >= PASS_SCORE;
@@ -107,9 +114,29 @@ export async function POST(request: Request) {
           reviewLockReason = 'The timer ran out before you could submit.';
         }
 
+        // PAY-001: per-option explanations are premium when ENTITLEMENTS_ENFORCED=on.
+        // Free tier still receives correctness + answer key when review is earned.
+        let includeExplanations = !enforcementOn();
+        if (enforcementOn() && supabaseAdmin) {
+          const e = cleanStr(body?.email, 254)?.toLowerCase();
+          const p = cleanStr(body?.pinHash, 128);
+          let userId: string | null = null;
+          if (e && p) {
+            const { data: user } = await (supabaseAdmin as unknown as SupabaseClient)
+              .from('users')
+              .select('id')
+              .eq('email', e)
+              .eq('pin_hash', p)
+              .maybeSingle();
+            userId = (user?.id as string | undefined) ?? null;
+          }
+          const access = await resolveAccess(userId, 'ccaf');
+          includeExplanations = access.tier === 'premium';
+        }
+
         // Only ship the key when review is earned; otherwise withhold it entirely.
         const items = reviewEnabled
-          ? answers.map((a) => {
+          ? gradable.map((a) => {
               const q = answerKey[a.id];
               return {
                 id: q.id,
@@ -120,7 +147,7 @@ export async function POST(request: Request) {
                   letter: o.letter,
                   text: o.text,
                   correct: o.correct,
-                  explain: o.explain,
+                  ...(includeExplanations ? { explain: o.explain } : {}),
                 })),
               };
             })
@@ -190,6 +217,42 @@ export async function POST(request: Request) {
               { onConflict: 'email,session_id' }
             );
             if (rErr) span.setAttribute('result.saved', false);
+            else {
+              // GROWTH-003: first graded mock may qualify a referral (best-effort).
+              try {
+                const { data: user } = await db
+                  .from('users')
+                  .select('id')
+                  .eq('email', rEmail)
+                  .eq('pin_hash', rPin)
+                  .maybeSingle();
+                if (user?.id) {
+                  await onActivation(user.id as string, {
+                    velocityKey: clientIpFromHeaders(request.headers),
+                  });
+                  // LEARN-003: accrue review cards for misses (free users too).
+                  try {
+                    for (const a of answers) {
+                      if (isCanary(a.id)) continue;
+                      const q = answerKey[a.id];
+                      const correctLetter = q?.options.find((o) => o.correct)?.letter ?? null;
+                      const ok = a.letter !== null && a.letter === correctLetter;
+                      if (!ok) {
+                        await upsertMissCard({
+                          userId: user.id as string,
+                          itemId: a.id,
+                          examCode: 'ccaf',
+                        });
+                      }
+                    }
+                  } catch {
+                    /* never block grade */
+                  }
+                }
+              } catch {
+                /* never block grade */
+              }
+            }
           } catch (e) {
             span.recordException(e as Error);
           }
@@ -199,6 +262,72 @@ export async function POST(request: Request) {
         span.setAttribute('exam.total', total);
         span.setAttribute('outcome', 'success');
         gradeCounter.add(1, { outcome: 'success' });
+
+        // Optional DB-backed sitting/response capture (DATA-001). Default off until DATA-002.
+        // shadow|on: best-effort writes; never changes the HTTP response contract.
+        const dbGradePath = (process.env.DB_GRADE_PATH || 'off').toLowerCase();
+        if (
+          supabaseAdmin &&
+          (dbGradePath === 'shadow' || dbGradePath === 'on') &&
+          answers.length > 0
+        ) {
+          try {
+            const db = supabaseAdmin as unknown as SupabaseClient;
+            const { data: examRow } = await db
+              .from('exams')
+              .select('id')
+              .eq('code', 'ccaf')
+              .maybeSingle();
+            if (examRow?.id) {
+              const extKeys = answers.map((a) => a.id);
+              const { data: dbItems } = await db
+                .from('items')
+                .select('id, external_key, version, correct_key')
+                .eq('exam_id', examRow.id)
+                .in('external_key', extKeys);
+              const byExt = new Map((dbItems ?? []).map((i) => [i.external_key, i]));
+              const question_set = answers
+                .map((a) => {
+                  const it = byExt.get(a.id);
+                  return it ? { item_id: it.id, item_version: it.version } : null;
+                })
+                .filter(Boolean);
+              if (question_set.length === answers.length) {
+                const { data: sitting } = await db
+                  .from('sittings')
+                  .insert({
+                    exam_id: examRow.id,
+                    mode: untimed ? 'practice' : 'exam',
+                    question_set,
+                    submitted_at: new Date().toISOString(),
+                    score_pct: Math.round((correct / total) * 10000) / 100,
+                    passed,
+                    breakdown: { source: 'grade_route', dbGradePath },
+                  })
+                  .select('id')
+                  .single();
+                if (sitting?.id) {
+                  const rows = answers.map((a) => {
+                    const it = byExt.get(a.id)!;
+                    return {
+                      sitting_id: sitting.id,
+                      item_id: it.id,
+                      item_version: it.version,
+                      selected_key: a.letter,
+                      is_correct: a.letter !== null && a.letter === it.correct_key,
+                      elapsed_ms: null,
+                    };
+                  });
+                  await db.from('item_responses').insert(rows);
+                  span.setAttribute('db_grade.written', true);
+                }
+              }
+            }
+          } catch (e) {
+            span.recordException(e as Error);
+            span.setAttribute('db_grade.written', false);
+          }
+        }
 
         return NextResponse.json({ ...graded, saved });
       } catch (err) {

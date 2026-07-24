@@ -1,9 +1,10 @@
+import { MARK_CCAF_NAME } from '@/lib/legal';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Layers } from 'lucide-react';
 import { DOMAIN_ORDER, DOMAINS, isGroupId, type GroupId } from '@/lib/domains';
 
-const SITE_URL = 'https://ccaf.cyberskill.world';
+import { SITE_URL } from '@/lib/site';
 
 type DomainContent = {
   covers: string;
@@ -51,7 +52,7 @@ export async function generateMetadata({ params }: { params: Promise<{ domain: s
   const d = DOMAINS[domain];
   return {
     title: `${d.label} - CCA-F practice domain | CyberSkill`,
-    description: `${d.blurb} What this Claude Certified Architect - Foundations domain covers, why it matters for an agent architect, and how to drill its 15 questions. Free and unofficial, by CyberSkill.`,
+    description: `${d.blurb} What this ${MARK_CCAF_NAME} domain covers, why it matters for an agent architect, and how to drill its 15 questions. Free and unofficial, by CyberSkill.`,
     alternates: { canonical: `/domains/${domain}` },
   };
 }
@@ -101,7 +102,7 @@ export default async function DomainPage({ params }: { params: Promise<{ domain:
         <p className="text-foreground/70 leading-relaxed">{d.blurb}</p>
         <p className="text-sm text-muted">
           15 questions in the full mock. Strong-domain archetype: {d.archetype}. This is an
-          unofficial study aid by CyberSkill, not affiliated with or endorsed by Anthropic.
+          unofficial study aid by CyberSkill, not affiliated with or affiliated with Anthropic.
         </p>
       </header>
 

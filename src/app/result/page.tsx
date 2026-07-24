@@ -9,6 +9,9 @@ import DOMPurify from 'isomorphic-dompurify';
 import DonateButton from '@/components/DonateButton';
 import DomainBreakdown from '@/components/DomainBreakdown';
 import Certificate from '@/components/Certificate';
+import PostResultCapture from '@/components/PostResultCapture';
+import { TutorPanel } from '@/components/TutorPanel';
+import { CommunityExplanations } from '@/components/CommunityExplanations';
 import { archetypeFor } from '@/lib/domains';
 import { track } from '@/lib/track';
 import { getServerResult } from '@/lib/serverResults';
@@ -33,6 +36,21 @@ export default function ResultPage() {
     null
   );
   const [remoteChecked, setRemoteChecked] = useState(false);
+  const [tutorIdentity, setTutorIdentity] = useState<{
+    email: string | null;
+    pinHash: string | null;
+  }>({ email: null, pinHash: null });
+
+  useEffect(() => {
+    try {
+      setTutorIdentity({
+        email: localStorage.getItem('ccaf-email'),
+        pinHash: localStorage.getItem('ccaf-pinHash'),
+      });
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   // zustand persist may finish rehydrating from localStorage AFTER this component mounts. Decide
   // whether to redirect only once hydration is done - otherwise a cold load of /result (refresh,
@@ -87,6 +105,12 @@ export default function ResultPage() {
   useEffect(() => {
     setNickname(localStorage.getItem('ccaf-nickname') || undefined);
   }, []);
+
+  // Funnel: result viewed (once per mount when we have a live/history result).
+  useEffect(() => {
+    if (!hydrated || !viewChecked || !result) return;
+    track('result_viewed', { passed: result.passed });
+  }, [hydrated, viewChecked, result]);
 
   if (!hydrated || !viewChecked) return null;
 
@@ -289,8 +313,10 @@ export default function ResultPage() {
             This mock is free and built by CyberSkill. A coffee keeps it running.
           </p>
         </div>
-        <DonateButton variant="solid" className="shrink-0" />
+        <DonateButton variant="solid" className="shrink-0" placement="result" />
       </div>
+
+      <PostResultCapture />
 
       {/* Work-with-CyberSkill prompt - the highest-intent moment to introduce the studio. */}
       <div className="rounded-2xl border border-primary/30 bg-[var(--overlay-subtle)] p-5 sm:p-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 justify-between min-w-0">
@@ -323,6 +349,17 @@ export default function ResultPage() {
 
       {/* Per-domain performance */}
       <DomainBreakdown scores={domainScores} />
+
+      {result.reviewEnabled && result.items[0] && (
+        <TutorPanel
+          surface="result"
+          sittingId={sessionIdShown}
+          itemId={result.items[0].id}
+          examInProgress={false}
+          email={tutorIdentity.email}
+          pinHash={tutorIdentity.pinHash}
+        />
+      )}
 
       {/* Question Review Section */}
       <div className="flex flex-col gap-6 mt-8">
@@ -410,6 +447,8 @@ export default function ResultPage() {
                       );
                     })}
                   </div>
+
+                  <CommunityExplanations itemId={it.id} />
                 </div>
               );
             })}

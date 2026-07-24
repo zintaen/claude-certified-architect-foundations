@@ -1,8 +1,9 @@
 'use client';
+import { MARK_CCAF_NAME } from '@/lib/legal';
 
 import { Download, Share2 } from 'lucide-react';
 
-const SITE_URL = 'https://ccaf.cyberskill.world';
+import { SITE_URL } from '@/lib/site';
 
 // Brand colors are literals here on purpose: a <canvas> 2D context cannot read CSS
 // custom properties, and the PNG must render the same regardless of the page theme.
@@ -55,7 +56,7 @@ export default function Certificate({
     // Title
     ctx.fillStyle = UMBER;
     ctx.font = 'bold 52px Georgia, serif';
-    ctx.fillText('Claude Certified Architect - Foundations', 600, 180);
+    ctx.fillText(MARK_CCAF_NAME, 600, 180);
 
     // Subtitle
     ctx.font = '24px Georgia, serif';

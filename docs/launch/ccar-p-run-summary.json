@@ -1,0 +1,136 @@
+{
+  "runId": "run-ccar-p-1784911037421",
+  "stages": {
+    "generate": {
+      "status": "ok",
+      "counts": {
+        "requested": 21,
+        "returned": 21
+      }
+    },
+    "review-auto": {
+      "status": "ok",
+      "counts": {
+        "pass": 21,
+        "rejected_auto": 0
+      }
+    },
+    "similarity": {
+      "status": "ok",
+      "counts": {
+        "clear": 21,
+        "rejected_similarity": 0
+      }
+    },
+    "sme-queue": {
+      "status": "ok",
+      "counts": {
+        "approved": 21,
+        "refused": 0
+      }
+    },
+    "explain": {
+      "status": "ok",
+      "counts": {
+        "explained": 21
+      }
+    },
+    "insert": {
+      "status": "ok",
+      "counts": {
+        "beta_candidates": 21,
+        "note": "DB insert via insertBetaItems when SUPABASE configured"
+      }
+    }
+  },
+  "spend": {
+    "estimatedUsd": 0.735,
+    "actualUsd": 0.84
+  },
+  "itemOutcomes": [
+    {
+      "itemId": "6560ad84-3cc3-4f1e-962d-a0cf4bd3d669",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "3ab3aa34-4b1f-4c5a-8f9d-951ab9104c6e",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "4c21735c-744e-47a1-b895-42891fa4ac55",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "49ffe815-e613-48e7-a59a-7965005f69e0",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "7e1779d0-705a-43bb-b6f5-b31e488a711d",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "637d6d0b-77cd-4ae0-a125-b7caddcdcce1",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "9a058516-3a90-44d8-9007-3bb92fd16e2b",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "95d434de-ab5e-493b-bd07-b508502e0ebc",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "6cd4649e-728c-437a-81e1-4c4e29399fa7",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "1bc13023-bd59-4ec0-b349-81dafe9257be",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "7779f106-f56b-4e25-8fbe-224c295e4526",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "ed65edbe-ac70-4857-beed-7ac6d3284343",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "e6d1111a-367c-431e-b871-46e71b908012",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "9300366d-6355-45de-8200-2218ee75178a",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "d05e91b5-7e05-4521-bad8-3b9edc4fa58c",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "8aa9a457-cc9f-4847-b3f0-a8ca8192b222",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "1938b6f3-0463-474b-b8b5-1bfe935be5d0",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "6f338e51-5677-468a-b344-0094f313b1f8",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "f2b6bb4a-1ed0-4daa-8386-3a23cffeae3e",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "bcc0802e-a64b-421c-a8ab-91fe33b4b4f9",
+      "outcome": "inserted_beta"
+    },
+    {
+      "itemId": "c5bbbd22-dc14-4afc-9f25-e1a9f7fcd3ec",
+      "outcome": "inserted_beta"
+    }
+  ]
+}

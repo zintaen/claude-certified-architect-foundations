@@ -1,4 +1,4 @@
-// Single source of truth for exam domains, the official pass mark, and per-domain
+// Single source of truth for exam domains, the published pass mark, and per-domain
 // scoring. Imported by the result page (breakdown + archetype), the practice picker
 // (drill by domain), and the About page (blueprint). Keep all domain labels here so
 // the UI stays consistent.
@@ -59,12 +59,12 @@ export function isGroupId(g: string): g is GroupId {
   return g in DOMAINS;
 }
 
-// Official CCA-F pass mark, published by Anthropic on a 100-1000 scale.
+// Published CCA-F pass mark (Anthropic), on a 100-1000 scale.
 export const PASS_SCORE = 720;
 export const SCORE_MAX = 1000;
 
-// Official blueprint facts for the About page. Only what is publicly sourced.
-export const OFFICIAL_BLUEPRINT = {
+// Published blueprint facts for the About page. Only what is publicly sourced.
+export const PUBLISHED_BLUEPRINT = {
   passScore: PASS_SCORE,
   scaleMax: SCORE_MAX,
   questionCount: 60,
@@ -130,3 +130,6 @@ export function archetypeFor(scores: DomainScore[]): string {
   if (!top) return 'Claude Architect';
   return DOMAINS[top.id].archetype;
 }
+
+/** @deprecated alias */
+export const OFFICIAL_BLUEPRINT = PUBLISHED_BLUEPRINT;

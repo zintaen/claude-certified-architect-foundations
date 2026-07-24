@@ -17,7 +17,9 @@ import {
 } from 'lucide-react';
 import DOMPurify from 'isomorphic-dompurify';
 import ThemeToggle from '@/components/ThemeToggle';
+import Disclaimer from '@/components/Disclaimer';
 import { isIdentified, saveServerSession, beaconSaveServerSession } from '@/lib/serverSession';
+import { newClientId, queueAnswer } from '@/lib/offline';
 
 export default function ExamPage() {
   const router = useRouter();
@@ -42,6 +44,27 @@ export default function ExamPage() {
       else submittingRef.current = false;
     },
     [finishExam, router]
+  );
+
+  const onSelectAnswer = useCallback(
+    (letter: string) => {
+      const idx = store.idx;
+      const item = store.items[idx];
+      store.answerQuestion(idx, letter);
+      // Offline practice: queue for idempotent sync on reconnect (no answer keys).
+      if (typeof navigator !== 'undefined' && !navigator.onLine && item && store.untimed) {
+        void queueAnswer({
+          clientId: newClientId(),
+          sittingId: store.sessionId || 'local',
+          itemId: item.id,
+          selectedKey: letter,
+          elapsedMs: Math.max(0, Date.now() - (store.startedAt || Date.now())),
+          queuedAt: new Date().toISOString(),
+          examCode: 'ccaf',
+        });
+      }
+    },
+    [store]
   );
 
   useEffect(() => {
@@ -188,6 +211,9 @@ export default function ExamPage() {
     // Viewport-contained shell: min-h-0 lets flex children shrink so the question body scrolls
     // inside the shell instead of expanding the page and leaving stems off-screen after Next.
     <div className="flex-1 flex flex-col md:flex-row min-h-0 h-[calc(100dvh-4.75rem)] max-h-[calc(100dvh-4.75rem)] overflow-hidden w-full">
+      <div className="sr-only">
+        <Disclaimer variant="inline" />
+      </div>
       {/* Sidebar: Navigation Palette — compact strip on mobile, full column on desktop */}
       <aside className="w-full md:w-64 glass-panel border-y-0 border-l-0 overflow-y-auto p-3 sm:p-4 flex flex-col gap-2 sm:gap-4 order-2 md:order-1 max-h-[28vh] md:max-h-none md:h-full shrink-0 min-h-0">
         <div className="flex items-center justify-between pb-2 sm:pb-4 border-b border-border shrink-0">
@@ -316,7 +342,7 @@ export default function ExamPage() {
                           name="q-opt"
                           className="sr-only"
                           checked={isSelected}
-                          onChange={() => store.answerQuestion(store.idx, opt.letter)}
+                          onChange={() => onSelectAnswer(opt.letter)}
                         />
                         <div
                           className={`

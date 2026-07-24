@@ -1,10 +1,13 @@
+import { MARK_CCAF_NAME } from '@/lib/legal';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react';
 
 export const metadata = {
   title: 'FAQ - Claude Certified Architect practice exam | CyberSkill',
   description:
-    'Answers about the free, unofficial Claude Certified Architect - Foundations practice mock: is it the official exam, is it free, how many questions, the pass mark, scoring, retakes, the leaderboard, who built it, and email/PIN privacy.',
+    'Answers about the free, unofficial ' +
+    MARK_CCAF_NAME +
+    ' practice mock: is it the real exam, is it free, how many questions, the pass mark, scoring, retakes, the leaderboard, who built it, and email/PIN privacy.',
   alternates: { canonical: '/faq' },
 };
 
@@ -12,14 +15,14 @@ type QA = { question: string; answer: string };
 
 const FAQS: QA[] = [
   {
-    question: 'Is this the official Claude Certified Architect exam?',
+    question: 'Is this the real Anthropic certification exam?',
     answer:
-      'No. This is an unofficial practice mock built by CyberSkill to help you prepare. It is not affiliated with, endorsed by, or sponsored by Anthropic. The real certification is administered by Anthropic.',
+      'No. This is an unofficial practice mock built by CyberSkill to help you prepare. It is not affiliated with, affiliated with, or sponsored by Anthropic. The real certification is administered by Anthropic.',
   },
   {
     question: 'Is it free?',
     answer:
-      'Yes. The full practice exam, the per-domain breakdown, the study guide, and the flashcards are all free. There is no paywall and no account required to take it.',
+      'Yes — a free practice tier covers the timed mock, domain drills, study guide, and flashcards with no account required. Paid plans unlock the full multi-exam bank and premium features (see Pricing). Donations never buy entitlements.',
   },
   {
     question: 'How many questions are there?',
@@ -90,7 +93,7 @@ export default function FaqPage() {
         </h1>
         <p className="text-foreground/70 leading-relaxed">
           Quick answers about this free, unofficial practice mock for the Claude Certified Architect
-          - Foundations exam. Not affiliated with or endorsed by Anthropic.
+          - Foundations exam. Not affiliated with or affiliated with Anthropic.
         </p>
       </header>
 

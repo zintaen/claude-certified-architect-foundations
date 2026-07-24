@@ -1,3 +1,4 @@
+import { MARK_CCAF_NAME } from '@/lib/legal';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -10,21 +11,22 @@ import {
 } from 'lucide-react';
 import { DOMAIN_ORDER, DOMAINS } from '@/lib/domains';
 
-const SITE_URL = 'https://ccaf.cyberskill.world';
+import { SITE_URL } from '@/lib/site';
 
 export const metadata = {
   title: 'How to pass the Claude Certified Architect Foundations exam | Study guide',
-  description:
-    'A free study guide for the Anthropic Claude Certified Architect - Foundations (CCA-F) exam: format, the four domains, a study plan built around our practice mock, and exam-day tips. Unofficial, by CyberSkill.',
+  description: `A free study guide for the Anthropic ${MARK_CCAF_NAME} (CCA-F) exam: format, the four domains, a study plan built around our practice mock, and exam-day tips. Unofficial, by CyberSkill.`,
   alternates: { canonical: '/guide' },
 };
 
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'How to pass the Claude Certified Architect - Foundations exam',
+  headline: 'How to pass the ' + MARK_CCAF_NAME + ' exam',
   description:
-    'A study guide for the Anthropic Claude Certified Architect - Foundations (CCA-F) exam: format, the four domains, a study plan built around a practice mock, and exam-day tips.',
+    'A study guide for the Anthropic ' +
+    MARK_CCAF_NAME +
+    ' (CCA-F) exam: format, the four domains, a study plan built around a practice mock, and exam-day tips.',
   author: { '@type': 'Organization', name: 'CyberSkill' },
   publisher: {
     '@type': 'Organization',
@@ -70,10 +72,10 @@ export default function GuidePage() {
           How to pass the Claude Certified Architect Foundations exam
         </h1>
         <p className="text-foreground/70 leading-relaxed">
-          This guide explains what the Claude Certified Architect - Foundations (CCA-F) exam asks of
-          you and how to prepare with a focused plan. It is written by CyberSkill and is an
-          unofficial study aid, not affiliated with or endorsed by Anthropic. Everything here is
-          free, including the practice mock it points you to.
+          This guide explains what the {MARK_CCAF_NAME} (CCA-F) exam asks of you and how to prepare
+          with a focused plan. It is written by CyberSkill and is an unofficial study aid, not
+          affiliated with or affiliated with Anthropic. Everything here is free, including the
+          practice mock it points you to.
         </p>
       </header>
 

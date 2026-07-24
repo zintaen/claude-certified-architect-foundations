@@ -14,6 +14,7 @@ import {
   HelpCircle,
   ListChecks,
   LayoutDashboard,
+  Tag,
 } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -28,6 +29,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/', label: 'Practice', icon: BookOpen },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/dashboard', label: 'Your dashboard', icon: LayoutDashboard },
+  { href: '/pricing', label: 'Pricing', icon: Tag },
   { href: '/guide', label: 'Guide', icon: GraduationCap },
   { href: '/sample-questions', label: 'Sample questions', icon: ListChecks },
   { href: '/faq', label: 'FAQ', icon: HelpCircle },

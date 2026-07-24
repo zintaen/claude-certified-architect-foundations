@@ -38,5 +38,11 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
+    env: {
+      ...process.env,
+      // Tight budgets so SEC-001 hammer e2e can trip 429 without 200+ requests.
+      RATE_LIMIT_WRITE_MAX: '20',
+      RATE_LIMIT_READ_MAX: '100',
+    },
   },
 });

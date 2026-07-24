@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { track } from '@/lib/track';
 import {
@@ -28,6 +29,7 @@ import { useExamEngine } from '@/hooks/useExamEngine';
 import { questions } from '@/data/questions';
 import ResumeBanner from '@/components/ResumeBanner';
 import { confirmDiscardIfInProgress } from '@/lib/session';
+import { canStartExamOffline } from '@/lib/offline';
 
 const DOMAINS = [
   {
@@ -83,12 +85,12 @@ const STATS = [
 
 const FAQ = [
   {
-    q: 'Is this the official exam?',
-    a: 'No. This is an unofficial practice mock built by CyberSkill. It is not affiliated with, endorsed by, or sponsored by Anthropic.',
+    q: 'Is this the vendor exam?',
+    a: 'No. This is an unofficial practice mock built by CyberSkill. It is not affiliated with, affiliated with, or sponsored by Anthropic.',
   },
   {
     q: 'Is it free?',
-    a: 'Yes, completely free, and you can take it as a guest with no account.',
+    a: 'A free practice tier is always available — take the timed mock as a guest with no account. Paid plans unlock the full multi-exam bank and premium features; see /pricing.',
   },
   {
     q: 'How is it scored?',
@@ -191,6 +193,11 @@ export default function Home() {
       }).catch(() => {});
     }
     // Always build a fresh timed session so "Begin exam" starts a new sitting, never a replay.
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      const refuse = canStartExamOffline();
+      window.alert(refuse.reason);
+      return;
+    }
     buildSession(questions, 60, false);
     router.push('/exam');
   };
@@ -467,11 +474,15 @@ export default function Home() {
       <section className="w-full max-w-6xl mx-auto px-6 pb-16">
         <div className="surface-raised border border-border rounded-3xl p-8 md:p-10 flex flex-col items-center text-center gap-4">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-            This mock is free, always
+            Free practice, paid unlocks
           </h2>
           <p className="text-muted max-w-xl">
-            No paywall, no account required. If it helped you prepare and you would like to keep it
-            running, a coffee goes a long way.
+            Start without an account on the free practice tier. When you need the full bank or
+            multi-exam access, paid plans are on{' '}
+            <Link href="/pricing" className="text-primary underline">
+              pricing
+            </Link>
+            . Donations never unlock entitlements — they just keep the lights on.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 mt-2">
             <DonateButton variant="solid" />

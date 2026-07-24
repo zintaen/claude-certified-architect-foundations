@@ -1,0 +1,13 @@
+{
+  "locale": "vi",
+  "dry_run": true,
+  "source_hash": "094f64d165abf601",
+  "keys": 25,
+  "legal_sensitive_preserved": [
+    "disclaimer.independence",
+    "disclaimer.trademark",
+    "disclaimer.short"
+  ],
+  "note": "Candidate only. Ship requires named reviewer in _review and matching source_hash.",
+  "wrote_candidate": false
+}

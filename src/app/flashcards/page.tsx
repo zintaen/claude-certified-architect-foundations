@@ -9,6 +9,7 @@ import { questions } from '@/data/questions';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, XCircle, Layers, ArrowRight } from 'lucide-react';
 import DOMPurify from 'isomorphic-dompurify';
+import Disclaimer from '@/components/Disclaimer';
 
 export default function FlashcardsPage() {
   const store = useExamStore();
@@ -127,6 +128,9 @@ export default function FlashcardsPage() {
 
   return (
     <div className="flex-1 max-w-3xl w-full mx-auto p-6 md:p-10 flex flex-col gap-6">
+      <div className="sr-only">
+        <Disclaimer variant="inline" />
+      </div>
       <div className="flex items-center justify-between">
         <Link
           href="/practice"
@@ -252,6 +256,33 @@ export default function FlashcardsPage() {
                   className="inline-flex items-center justify-center gap-2 min-h-11 px-4 py-2.5 rounded-md font-medium border border-border text-foreground/80 hover:border-ring transition-colors"
                 >
                   <XCircle className="w-4 h-4" /> Review again
+                </button>
+                <button
+                  type="button"
+                  data-testid="flashcard-add-review"
+                  onClick={() => {
+                    try {
+                      const email = localStorage.getItem('ccaf-email');
+                      const pinHash = localStorage.getItem('ccaf-pinHash');
+                      const id = store.items[store.idx]?.id;
+                      if (!email || !pinHash || !id) return;
+                      void fetch('/api/review', {
+                        method: 'POST',
+                        headers: { 'content-type': 'application/json' },
+                        body: JSON.stringify({
+                          op: 'enroll_flashcard',
+                          flashcardKey: id,
+                          email,
+                          pinHash,
+                        }),
+                      });
+                    } catch {
+                      /* ignore */
+                    }
+                  }}
+                  className="inline-flex items-center justify-center gap-2 min-h-11 px-4 py-2.5 rounded-md font-medium border border-border text-foreground/80 hover:border-ring transition-colors"
+                >
+                  Add to review
                 </button>
               </div>
             </div>

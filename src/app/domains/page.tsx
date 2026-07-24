@@ -1,13 +1,16 @@
+import { MARK_CCAF_NAME } from '@/lib/legal';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Layers } from 'lucide-react';
 import { DOMAIN_ORDER, DOMAINS } from '@/lib/domains';
 
-const SITE_URL = 'https://ccaf.cyberskill.world';
+import { SITE_URL } from '@/lib/site';
 
 export const metadata = {
   title: 'Exam domains - Claude Certified Architect practice | CyberSkill',
   description:
-    'The four domains covered by our free Claude Certified Architect - Foundations practice mock: research pipelines, extraction pipelines, customer support agents, and code exploration. 15 questions each. Unofficial, by CyberSkill.',
+    'The four domains covered by our free ' +
+    MARK_CCAF_NAME +
+    ' practice mock: research pipelines, extraction pipelines, customer support agents, and code exploration. 15 questions each. Unofficial, by CyberSkill.',
   alternates: { canonical: '/domains' },
 };
 
@@ -47,7 +50,7 @@ export default function DomainsPage() {
           Our practice mock splits 60 questions evenly across four domains, 15 each. Each one is a
           kind of agent system you are expected to reason about as an architect. Open a domain to
           see what it covers and drill it on its own. This is an unofficial study aid by CyberSkill,
-          not affiliated with or endorsed by Anthropic.
+          not affiliated with or affiliated with Anthropic.
         </p>
       </header>
 

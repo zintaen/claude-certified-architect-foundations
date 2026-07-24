@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Be_Vietnam_Pro, JetBrains_Mono } from 'next/font/google';
+import { headers } from 'next/headers';
 import Link from 'next/link';
 import Image from 'next/image';
 import './globals.css';
@@ -9,10 +10,16 @@ import DonateButton from '@/components/DonateButton';
 import MobileNav from '@/components/MobileNav';
 import MotionProvider from '@/components/MotionProvider';
 import Analytics from '@/components/Analytics';
+import AnalyticsProvider from '@/components/AnalyticsProvider';
 import AppFooter from '@/components/AppFooter';
+import CookieConsent from '@/components/CookieConsent';
+import { ReferralCapture } from '@/components/ReferralCapture';
+import LocaleBanner from '@/components/LocaleBanner';
+import OfflineBanner from '@/components/OfflineBanner';
+import PwaRegister from '@/components/PwaRegister';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-
-const SITE_URL = 'https://ccaf.cyberskill.world';
+import { isLocale } from '@/i18n/config';
+import { SITE_URL } from '@/lib/site';
 
 const beVietnamPro = Be_Vietnam_Pro({
   variable: '--font-be-vietnam-pro',
@@ -27,7 +34,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 const SITE_TITLE = 'Claude Certified Architect - Mock Exam | CyberSkill';
 const SITE_DESCRIPTION =
-  'A free, unofficial practice exam for the Anthropic Claude Certified Architect certification. Timed simulation, scored feedback, and answer review - built by CyberSkill.';
+  'Unofficial practice exams for AI certifications, including Anthropic Claude Certified Architect. Free practice tier, timed mocks, scored feedback — plus paid full-bank access when you need more.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -83,19 +90,25 @@ export const viewport: Viewport = {
 // a stored preference (ccaf-theme) wins.
 const themeInit = `(function(){try{var t=localStorage.getItem('ccaf-theme');if(t!=='dark'&&t!=='light'){t='light';}document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();`;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const h = await headers();
+  const raw = h.get('x-locale') || 'en';
+  const lang = isLocale(raw) ? raw : 'en';
+
   return (
-    <html lang="en" data-theme="light" suppressHydrationWarning>
+    <html lang={lang} data-theme="light" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body
         className={`${beVietnamPro.variable} ${jetbrainsMono.variable} antialiased min-h-dvh flex flex-col`}
       >
+        <LocaleBanner />
+        <OfflineBanner />
         <header className="sticky top-0 z-50 shrink-0 border-b border-border bg-background/80 backdrop-blur-md">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-3.5 flex items-center justify-between gap-3 sm:gap-4">
             <Link href="/" className="flex items-center gap-2.5 sm:gap-3 min-w-0">
@@ -141,6 +154,12 @@ export default function RootLayout({
                 Guide
               </Link>
               <Link
+                href="/pricing"
+                className="hidden sm:inline hover:text-primary transition-colors px-2 py-1"
+              >
+                Pricing
+              </Link>
+              <Link
                 href="/about"
                 className="hidden sm:inline hover:text-primary transition-colors px-2 py-1"
               >
@@ -161,8 +180,12 @@ export default function RootLayout({
           <main className="flex-1 flex flex-col min-h-0">{children}</main>
         </MotionProvider>
         <AppFooter />
+        <CookieConsent />
+        <ReferralCapture />
         <BugReporter />
+        <AnalyticsProvider />
         <Analytics />
+        <PwaRegister />
         <SpeedInsights />
       </body>
     </html>

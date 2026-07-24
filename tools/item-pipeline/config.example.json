@@ -1,0 +1,18 @@
+{
+  "examCode": "ccaf",
+  "vendor": { "key": "anthropic", "ai_generation_policy": "permitted" },
+  "blueprintDoc": "docs/blueprints/ccaf-blueprint.md",
+  "corpusRef": "corpus-ccaf-v1",
+  "targets": { "totalItems": 8 },
+  "cognitiveMix": { "recall": 0.25, "application": 0.5, "analysis": 0.25 },
+  "model": { "generate": "mock-frontier", "explain": "mock-frontier" },
+  "betaMixRatio": 1,
+  "maxUsd": 25,
+  "maxReviserIterations": 2,
+  "promotion": {
+    "minResponses": 30,
+    "pValueMin": 0.2,
+    "pValueMax": 0.85,
+    "pointBiserialMin": 0.15
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "examCode": "fixture-prohibited-vendor",
+  "vendor": { "key": "fixture", "ai_generation_policy": "prohibited" },
+  "blueprintDoc": "docs/blueprints/aws-aif-c01-blueprint.md",
+  "corpusRef": "corpus-aws-aif-v1",
+  "targets": { "totalItems": 2 },
+  "cognitiveMix": { "recall": 0.5, "application": 0.5, "analysis": 0 },
+  "model": { "generate": "mock-frontier", "explain": "mock-frontier" },
+  "betaMixRatio": 1,
+  "maxUsd": 5,
+  "maxReviserIterations": 1,
+  "promotion": {
+    "minResponses": 30,
+    "pValueMin": 0.2,
+    "pValueMax": 0.85,
+    "pointBiserialMin": 0.15
+  },
+  "pass_threshold": { "value": 70, "basis": "site_default" }
+}

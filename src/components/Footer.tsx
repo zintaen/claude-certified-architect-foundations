@@ -1,7 +1,12 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail, ExternalLink, Globe } from 'lucide-react';
 import DonateButton from './DonateButton';
+import Disclaimer from '@/components/Disclaimer';
+import LocaleSwitcher from '@/components/LocaleSwitcher';
+import PwaInstallButton from '@/components/PwaInstallButton';
 
 const YEAR = new Date().getFullYear();
 
@@ -25,15 +30,24 @@ export default function Footer() {
             </div>
           </div>
           <p className="text-sm text-muted leading-relaxed max-w-xs">
-            A software solutions consultancy building products and developer tools. This mock exam
-            is one of our free resources for the Claude practitioner community.
+            A software solutions consultancy building products and developer tools. This practice
+            site offers a free tier for the Claude practitioner community, with paid full-bank
+            access when you need more.
           </p>
           <DonateButton variant="soft" label="Support this project" className="self-start mt-1" />
+          <PwaInstallButton />
+          <LocaleSwitcher />
         </div>
 
         {/* Mock exam links */}
         <div className="flex flex-col gap-3">
           <h3 className="text-xs font-bold uppercase tracking-widest text-muted">Mock exam</h3>
+          <Link
+            href="/exams"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
+          >
+            All exams
+          </Link>
           <Link
             href="/"
             className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
@@ -57,6 +71,12 @@ export default function Footer() {
             className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
           >
             Changelog
+          </Link>
+          <Link
+            href="/pricing"
+            className="text-sm text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
+          >
+            Pricing
           </Link>
           <Link
             href="/about"
@@ -123,16 +143,53 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* Legal links */}
+      <div
+        className="max-w-6xl mx-auto px-6 pb-2 flex flex-wrap gap-x-4 gap-y-1 text-sm"
+        data-testid="footer-legal"
+      >
+        <Link
+          href="/pricing"
+          className="text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
+        >
+          Pricing
+        </Link>
+        <Link
+          href="/terms"
+          className="text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
+        >
+          Terms
+        </Link>
+        <Link
+          href="/privacy"
+          className="text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
+        >
+          Privacy
+        </Link>
+        <Link
+          href="/acceptable-use"
+          className="text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
+        >
+          Acceptable use
+        </Link>
+        <Link
+          href="/refunds"
+          className="text-foreground/80 hover:text-primary transition-colors py-2 min-h-11 inline-flex items-center"
+        >
+          Refunds
+        </Link>
+      </div>
+
       {/* Bottom bar */}
       <div className="border-t border-border">
-        <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row gap-3 items-center justify-between text-xs text-muted">
-          <p>
-            &copy; {YEAR} CyberSkill Software Solutions Consultancy and Development JSC. Ho Chi Minh
-            City, Vietnam.
-          </p>
-          <p className="text-center sm:text-right">
-            Unofficial study aid - not affiliated with or endorsed by Anthropic.
-          </p>
+        <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col gap-3 text-xs text-muted">
+          <Disclaimer variant="footer" />
+          <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+            <p>
+              &copy; {YEAR} CyberSkill Software Solutions Consultancy and Development JSC. Ho Chi
+              Minh City, Vietnam.
+            </p>
+          </div>
         </div>
       </div>
     </footer>

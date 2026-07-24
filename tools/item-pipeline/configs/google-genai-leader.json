@@ -1,0 +1,27 @@
+{
+  "examCode": "google-genai-leader",
+  "vendor": { "key": "google", "ai_generation_policy": "permitted" },
+  "blueprintDoc": "docs/blueprints/google-genai-leader-blueprint.md",
+  "corpusRef": "corpus-google-genai-leader-v1",
+  "_policy_finding": "docs/legal/vendor-guidelines.md#google-ai-content-policy",
+  "targets": { "totalItems": 8 },
+  "cognitiveMix": { "recall": 0.25, "application": 0.5, "analysis": 0.25 },
+  "model": { "generate": "mock-frontier", "explain": "mock-frontier" },
+  "betaMixRatio": 1,
+  "maxUsd": 25,
+  "maxReviserIterations": 2,
+  "promotion": {
+    "minResponses": 30,
+    "pValueMin": 0.2,
+    "pValueMax": 0.85,
+    "pointBiserialMin": 0.15
+  },
+  "official": {
+    "price_usd": null,
+    "delivery": "Google Cloud certification (verify on cloud.google.com)",
+    "validity_months": null,
+    "source_url": "https://cloud.google.com/learn/certification/generative-ai-leader",
+    "retrieved": "2026-07-24"
+  },
+  "pass_threshold": { "value": 70, "basis": "site_default" }
+}

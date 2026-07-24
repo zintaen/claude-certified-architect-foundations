@@ -1,4 +1,7 @@
+'use client';
+
 import { Coffee } from 'lucide-react';
+import { track } from '@/lib/track';
 
 const DONATE_URL = 'https://buymeacoffee.com/zintaen';
 
@@ -19,10 +22,12 @@ export default function DonateButton({
   variant = 'solid',
   label = 'Buy me a coffee',
   className = '',
+  placement = 'unknown',
 }: {
   variant?: Variant;
   label?: string;
   className?: string;
+  placement?: string;
 }) {
   return (
     <a
@@ -30,6 +35,7 @@ export default function DonateButton({
       target="_blank"
       rel="noopener noreferrer"
       className={`${STYLES[variant]} ${className}`}
+      onClick={() => track('donate_clicked', { placement })}
     >
       <Coffee className="w-4 h-4" />
       {label}

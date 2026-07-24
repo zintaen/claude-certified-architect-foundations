@@ -1,10 +1,11 @@
+import { MARK_CCAF_NAME } from '@/lib/legal';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, ArrowRight, ListChecks, CheckCircle2, Circle } from 'lucide-react';
 import { DOMAIN_ORDER, DOMAINS, isGroupId } from '@/lib/domains';
 import { SAMPLE_BY_DOMAIN } from '@/data/sampleQuestions';
 
-const SITE_URL = 'https://ccaf.cyberskill.world';
+import { SITE_URL } from '@/lib/site';
 
 export function generateStaticParams() {
   return DOMAIN_ORDER.map((domain) => ({ domain }));
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ domain: s
   const d = DOMAINS[domain];
   return {
     title: `${d.label} sample questions with answers | Claude Certified Architect (CCA-F)`,
-    description: `Five free, original ${d.label.toLowerCase()} sample questions for the Claude Certified Architect - Foundations exam, each with the answer and an explanation for every option. Unofficial practice by CyberSkill.`,
+    description: `Five free, original ${d.label.toLowerCase()} sample questions for the ${MARK_CCAF_NAME} exam, each with the answer and an explanation for every option. Unofficial practice by CyberSkill.`,
     alternates: { canonical: `/sample-questions/${domain}` },
   };
 }
@@ -39,7 +40,7 @@ export default async function DomainSamplePage({
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: `${d.label} sample questions with answers and explanations`,
-    description: `Five original ${d.label.toLowerCase()} sample questions for the Claude Certified Architect - Foundations exam, each with the answer and an explanation.`,
+    description: `Five original ${d.label.toLowerCase()} sample questions for the ${MARK_CCAF_NAME} exam, each with the answer and an explanation.`,
     author: { '@type': 'Organization', name: 'CyberSkill' },
     publisher: {
       '@type': 'Organization',
@@ -97,10 +98,9 @@ export default async function DomainSamplePage({
         </h1>
         <p className="text-foreground/70 leading-relaxed">
           Five original sample questions with answers and explanations for the{' '}
-          {d.label.toLowerCase()} domain of the Claude Certified Architect - Foundations exam. They
-          are written by CyberSkill and kept separate from the mock question bank, so the answers
-          are shown here. This is an unofficial study aid and is not affiliated with or endorsed by
-          Anthropic.
+          {d.label.toLowerCase()} domain of the {MARK_CCAF_NAME} exam. They are written by
+          CyberSkill and kept separate from the mock question bank, so the answers are shown here.
+          This is an unofficial study aid and is not affiliated with or affiliated with Anthropic.
         </p>
       </header>
 

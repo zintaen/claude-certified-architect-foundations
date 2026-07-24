@@ -1,6 +1,7 @@
 // IMPORTANT: import only from server code (API route handlers). Never import
 // this module from a client component, or the answer key ships to the browser.
 
+// SEC-001: canary registry lives in canary.server.ts (server-only). Do not merge answerKey into client bundles.
 // The authoritative answer key, kept out of the client bundle so the timed mock
 // is graded on the server and answers cannot be read from the browser.
 export interface AnswerOption {

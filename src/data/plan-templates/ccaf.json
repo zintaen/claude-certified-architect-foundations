@@ -1,0 +1,23 @@
+{
+  "examCode": "ccaf",
+  "provenance": {
+    "method": "offline_template_authoring",
+    "reviewer": "Stephen Cheng",
+    "reviewed_at": "2026-07-24",
+    "note": "Hand-authored guidance blocks; no live model in request path"
+  },
+  "phases": [
+    { "key": "diagnose", "theme": "Baseline diagnosis", "minWeeks": 1 },
+    { "key": "build", "theme": "Build domain foundations", "minWeeks": 1 },
+    { "key": "drill", "theme": "Drill weak areas", "minWeeks": 1 },
+    { "key": "mock", "theme": "Full mock practice", "minWeeks": 1 },
+    { "key": "taper", "theme": "Taper and light review", "minWeeks": 1 }
+  ],
+  "domainGuidance": {
+    "research_pipeline": "Orchestration, state recovery, and hand-offs — practice multi-agent scenarios.",
+    "extraction_pipeline": "Tool contracts and structured output — drill extraction reliability.",
+    "customer_support": "Escalation judgment and honest failure handling.",
+    "code_exploration": "Scoping agent searches in large codebases."
+  },
+  "hoursPerDeficitUnit": 8
+}

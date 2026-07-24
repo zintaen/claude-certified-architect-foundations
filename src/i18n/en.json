@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "legalSensitiveKeys": ["disclaimer.independence", "disclaimer.trademark", "disclaimer.short"]
+  },
+  "nav.home": "Home",
+  "nav.practice": "Practice",
+  "nav.exams": "All exams",
+  "nav.about": "About",
+  "nav.guide": "Guide",
+  "nav.faq": "FAQ",
+  "locale.switcherLabel": "Language",
+  "locale.bannerSuggest": "This site is also available in Vietnamese. Switch language?",
+  "locale.bannerAccept": "Use Vietnamese",
+  "locale.bannerDismiss": "Keep English",
+  "locale.questionsInEnglish": "Practice questions remain in English on this localized UI.",
+  "home.eyebrow": "Practice modes",
+  "home.title": "Prepare for Claude certifications",
+  "home.subtitle": "Timed mocks, practice drills, and review — independent study tools from CyberSkill.",
+  "home.ctaPractice": "Start practicing",
+  "home.ctaExams": "Browse exams",
+  "about.title": "About this mock exam",
+  "about.body": "An independent practice resource for Claude certification preparation, maintained by CyberSkill.",
+  "practice.title": "Practice your way",
+  "practice.subtitle": "Relaxed modes help you learn without the clock.",
+  "legal.englishNotice": "Legal pages for this locale remain in English until a counsel-reviewed translation is published.",
+  "disclaimer.independence": "CyberSkill is an independent practice-exam resource and is neither affiliated with, nor authorized, sponsored, or approved by, Anthropic, PBC.",
+  "disclaimer.short": "Independent practice resource — not affiliated with Anthropic, PBC.",
+  "disclaimer.trademark": "Claude and related marks are trademarks of Anthropic, PBC. Used here for nominative identification only.",
+  "format.priceUnavailable": "Pricing unavailable"
+}

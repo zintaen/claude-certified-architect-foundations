@@ -1,11 +1,16 @@
 import Link from 'next/link';
 import { ArrowLeft, Info, Clock, ShieldCheck, Trophy, Layers, Sparkles } from 'lucide-react';
 import DonateButton from '@/components/DonateButton';
+import {
+  INDEPENDENCE_DISCLAIMER,
+  TRADEMARK_NOTICE,
+  MARK_CCAF_NAME,
+  MARK_CLAUDE,
+} from '@/lib/legal';
 
 export const metadata = {
-  title: 'About - Claude Certified Architect Mock Exam | CyberSkill',
-  description:
-    'About the unofficial CyberSkill practice exam for Claude Certified Architect - Foundations: format, domains, scoring, privacy, and the team behind it.',
+  title: `About - ${MARK_CCAF_NAME} Mock Exam | CyberSkill`,
+  description: `About the unofficial CyberSkill practice exam for ${MARK_CCAF_NAME}: format, domains, scoring, privacy, and the team behind it.`,
 };
 
 export default function AboutPage() {
@@ -24,8 +29,8 @@ export default function AboutPage() {
           About this mock exam
         </h1>
         <p className="text-muted mt-2">
-          An unofficial, community-built practice exam for Claude Certified Architect - Foundations,
-          made and maintained by CyberSkill.
+          An unofficial, community-built practice exam for {MARK_CCAF_NAME}, made and maintained by
+          CyberSkill.
         </p>
       </div>
 
@@ -50,7 +55,7 @@ export default function AboutPage() {
           (multi-agent orchestration and state recovery), extraction pipelines (tool contracts and
           structured output), customer support agents (graceful degradation and escalation), and
           code exploration (navigating large codebases with agents). Every item is a scenario with a
-          best answer and an explanation for each option. The official exam draws from six scenario
+          best answer and an explanation for each option. The vendor exam draws from six scenario
           types across weighted domains, with agentic architecture and orchestration the largest at
           27 percent; this mock covers four of those scenario types.
         </p>
@@ -85,8 +90,8 @@ export default function AboutPage() {
           CyberSkill (CyberSkill Software Solutions Consultancy and Development JSC) is a software
           consultancy founded in 2020 in Ho Chi Minh City, Vietnam. We design and ship products,
           developer tooling, and AI-driven workflows for teams worldwide. We built this exam as a
-          free resource for people preparing to work seriously with Claude. Our motto is simple:
-          turn your will into real.
+          free resource for people preparing to work seriously with {MARK_CLAUDE}. Our motto is
+          simple: turn your will into real.
         </p>
         <div className="flex flex-wrap items-center gap-4 mt-1">
           <a
@@ -101,21 +106,28 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="glass-panel p-6 rounded-2xl flex flex-col gap-3 border-t-2 border-t-primary/40">
-        <h2 className="text-xl font-bold">Disclaimer</h2>
+      <section className="glass-panel p-6 rounded-2xl flex flex-col gap-3">
+        <h2 className="text-xl font-bold">Practice readiness</h2>
         <p className="text-foreground/80 leading-relaxed">
-          CCAF, Claude, and the Claude Partner Network are Anthropic products and programs. This
-          site is an unofficial, community-made study aid and is not affiliated with, endorsed by,
-          or sponsored by Anthropic. Built by{' '}
-          <a
-            href="https://cyberskill.world"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            CyberSkill
-          </a>{' '}
-          - Turn Your Will Into Real.
+          Identified learners can see a practice readiness band on the dashboard. It summarizes
+          practice performance on this site — guidance for study focus, not a prediction about any
+          live exam.
+        </p>
+        <Link href="/methodology" className="text-primary underline underline-offset-2 self-start">
+          How the readiness score works
+        </Link>
+      </section>
+
+      <section
+        id="trademarks"
+        className="glass-panel p-6 rounded-2xl flex flex-col gap-3 border-t-2 border-t-primary/40"
+      >
+        <h2 className="text-xl font-bold">Trademarks and independence</h2>
+        <p className="text-foreground/80 leading-relaxed">{INDEPENDENCE_DISCLAIMER}</p>
+        <p className="text-foreground/80 leading-relaxed text-sm">{TRADEMARK_NOTICE}</p>
+        <p className="text-foreground/80 leading-relaxed text-sm">
+          Marks appear in plain text only for nominative fair use. Certification badges are licensed
+          to individual credential holders and are not used by this product.
         </p>
       </section>
     </div>

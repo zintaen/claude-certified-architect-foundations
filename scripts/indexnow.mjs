@@ -3,10 +3,14 @@
 // ownership verification. Run after a deploy:  node scripts/indexnow.mjs
 // (Google does not use IndexNow - submit the sitemap in Google Search Console for Google.)
 const KEY = 'f3a9c1e7b25d480a9c6e1b7d4f0a8c52';
-const HOST = 'ccaf.cyberskill.world';
+const HOST = 'practice.cyberskill.world';
 
 const paths = [
   '/',
+  '/pricing',
+  '/terms',
+  '/privacy',
+  '/refunds',
   '/guide',
   '/faq',
   '/domains',

@@ -1,29 +1,122 @@
-// Kill-switch service worker.
-//
-// The previous (V1, Vite + Workbox) build registered a PWA service worker at /sw.js. It keeps
-// intercepting navigations on this origin for returning visitors and serving stale, precached
-// responses - including 404s for routes that only exist in the current app (e.g. /leaderboard,
-// /dashboard). The current Next.js app ships no service worker of its own.
-//
-// This file replaces the old worker at the same path. When an existing client performs its periodic
-// service-worker update check and re-fetches /sw.js, it installs this version, which deletes every
-// cache, unregisters itself, and reloads any open pages so the user lands on the live site. Browsers
-// with no service worker (new visitors, or anyone already cleared) are unaffected: the app never
-// calls navigator.serviceWorker.register, so this script is only ever activated as a replacement for
-// the stale worker. Once all returning clients have healed, this file can be removed.
+/* SCALE-002 service worker — hand-rolled strategy map (see src/sw.ts). */
+/* eslint-disable no-restricted-globals */
+const VERSION = 'ccaf-pwa-v1';
+const CACHE_STATIC = `${VERSION}-static`;
+const CACHE_SHELLS = `${VERSION}-shells`;
 
-self.addEventListener('install', () => {
-  self.skipWaiting();
+const NEVER_PREFIXES = [
+  '/api/exam/grade',
+  '/api/entitlements',
+  '/api/tutor',
+  '/api/webhooks',
+  '/api/offline/sync',
+  '/checkout',
+  '/api/paddle',
+];
+
+function strategyFor(pathname) {
+  for (const p of NEVER_PREFIXES) {
+    if (pathname === p || pathname.startsWith(p + '/')) return 'bypass';
+  }
+  if (pathname.startsWith('/api/')) return 'network-first';
+  if (
+    pathname.startsWith('/_next/static/') ||
+    /\.(?:js|css|png|jpg|jpeg|gif|webp|svg|ico|woff2?)$/i.test(pathname)
+  ) {
+    return 'cache-first';
+  }
+  if (pathname === '/' || !pathname.includes('.')) return 'stale-while-revalidate';
+  return 'network-first';
+}
+
+self.addEventListener('install', (event) => {
+  // Idle-deferred precache: do not block install with a large precache list.
+  event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
-      await Promise.all(keys.map((key) => caches.delete(key)));
-      await self.registration.unregister();
-      const clients = await self.clients.matchAll({ type: 'window' });
-      clients.forEach((client) => client.navigate(client.url));
+      await Promise.all(
+        keys
+          .filter((k) => k.startsWith('ccaf-pwa-') && !k.startsWith(VERSION))
+          .map((k) => caches.delete(k))
+      );
+      await self.clients.claim();
     })()
   );
+});
+
+self.addEventListener('message', (event) => {
+  const data = event.data || {};
+  if (data.type === 'PURGE_AND_UNREGISTER') {
+    event.waitUntil(
+      (async () => {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+        await self.registration.unregister();
+      })()
+    );
+  }
+});
+
+async function cacheFirst(request) {
+  const cache = await caches.open(CACHE_STATIC);
+  const hit = await cache.match(request);
+  if (hit) return hit;
+  const res = await fetch(request);
+  if (res.ok) cache.put(request, res.clone());
+  return res;
+}
+
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_SHELLS);
+  const hit = await cache.match(request);
+  const network = fetch(request)
+    .then((res) => {
+      if (res.ok) cache.put(request, res.clone());
+      return res;
+    })
+    .catch(() => hit);
+  return hit || network;
+}
+
+async function networkFirst(request) {
+  try {
+    return await fetch(request);
+  } catch {
+    const cache = await caches.open(CACHE_SHELLS);
+    const hit = await cache.match(request);
+    if (hit) return hit;
+    throw new Error('offline');
+  }
+}
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+
+  let url;
+  try {
+    url = new URL(req.url);
+  } catch {
+    return;
+  }
+  if (url.origin !== self.location.origin) return;
+
+  const strategy = strategyFor(url.pathname);
+  if (strategy === 'bypass') return; // network only, never touch Cache Storage
+
+  if (strategy === 'cache-first') {
+    event.respondWith(cacheFirst(req));
+    return;
+  }
+  if (strategy === 'stale-while-revalidate') {
+    event.respondWith(staleWhileRevalidate(req));
+    return;
+  }
+  if (strategy === 'network-first') {
+    event.respondWith(networkFirst(req));
+  }
 });

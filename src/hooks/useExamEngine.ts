@@ -9,6 +9,8 @@ import { useCallback } from 'react';
 interface BuildOptions {
   group?: GroupId; // restrict the pool to a single domain (targeted drill)
   flashcard?: boolean; // flashcard review: always untimed, never submitted to the leaderboard
+  /** LEARN-002: exact item order from adaptive plan */
+  itemIds?: string[];
 }
 
 export function useExamEngine() {
@@ -22,9 +24,16 @@ export function useExamEngine() {
       const relaxed = untimed || flashcard; // no timer for practice or flashcards
 
       // Optionally narrow to a single domain, then shuffle the questions and take `count`.
-      const source = opts?.group ? qs.filter((q) => q.group === opts.group) : qs;
-      const shuffledQs = [...source].sort(() => Math.random() - 0.5);
-      const pool = shuffledQs.slice(0, Math.max(1, count));
+      // LEARN-002: exact adaptive plan order when itemIds provided.
+      let pool: PublicQuestion[];
+      if (opts?.itemIds?.length) {
+        const byId = new Map(qs.map((q) => [q.id, q]));
+        pool = opts.itemIds.map((id) => byId.get(id)).filter(Boolean) as PublicQuestion[];
+      } else {
+        const source = opts?.group ? qs.filter((q) => q.group === opts.group) : qs;
+        const shuffledQs = [...source].sort(() => Math.random() - 0.5);
+        pool = shuffledQs.slice(0, Math.max(1, count));
+      }
 
       // Keep each question's options in their authored order. The letter is glued to its text, so
       // preserving order keeps the letter shown in the exam identical to the one shown in review
@@ -110,6 +119,33 @@ export function useExamEngine() {
         passed: data.passed,
         mode: s.untimed ? 'practice' : 'timed',
       });
+      // GROWTH-003: client mirror for qualification analytics (server already ran onActivation).
+      try {
+        const email = localStorage.getItem('ccaf-email');
+        const pinHash = localStorage.getItem('ccaf-pinHash');
+        if (email && pinHash) {
+          void fetch('/api/referrals', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ op: 'activate', email, pinHash }),
+          })
+            .then(async (r) => {
+              if (!r.ok) return;
+              const j = (await r.json()) as { codeHash?: string; status?: string };
+              if (
+                j.codeHash &&
+                j.status &&
+                j.status !== 'no_referral' &&
+                j.status !== 'already_qualified'
+              ) {
+                track('referral_qualified', { code_hash: j.codeHash });
+              }
+            })
+            .catch(() => undefined);
+        }
+      } catch {
+        /* ignore */
+      }
       store.endExam({
         timedOut,
         focusLoss: store.focusLoss,
