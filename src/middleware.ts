@@ -3,17 +3,17 @@ import type { NextRequest } from 'next/server';
 import { metrics } from '@opentelemetry/api';
 import { isRoutedLocale } from '@/i18n/config';
 import { classify, clientIpFromHeaders, hitRateLimit } from '@/lib/rateLimit';
-import { LEGACY_SITE_HOST, SITE_HOST } from '@/lib/site';
+import { hostCutoverRedirectEnabled, LIVE_SITE_HOST, PRACTICE_SITE_HOST } from '@/lib/site';
 
 const meter = metrics.getMeter('ccaf.sec');
 const rateLimited = meter.createCounter('sec.rate_limited');
 
 export async function middleware(request: NextRequest) {
   const host = request.headers.get('host')?.split(':')[0]?.toLowerCase() ?? '';
-  // Belt-and-suspenders: prefer Vercel domain redirect; this covers same-project dual host.
-  if (host === LEGACY_SITE_HOST) {
+  // LAUNCH only: HOST_CUTOVER_REDIRECT=on. Default off so production users stay on ccaf.
+  if (hostCutoverRedirectEnabled() && host === LIVE_SITE_HOST) {
     const url = request.nextUrl.clone();
-    url.hostname = SITE_HOST;
+    url.hostname = PRACTICE_SITE_HOST;
     url.protocol = 'https:';
     url.port = '';
     return NextResponse.redirect(url, 301);

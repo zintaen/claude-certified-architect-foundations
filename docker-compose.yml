@@ -1,0 +1,23 @@
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      HOST_CUTOVER_REDIRECT: 'off'
+      ENTITLEMENTS_ENFORCED: 'off'
+      # Optional: point at local Supabase from `npx supabase start` (host network).
+      # NEXT_PUBLIC_SUPABASE_URL: http://host.docker.internal:54321
+      # NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+      # SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
+    env_file:
+      - path: .env.local
+        required: false
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./tests:/app/tests
+    # On Linux, host.docker.internal needs this; harmless on Docker Desktop Mac.
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'

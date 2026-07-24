@@ -30,7 +30,7 @@ if (!url || !key) {
 const db = createClient(url, key, { auth: { persistSession: false } });
 const dailyCap = Number(process.env.EMAIL_DAILY_CAP || 200);
 const perWeek = Number(process.env.EMAIL_PER_RECIPIENT_PER_WEEK || 2);
-const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://practice.cyberskill.world';
+const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://ccaf.cyberskill.world';
 
 function hashRecipient(email) {
   return createHash('sha256').update(email.trim().toLowerCase()).digest('hex').slice(0, 32);

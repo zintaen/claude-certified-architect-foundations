@@ -1,6 +1,7 @@
 /**
  * Frozen public URL contract (SEO-001). Single source shared with sitemap.ts.
- * Freeze date: 2026-07-24. Host: practice.cyberskill.world (legacy ccaf.* 301s here).
+ * Freeze date: 2026-07-24. Live host until LAUNCH: ccaf.cyberskill.world
+ * (practice cutover gated by HOST_CUTOVER_REDIRECT — see docs/ops/practice-host-cutover.md).
  */
 import { DOMAIN_ORDER } from '@/lib/domains';
 import { catalogExamCodes } from '@/lib/examRegistry';

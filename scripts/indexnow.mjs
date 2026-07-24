@@ -3,7 +3,9 @@
 // ownership verification. Run after a deploy:  node scripts/indexnow.mjs
 // (Google does not use IndexNow - submit the sitemap in Google Search Console for Google.)
 const KEY = 'f3a9c1e7b25d480a9c6e1b7d4f0a8c52';
-const HOST = 'practice.cyberskill.world';
+const HOST = (process.env.NEXT_PUBLIC_SITE_URL || 'https://ccaf.cyberskill.world')
+  .replace(/^https?:\/\//, '')
+  .replace(/\/$/, '');
 
 const paths = [
   '/',

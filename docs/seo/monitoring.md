@@ -36,4 +36,4 @@ Until filled, **do not** flip production read surfaces (`SERVE_FROM_DB` / `DASHB
 
 ## Host note
 
-Host cutover to `practice.cyberskill.world` is documented in `docs/ops/practice-host-cutover.md`. Legacy `ccaf.cyberskill.world` should 301 to practice; apex `cyberskill.world` stays the agency site.
+Host cutover to `practice.cyberskill.world` is documented in `docs/ops/practice-host-cutover.md` and runs only after operator `LAUNCH`. Until then production stays on `ccaf.cyberskill.world`; apex `cyberskill.world` stays the agency site.
